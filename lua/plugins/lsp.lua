@@ -68,6 +68,13 @@ return {
         config = function()
             local lsp = require('lsp-zero').preset({})
 
+            lsp.set_sign_icons({
+                Error = '',
+                Warning = '',
+                Hint = '',
+                Information = '',
+            })
+
             lsp.ensure_installed({
                 'tsserver',
                 'eslint'

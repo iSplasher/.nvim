@@ -33,8 +33,8 @@ return {
         vim.b.copilot_suggestion_hidden = false
       end)
 
-      -- status line
-      local statusline = function()
+      -- status indicator
+      local indicator = function()
         local M = { init = false }
 
         local status = ''
@@ -63,7 +63,16 @@ return {
         return M
       end
 
-      local tabline = require('lualine').get_config
+      local copilot_status = indicator().get_status
+
+      -- add to lualine
+      local lualine_require = require("lualine_require")
+      local modules = lualine_require.lazy_require({ config_module = "lualine.config" })
+
+      local current_config = modules.config_module.get_config()
+      -- Edit here"
+      current_config.sections.lualine_x = { copilot_status, table.unpack(current_config.sections.lualine_x) }
+      require("lualine").setup(current_config)
 
     end
   },

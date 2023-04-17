@@ -10,7 +10,6 @@ local kmap = function(mode, keys, func, desc, opts)
 end
 
 
-
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -29,9 +28,6 @@ kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager")
 
 -- Makes cursor remain in the same place when joining lines
 -- vim.keymap.set("n", "J", "mzJ`z")
-
--- Keep cursor in the middle when jumping pages
-
 
 -- Keep cursor in the middle when jumping to search terms
 vim.keymap.set("n", "n", "nzzzv")
@@ -59,3 +55,14 @@ end, "[F]ormat current buffer")
 -- remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- provide hjkl movements in Insert mode and Command-line mode via the <Alt> modifier key
+vim.keymap.set('i', '<A-h>', '<Left>', { noremap = true })
+vim.keymap.set('i', '<A-j>', '<Down>', { noremap = true })
+vim.keymap.set('i', '<A-k>', '<Up>', { noremap = true })
+vim.keymap.set('i', '<A-l>', '<Right>', { noremap = true })
+
+-- word motion in insert mode
+vim.keymap.set('i', '<A-b>', '<C-o>b', { noremap = true })
+vim.keymap.set('i', '<A-w>', '<C-o>w', { noremap = true })
+vim.keymap.set('i', '<A-e>', '<C-o>e', { noremap = true })

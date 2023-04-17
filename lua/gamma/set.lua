@@ -37,8 +37,12 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 -- vim.opt.colorcolumn = "120"
 
---- misc
+-- Show a few lines of context around the cursor. Note that this makes the
+-- text scroll if you mouse-click near the start or end of the window.
 vim.opt.scrolloff = 5
+
+
+--- misc
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
