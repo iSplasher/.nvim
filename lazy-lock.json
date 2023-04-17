@@ -15,6 +15,7 @@
   "mason.nvim": { "branch": "main", "commit": "e24d594dc7dbe08305a881c8e7348d4d45445ffe" },
   "material": { "branch": "main", "commit": "18d5e8af4c4bc77382bda5e5ae2830ab515cf5c6" },
   "neodev.nvim": { "branch": "main", "commit": "f1550583dcb4270f8b1bb830faebe62494c1a189" },
+  "neoscroll.nvim": { "branch": "master", "commit": "d7601c26c8a183fa8994ed339e70c2d841253e93" },
   "neovim-session-manager": { "branch": "master", "commit": "d1883f30921193f3cff4537e27514e454e0331e9" },
   "nvim-cmp": { "branch": "main", "commit": "777450fd0ae289463a14481673e26246b5e38bf2" },
   "nvim-hlslens": { "branch": "main", "commit": "5e3e9088fba7508cee3612ee50b14dfdd3ab19af" },
