@@ -13,6 +13,8 @@ end
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+kmap("n", "<leader>h", vim.cmd.Dashboard, "Dashboard")
+
 local function open_project_tree()
   -- Set to cwd
   local api = require("nvim-tree.api")
