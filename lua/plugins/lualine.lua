@@ -43,7 +43,9 @@ return {
 
             local function word_count()
                 local counts = vim.fn['wordcount']()
-                return 'W: ' .. counts['words'] .. '｜' .. counts['chars']
+                local w = counts['visual_words'] or counts['words']
+                local c = counts['visual_chars'] or counts['chars']
+                return 'W: ' .. w .. '｜' .. c
             end
 
             ------------

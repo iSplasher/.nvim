@@ -35,12 +35,12 @@ kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
--- Copy-paste fixes
+-- Copy-paste fixes (the mc and `c are to preserve cursor position)
 vim.keymap.set("x", "p", "\"_dP")
 
-vim.keymap.set("n", "y", "\"+y")
-vim.keymap.set("v", "y", "\"+y")
-vim.keymap.set("n", "Y", "\"+Y")
+vim.keymap.set("n", "y", "mc\"+y`c")
+vim.keymap.set("v", "y", "mc\"+y`c")
+vim.keymap.set("n", "Y", "mc\"+Y`c")
 
 -- delete into void instead of overwriting previous paste
 vim.keymap.set("n", "d", "\"_d")
