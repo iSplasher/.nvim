@@ -142,7 +142,6 @@ return {
     {
         'junegunn/goyo.vim',
         config = function()
-            vim.keymap.set('n', "<leader>z", vim.cmd.Goyo, { desc = "Toggle [Z]en Mode" })
             vim.g.goyo_width = "80%"
             vim.g.goyo_height = "95%"
         end
@@ -154,6 +153,8 @@ return {
             require("zen-mode").setup {
                 width = .85
             }
+
+            vim.keymap.set('n', "<leader>z", vim.cmd.ZenMode, { desc = "Toggle [Z]en Mode" })
         end
     },
 
