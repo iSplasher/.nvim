@@ -1,4 +1,3 @@
-
 -- line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -39,7 +38,7 @@ vim.opt.termguicolors = true
 
 -- Show a few lines of context around the cursor. Note that this makes the
 -- text scroll if you mouse-click near the start or end of the window.
-vim.opt.scrolloff = 5
+vim.opt.scrolloff = 8
 
 
 --- misc
