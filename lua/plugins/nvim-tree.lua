@@ -1,7 +1,7 @@
 return {
     {
         'nvim-tree/nvim-tree.lua',
-        lazt = true,
+        lazy = true,
         dependencies = {
             'nvim-tree/nvim-web-devicons'
         },
@@ -59,6 +59,11 @@ return {
                 sort_by = function(nodes)
                     table.sort(nodes, natural_cmp)
                 end,
+                reload_on_bufenter = true,
+                update_focused_file = {
+                    enable = true,
+                    update_root = true,
+                },
                 filters = {
                     dotfiles = true
                 }

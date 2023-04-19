@@ -68,3 +68,9 @@ vim.keymap.set('i', '<A-l>', '<Right>', { noremap = true })
 vim.keymap.set('i', '<A-b>', '<C-o>b', { noremap = true })
 vim.keymap.set('i', '<A-w>', '<C-o>w', { noremap = true })
 vim.keymap.set('i', '<A-e>', '<C-o>e', { noremap = true })
+
+-- H and L to move to the beginning and end of the line
+vim.keymap.set('n', 'H', '^', { noremap = true })
+vim.keymap.set('v', 'H', '^', { noremap = true })
+vim.keymap.set('n', 'L', '$', { noremap = true })
+vim.keymap.set('v', 'L', '$', { noremap = true })

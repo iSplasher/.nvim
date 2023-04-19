@@ -40,16 +40,19 @@ return {
         local status = ''
         local setup = function()
           local api = require('copilot.api')
+          local spinners = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" }
           api.register_status_notification_handler(function(data)
-            -- customize your message however you want
+            local ms = vim.loop.hrtime() / 1000000
+            local frame = math.floor(ms / 120) % #spinners
+
             if data.status == 'Normal' then
-              status = 'Ready'
+              status = ''
             elseif data.status == 'InProgress' then
-              status = 'Pending'
+              status = ''
+              status = status .. spinners[frame + 1]
             else
-              status = data.status or 'Offline' -- might never actually be nil but just in case
+              status = ''
             end
-            status = 'Copilot: ' .. status
           end)
         end
 
@@ -73,7 +76,6 @@ return {
       -- Edit here"
       current_config.sections.lualine_x = { copilot_status, table.unpack(current_config.sections.lualine_x) }
       require("lualine").setup(current_config)
-
     end
   },
 }

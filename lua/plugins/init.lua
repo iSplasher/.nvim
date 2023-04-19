@@ -1,5 +1,12 @@
 return {
 
+    -- better format for hover
+    {
+        "Fildo7525/pretty_hover",
+        event = "LspAttach",
+        opts = {}
+    },
+
     -- Smooth scroll
     {
         'karb94/neoscroll.nvim',
