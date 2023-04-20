@@ -13,7 +13,9 @@ end
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-kmap("n", "<leader>h", vim.cmd.Dashboard, "Dashboard")
+if not vim.g.vscode then
+  kmap("n", "<leader>h", vim.cmd.Dashboard, "Dashboard")
+end
 
 local function open_project_tree()
   -- Set to cwd
@@ -24,9 +26,11 @@ local function open_project_tree()
   vim.cmd.NvimTreeToggle()
 end
 
-kmap("n", "<leader>pt", open_project_tree, "Project Tree")
+if not vim.g.vscode then
+  kmap("n", "<leader>pt", open_project_tree, "Project Tree")
+  kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager")
+end
 
-kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager")
 
 -- Makes cursor remain in the same place when joining lines
 -- vim.keymap.set("n", "J", "mzJ`z")
@@ -50,9 +54,11 @@ vim.keymap.set("v", "d", "\"_d")
 vim.keymap.set("n", "Q", "<nop>")
 
 -- format
-kmap("n", "<leader>=", function()
-  vim.lsp.buf.format()
-end, "[F]ormat current buffer")
+if not vim.g.vscode then
+  kmap("n", "<leader>=", function()
+    vim.lsp.buf.format()
+  end, "[F]ormat current buffer")
+end
 
 -- remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })

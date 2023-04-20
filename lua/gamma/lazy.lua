@@ -14,6 +14,34 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup("plugins", {
   checker = {
-    enabled = true
+    enabled = true,
+    notify = false,
+  },
+  change_detection = {
+    enabled = true,
+    notify = vim.g.vscode == nil
+  },
+  defaults = {
+    cond = function(plugin)
+      if vim.g.vscode then
+        -- list of plugin names that should not be disabled in vscode
+        local whitelist = {
+          "kevinhwang91/nvim-hlslens",
+          "tpope/vim-sleuth",
+          -- colorschemes
+          'gruvy',
+          'rktjmp/lush.nvim',
+          'lush.nvim',
+        }
+        for _, name in ipairs(whitelist) do
+          if plugin.name == name then
+            return true
+          end
+        end
+
+        return false
+      end
+      return true
+    end
   }
 })
