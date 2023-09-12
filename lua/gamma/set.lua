@@ -29,7 +29,11 @@ vim.opt.wrap = false
 vim.opt.clipboard = "unnamedplus"
 
 -- search & highlighting
-vim.opt.hlsearch = false
+if vim.g.vscode then
+  vim.opt.hlsearch = false
+else
+  vim.opt.hlsearch = true
+end
 vim.opt.incsearch = true
 
 -- colors

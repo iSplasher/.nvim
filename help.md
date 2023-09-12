@@ -1,3 +1,19 @@
+## General
+
+**Leader key**: ` ` (space)
+
+### Opening files
+
+- `:e <path>`: Open a file at `<path>`.
+- `pt`: Open tree view of pwd
+- `pf`: Open file finder
+
+### Saving and exiting
+
+- `:w`: Save the current file.
+- `:wq`: Save the current file and exit.
+- `:q!`: Discard changes and exit.
+- `:qa!`: Discard changes and exit all open windows.
 
 ### Movement
 
@@ -22,7 +38,8 @@
 - `o`: Begin a new line below the current line and enter insert mode.
 - `O`: Begin a new line above the current line and enter insert mode.
 - `r`: Replace the character under the cursor with the next character typed.
-- `x`: Delete the character under the cursor.
+- `x`: Cut the character under the cursor.
+- `X`: Cut the current line.
 - `dd`: Delete the current line.
 - `yy`: Copy the current line.
 - `p`: Paste the last deleted or copied text.
@@ -82,21 +99,16 @@
 - `<<`: Indent the current line one level to the left.
 - `==`: Auto-indent the current line.
 
-### Splitting windows
+### Windows `Ctrl + w`
 
-- `:split`: Split the current window horizontally.
-- `:vsplit`: Split the current window vertically.
+- `Ctrl + w + q`: Quit the current window.`
+- `Ctrl + w + s`: Split the current window horizontally.
+- `Ctrl + w + v`: Split the current window vertically.
 - `Ctrl + w + h`: Move the cursor to the window on the left.
 - `Ctrl + w + j`: Move the cursor to the window below.
 - `Ctrl + w + k`: Move the cursor to the window above.
 - `Ctrl + w + l`: Move the cursor to the window on the right.
 
-### Saving and exiting
-
-- `:w`: Save the current file.
-- `:wq`: Save the current file and exit.
-- `:q!`: Discard changes and exit.
-- `:qa!`: Discard changes and exit all open windows.
 
 ### Buffers
 
@@ -148,9 +160,22 @@
 - `'` + letter: Jump to the line containing the mark.
 - ```` + letter: Jump to the exact cursor position of the mark.
 
-### Surroundings
+## Plugins
+
+### vim-commentary -- Comment stuff out
+- `gcc`: Comment out the current line.
+- `gc`: Comment out the target of a motion command.
+
+### vim-surround -- All about surroundings
 
 - `cs` + old_char + new_char: Replace the surrounding character `old_char` with `new_char`.
 - `ds` + old_char: Delete the surrounding character `old_char`.
 - `ys` + motion + new_char: Add `new_char` as the new surrounding character around the selected text.
 - `yS` + old_char + new_char: Same as `ys` but the surrounding character is a newline.
+
+### session-manager
+
+- `:SessionManager load_session`: Load a session from a list.
+- `:SessionManager delete_session`: Delete a session from a list.
+
+

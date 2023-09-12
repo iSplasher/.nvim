@@ -27,6 +27,11 @@ return {
         vim.cmd('SessionManager load_current_dir_session')
       end
 
+      local function open_help()
+        -- open custom help file in config dir without changing pwd
+        vim.cmd('e ' .. vim.fn.stdpath('config') .. '/help.md')
+      end
+
       require('dashboard').setup {
         theme = 'hyper',
         config = {
@@ -54,6 +59,12 @@ return {
               group = 'Number',
               action = cd_to_config,
               key = 'c',
+            },
+            {
+              desc = '󰋗 Reference',
+              group = 'Number',
+              action = open_help,
+              key = '?',
             },
           },
         },

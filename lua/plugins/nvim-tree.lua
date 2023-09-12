@@ -19,6 +19,7 @@ return {
 
                 vim.keymap.set('n', '%', api.fs.create, opts('Create file'))
                 vim.keymap.set('n', 'D', api.fs.remove, opts('Delete'))
+                vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
             end
 
             -- Automatically open file upon creation

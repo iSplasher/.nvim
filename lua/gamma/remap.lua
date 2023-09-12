@@ -46,9 +46,12 @@ vim.keymap.set("n", "y", "mc\"+y`c")
 vim.keymap.set("v", "y", "mc\"+y`c")
 vim.keymap.set("n", "Y", "mc\"+Y`c")
 
--- delete into void instead of overwriting previous paste
+-- Delete into void instead of overwriting previous paste
 vim.keymap.set("n", "d", "\"_d")
 vim.keymap.set("v", "d", "\"_d")
+
+-- X to cut the current line
+vim.keymap.set('n', 'X', 'dd', { noremap = true })
 
 -- disable Q
 vim.keymap.set("n", "Q", "<nop>")
@@ -80,3 +83,6 @@ vim.keymap.set('n', 'H', '^', { noremap = true })
 vim.keymap.set('v', 'H', '^', { noremap = true })
 vim.keymap.set('n', 'L', '$', { noremap = true })
 vim.keymap.set('v', 'L', '$', { noremap = true })
+
+-- U to redo
+vim.keymap.set('n', 'U', '<C-r>', { noremap = true })
