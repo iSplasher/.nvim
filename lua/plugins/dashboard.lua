@@ -56,13 +56,23 @@ return {
               key = 'h',
             },
             {
-              desc = ' Config',
+              icon = ' ',
+              desc = 'Temp File',
+              group = 'Label',
+              action = '<leader>nt',
+              key = 't',
+            },
+            {
+              icon = ' ',
+              desc = 'Config',
               group = 'Number',
               action = cd_to_config,
               key = 'c',
             },
             {
-              desc = '󰋗 Reference',
+              -- a help icon
+              icon = ' ',
+              desc = 'Ref',
               group = 'Number',
               action = open_help,
               key = '?',

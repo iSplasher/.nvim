@@ -117,8 +117,6 @@ return {
             utility.kmap('n', "<leader>fc", vim.cmd.LeaderfCommand, "Find [C]ommand")
             utility.kmap('n', "<leader>fw", vim.cmd.LeaderfWindow, "Find [W]indow")
             utility.kmap('n', "<leader>fl", vim.cmd.LeaderfLine, "Find [L]ine")
-
-            utility.kmap('n', "<leader>bb", vim.cmd.LeaderfBuffer, "Find [B]uffer")
         end
     },
 

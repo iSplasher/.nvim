@@ -1,3 +1,5 @@
+local utility = require('gamma.utility')
+
 return {
     {
         'nvim-telescope/telescope.nvim',
@@ -17,20 +19,23 @@ return {
 
             local builtin = require('telescope.builtin')
 
-            vim.keymap.set('n', '<leader>/', function()
+            utility.kmap('n', '<leader>/', function()
                 -- You can pass additional configuration to telescope to change theme, layout, etc.
                 builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
                     winblend = 10,
                     previewer = false,
                 })
-            end, { desc = '[/] Fuzzily search in current buffer' })
+            end, '[/] Fuzzily search in current buffer')
 
 
-            vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
-            vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
-            vim.keymap.set('n', '<leader>ps', function()
+            utility.kmap('n', '<leader>pf', builtin.find_files, '[P]ick [F]ile')
+            utility.kmap('n', '<leader>gf', builtin.git_files, '[G]it [F]iles')
+            utility.kmap('n', '<leader>ps', function()
                 builtin.grep_string({ search = vim.fn.input("Grep > ") });
-            end)
+            end, '[G]rep in Files')
+            utility.kmap('n', '<leader>sg', '<leader>ps', '[G]rep in Files')
+
+            utility.kmap('n', '<leader>bf', builtin.buffers, '[F]ind [B]uffer')
         end
     },
 }
