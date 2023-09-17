@@ -12,6 +12,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local vscode = require('gamma/vscode')
+
 require('lazy').setup("plugins", {
   checker = {
     enabled = true,
@@ -23,17 +25,9 @@ require('lazy').setup("plugins", {
   },
   defaults = {
     cond = function(plugin)
+      -- When running in VSCode
       if vim.g.vscode then
-        -- list of plugin names that should not be disabled in vscode
-        local whitelist = {
-          "kevinhwang91/nvim-hlslens",
-          "tpope/vim-sleuth",
-          -- colorschemes
-          'gruvy',
-          'rktjmp/lush.nvim',
-          'lush.nvim',
-        }
-        for _, name in ipairs(whitelist) do
+        for _, name in ipairs(vscode.enabled) do
           if plugin.name == name then
             return true
           end

@@ -5,6 +5,9 @@ return {
         config = function()
             local cfg = require('lualine').get_config()
 
+            cfg.options.icons_enabled = true
+            cfg.extensions = { 'nvim-tree', 'lazy', 'fugitive' }
+
             -- Show the current keymap in the statusline
             local function keymap()
                 if vim.opt.iminsert:get() > 0 and vim.b.keymap_name then
@@ -50,7 +53,19 @@ return {
 
             ------------
 
-            cfg.sections.lualine_c = { custom_fname }
+            cfg.sections.lualine_c = {
+                '%=', -- centers file name
+                {
+                    custom_fname,
+                    path = 3,
+                    symbols = {
+                        modified = ' ',
+                        saved = ' ',
+                        unnamed = ' ',
+                        newfile = ' ',
+                    },
+                }
+            }
             cfg.sections.lualine_x = {
                 keymap,
                 'encoding',

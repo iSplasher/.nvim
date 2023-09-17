@@ -1,7 +1,9 @@
+local utility = require('gamma.utility')
+
 return {
     {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v2.x',
+        branch = 'v3.x',
         dependencies = {
             -- LSP Support
             { 'neovim/nvim-lspconfig' }, -- Required
@@ -21,52 +23,14 @@ return {
             { 'williamboman/mason-lspconfig.nvim' }, -- Optional
 
             -- Autocompletion
-            {
-                'hrsh7th/nvim-cmp',
-                config = function()
-                    local cmp = require("cmp")
-                    cmp.setup({
-                        mapping = {
-                            -- If nothing is selected (including preselections) add a newline as usual.
-                            -- If something has explicitly been selected by the user, select it.
-                            ["<Enter>"] = function(fallback)
-                                -- Don't block <CR> if signature help is active
-                                -- https://github.com/hrsh7th/cmp-nvim-lsp-signature-help/issues/13
-                                if not cmp.visible() or not cmp.get_selected_entry() or cmp.get_selected_entry().source.name == 'nvim_lsp_signature_help' then
-                                    fallback()
-                                else
-                                    cmp.confirm({
-                                        -- Replace word if completing in the middle of a word
-                                        -- https://github.com/hrsh7th/nvim-cmp/issues/664
-                                        behavior = cmp.ConfirmBehavior.Replace,
-                                        -- Don't select first item on CR if nothing was selected
-                                        select = false,
-                                    })
-                                end
-                            end,
-                            ["<Tab>"] = cmp.mapping(function(fallback)
-                                -- This little snippet will confirm with tab, and if no entry is selected, will confirm the first item
-                                if cmp.visible() then
-                                    local entry = cmp.get_selected_entry()
-                                    if not entry then
-                                        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-                                    else
-                                        cmp.confirm()
-                                    end
-                                else
-                                    fallback()
-                                end
-                            end, { "i", "s", "c", }),
-                        }
-                    })
-                end
-            },                          -- Required
-
+            { 'hrsh7th/nvim-cmp' },     -- Required
             { 'hrsh7th/cmp-nvim-lsp' }, -- Required
             { 'L3MON4D3/LuaSnip' },     -- Required
+
+            { 'onsails/lspkind.nvim' }
         },
         config = function()
-            local lsp = require('lsp-zero').preset({})
+            local lsp = require('lsp-zero')
 
             lsp.set_sign_icons({
                 Error = '',
@@ -75,10 +39,45 @@ return {
                 Information = '',
             })
 
-            lsp.ensure_installed({
-                'tsserver',
-                'eslint'
+            require('mason').setup({})
+            require('mason-lspconfig').setup({
+                ensure_installed = {
+                    'eslint',
+                    'diagnosticls',
+                    'marksman',
+                    'jsonls'
+                },
+                handlers = {
+                    lsp.default_setup,
+                    lua_ls = function()
+                        local lua_opts = lsp.nvim_lua_ls()
+                        require('lspconfig').lua_ls.setup(lua_opts)
+                    end,
+                }
             })
+
+            -- setup autocompletion
+            local cmp = require('cmp')
+            local cmp_format = lsp.cmp_format()
+            local lspkind = require('lspkind')
+            local lsp_cmp_format = lspkind.cmp_format({
+                menu = nil,
+                before = cmp_format.format,
+                symbol_map = {
+                    Copilot = "",
+                }
+            })
+
+            cmp.setup {
+                formatting = utility.merge_table(cmp_format, {
+                    format = lsp_cmp_format
+                }),
+                mapping = cmp.mapping.preset.insert({
+                    -- scroll up and down the documentation window
+                    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+                    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+                }),
+            }
 
             lsp.on_attach(function(client, bufnr)
                 -- NOTE: Remember that lua is a real programming language, and as such it is possible
@@ -121,10 +120,10 @@ return {
                 vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
                     vim.lsp.buf.format()
                 end, { desc = 'Format current buffer with LSP' })
-            end)
 
-            -- (Optional) Configure lua language server for neovim
-            require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
+                -- default mappings (won't override the ones we already set above)
+                lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
+            end)
 
             lsp.setup()
         end

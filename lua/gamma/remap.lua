@@ -1,14 +1,5 @@
-table.unpack = table.unpack or unpack -- Lua 5.1 compatibility
-
-local kmap = function(mode, keys, func, desc, opts)
-  opts = opts or {}
-  if desc then
-    desc = '>: ' .. desc
-  end
-
-  vim.keymap.set(mode, keys, func, { desc = desc, table.unpack(opts) })
-end
-
+require('compat')
+local kmap = require('gamma.utility').kmap
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -16,6 +7,7 @@ vim.g.maplocalleader = " "
 if not vim.g.vscode then
   kmap("n", "<leader>h", vim.cmd.Dashboard, "Dashboard")
 end
+
 
 local function open_project_tree()
   -- Set to cwd
@@ -30,7 +22,6 @@ if not vim.g.vscode then
   kmap("n", "<leader>pt", open_project_tree, "Project Tree")
   kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager")
 end
-
 
 -- Makes cursor remain in the same place when joining lines
 -- vim.keymap.set("n", "J", "mzJ`z")
@@ -63,6 +54,12 @@ if not vim.g.vscode then
   end, "[F]ormat current buffer")
 end
 
+-- refresh/reload buffers
+kmap("n", "<F5>", function()
+  vim.cmd("checktime")
+  vim.cmd("edit")
+end, "[R]eload current buffer")
+
 -- remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -86,3 +83,12 @@ vim.keymap.set('v', 'L', '$', { noremap = true })
 
 -- U to redo
 vim.keymap.set('n', 'U', '<C-r>', { noremap = true })
+
+-- buffers
+kmap("n", "<leader>bb", vim.cmd.Buffers, "[B]uffers", { noremap = true })
+kmap("n", "<leader>bd", vim.cmd.Bdelete, "[B]uffer [D]elete")
+kmap("n", "<leader>bn", vim.cmd.Bnext, "[B]uffer [N]ext")
+kmap("n", "<leader>bp", vim.cmd.Bprevious, "[B]uffer [P]revious")
+kmap("n", "<leader>bl", vim.cmd.Blast, "[B]uffer [L]ast")
+kmap("n", "<leader>bs", vim.cmd.Bstart, "[B]uffer [S]tart")
+kmap("n", "<leader>bw", vim.cmd.Bwipeout, "[B]uffer [W]ipeout")

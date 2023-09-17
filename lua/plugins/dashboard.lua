@@ -2,6 +2,7 @@ return {
   {
     'glepnir/dashboard-nvim',
     event = 'VimEnter',
+    priority = 100,
     config = function()
       local header = {
         '',
@@ -39,7 +40,7 @@ return {
           shortcut = {
             { desc = '󱑒 Last Session', group = 'DiagnosticOk', action = 'SessionManager load_last_session', key = 'r' },
             { desc = '󱑒 Sessions',     group = 'Title',        action = 'SessionManager load_session',      key = 's' },
-            { desc = ' Update',        group = '@property',    action = 'Lazy update',                      key = 'u' },
+            { desc = ' Lazy',          group = '@property',    action = 'Lazy',                             key = 'l' },
             {
               icon = ' ',
               icon_hl = '@variable',

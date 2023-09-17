@@ -1,4 +1,15 @@
+local utility = require('gamma.utility')
+
 return {
+
+    -- snippets
+    {
+        "L3MON4D3/LuaSnip",
+        -- follow latest release.
+        version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+        -- install jsregexp (optional!).
+        build = "make install_jsregexp"
+    },
 
     -- better format for hover
     {
@@ -84,41 +95,31 @@ return {
     },
 
     {
-        "zbirenbaum/copilot.lua",
-        lazy = true,
-        cmd = 'Copilot',
-        event = 'InsertEnter',
-        config = function()
-            require('copilot').setup {
-                suggestion = {
-                    auto_trigger = true
-                },
-                panel = {
-                    auto_refresh = true,
-                },
-                filetypes = {
-                    yaml = true,
-                    markdown = true,
-                    ["."] = true
-                },
-            }
-
-
-            local cmp = require("cmp")
-
-            cmp.event:on("menu_opened", function()
-                vim.b.copilot_suggestion_hidden = true
-            end)
-
-            cmp.event:on("menu_closed", function()
-                vim.b.copilot_suggestion_hidden = false
-            end)
-        end
-    },
-
-    {
         'Yggdroot/LeaderF',
-        build = ':LeaderfInstallCExtension'
+        build = ':LeaderfInstallCExtension',
+        init = function()
+            -- these break the plugin for some reason
+            -- vim.g.Lf_ShortcutF = ''
+            -- vim.g.Lf_ShortcutB = ''
+            -- vim.g.Lf_WindowPosition = 'popup'
+            -- vim.g.Lf_CommandMap = { ['<C-K>'] = '<Up>',['<C-J>'] = '<Down>' }
+        end,
+        config = function()
+            utility.kmap('n', "<leader>f", '<nop>')
+            utility.kmap('n', "<leader>b", '<nop>')
+
+            utility.kmap('n', "<leader>ff", vim.cmd.LeaderfFile, "Find [F]ile")
+            utility.kmap('n', "<leader>fb", vim.cmd.LeaderfBuffer, "Find [B]uffer")
+            utility.kmap('n', "<leader>fh", vim.cmd.LeaderfHelp, "Find [H]elp")
+            utility.kmap('n', "<leader>fm", vim.cmd.LeaderfMru, "Find [M]ost [R]ecently [U]sed")
+            utility.kmap('n', "<leader>fs", vim.cmd.LeaderfGTagsSymbol, "Find [S]ymbol")
+            utility.kmap('n', "<leader>f#", vim.cmd.LeaderfRgInteractive, "Find Interactive")
+            utility.kmap('n', "<leader>fc", vim.cmd.LeaderfCommand, "Find [C]ommand")
+            utility.kmap('n', "<leader>fw", vim.cmd.LeaderfWindow, "Find [W]indow")
+            utility.kmap('n', "<leader>fl", vim.cmd.LeaderfLine, "Find [L]ine")
+
+            utility.kmap('n', "<leader>bb", vim.cmd.LeaderfBuffer, "Find [B]uffer")
+        end
     },
 
     {
@@ -163,7 +164,7 @@ return {
                 width = .85
             }
 
-            vim.keymap.set('n', "<leader>z", vim.cmd.ZenMode, { desc = "Toggle [Z]en Mode" })
+            utility.kmap('n', "<leader>z", vim.cmd.ZenMode, "Toggle [Z]en Mode")
         end
     },
 
@@ -187,10 +188,43 @@ return {
                 autocmds = {
                     enableOnVimEnter = true,
                     enableOnTabEnter = true
+                },
+                buffers = {
+                    setNames = true,
+                    scratchPad = {
+                        enable = false,
+                        fileName = 'Scratch Pad',
+                    },
                 }
+
             }
         end
     },
+
+    -- Temp files/buffers
+    {
+        'm-demare/attempt.nvim',
+        dependencies = {
+            { 'nvim-lua/plenary.nvim' }
+        },
+        config = function()
+            local attempt = require('attempt')
+
+
+            attempt.setup {
+                autosave = true,
+                list_buffers = true,
+                ext_options = { 'lua', 'js', 'py', 'cpp', 'c', 'txt', '' }
+            }
+
+            require('telescope').load_extension 'attempt'
+
+            utility.kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)")
+            utility.kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)")
+            utility.kmap('n', "<leader>ft", 'Telescope attempt', "Find [T]emp files")
+        end
+    },
+
 
     -- Collab
 

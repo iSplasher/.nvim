@@ -2,6 +2,21 @@
 
 **Leader key**: ` ` (space)
 
+| Notation | Meaning |
+| -------- | ------- |
+|`<C-…>` | control-key |
+| `<M-…>` | alt-key or meta-key |
+|`<A-…>` | same as <M-…> |
+| `<T-…>` | meta-key when it's not alt |
+| `<D-…>` | command-key or "super" key |
+
+#### Running commands
+
+- `:command`: Run a command.
+- `:help [command/<key>]`: Open the help window. [command/<key>] is
+  optional, but can be any command or key combination, e.g. `:help
+  <ctrl-r>`].
+
 ### Opening files
 
 - `:e <path>`: Open a file at `<path>`.
@@ -113,9 +128,10 @@
 ### Buffers
 
 - `:ls`: List all open buffers.
-- `:bnext`: Move to the next buffer.
-- `:bprevious`: Move to the previous buffer.
-- `:bdelete`: Delete the current buffer.
+- `:bn[ext]`: Move to the next buffer.
+- `:bp[revious]`: Move to the previous buffer.
+- `:bd[elete]`: Delete the current buffer.
+- `:b[uffer] <N>`: Open the buffer with number `<N>`
 
 ### Macros
 

@@ -1,3 +1,7 @@
+-- leader key
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
+
 -- line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -44,10 +48,34 @@ vim.opt.termguicolors = true
 -- text scroll if you mouse-click near the start or end of the window.
 vim.opt.scrolloff = 8
 
+-- Show special characters like newlines, tabs, etc.
+vim.opt.list = true
+vim.opt.showbreak = "↪ "
+vim.opt.listchars = {
+  tab = "» ",
+  trail = "·",
+  extends = "⟩",
+  precedes = "⟨",
+  nbsp = "␣",
+  eol = "↲"
+}
+
+-- Auto reload file if changed outside of vim
+vim.opt.autoread = true
 
 --- misc
 vim.opt.signcolumn = "yes"
+
+--
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
-vim.g.mapleader = " "
+
+
+-- neovide
+if vim.g.neovide then
+  vim.g.neovide_transparency = 0.8
+  vim.g.neovide_floating_blur_amount_x = 2.0
+  vim.g.neovide_floating_blur_amount_y = 2.0
+  vim.g.neovide_remember_window_size = true
+end
