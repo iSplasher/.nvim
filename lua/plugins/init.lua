@@ -39,17 +39,6 @@ return {
         end
     },
 
-    -- Add indentation guides even on blank lines
-    {
-        'lukas-reineke/indent-blankline.nvim',
-        -- Enable `lukas-reineke/indent-blankline.nvim`
-        -- See `:help indent_blankline.txt`
-        opts = {
-            char = '|',
-            show_trailing_blankline_indent = false,
-        },
-    },
-
     -- Writing
     'preservim/vim-pencil',
 
@@ -60,6 +49,7 @@ return {
     -- Git related
     'tpope/vim-fugitive',
     'tpope/vim-rhubarb',
+    'lewis6991/gitsigns.nvim',
 
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
@@ -219,7 +209,7 @@ return {
 
             utility.kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)")
             utility.kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)")
-            utility.kmap('n', "<leader>ft", 'Telescope attempt', "Find [T]emp files")
+            utility.kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files")
         end
     },
 

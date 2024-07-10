@@ -1,11 +1,20 @@
 require('compat')
-local kmap = require('gamma.utility').kmap
+local utility = require('gamma.utility')
+
+-- Load all remaps
+utility.require_dir("gamma/remap/leader", true)
+
+local kmap = utility.kmap
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 if not vim.g.vscode then
   kmap("n", "<leader>h", vim.cmd.Dashboard, "Dashboard")
+end
+
+if not vim.g.vscode then
+  kmap("n", "<leader>er", utility.cmd("file"), "Rename file")
 end
 
 
@@ -85,10 +94,10 @@ vim.keymap.set('v', 'L', '$', { noremap = true })
 vim.keymap.set('n', 'U', '<C-r>', { noremap = true })
 
 -- buffers
-kmap("n", "<leader>bb", vim.cmd.Buffers, "[B]uffers", { noremap = true })
-kmap("n", "<leader>bd", vim.cmd.Bdelete, "[B]uffer [D]elete")
-kmap("n", "<leader>bn", vim.cmd.Bnext, "[B]uffer [N]ext")
-kmap("n", "<leader>bp", vim.cmd.Bprevious, "[B]uffer [P]revious")
-kmap("n", "<leader>bl", vim.cmd.Blast, "[B]uffer [L]ast")
-kmap("n", "<leader>bs", vim.cmd.Bstart, "[B]uffer [S]tart")
-kmap("n", "<leader>bw", vim.cmd.Bwipeout, "[B]uffer [W]ipeout")
+kmap("n", "<leader>bb", vim.cmd.buffers, "[B]uffers")
+kmap("n", "<leader>bd", vim.cmd.bdelete, "[B]uffer [D]elete")
+kmap("n", "<leader>bn", vim.cmd.bnext, "[B]uffer [N]ext")
+kmap("n", "<leader>bp", vim.cmd.bprevious, "[B]uffer [P]revious")
+kmap("n", "<leader>bl", vim.cmd.blast, "[B]uffer [L]ast")
+kmap("n", "<leader>bs", vim.cmd.bstart, "[B]uffer [S]tart")
+kmap("n", "<leader>bw", vim.cmd.bwipeout, "[B]uffer [W]ipeout")

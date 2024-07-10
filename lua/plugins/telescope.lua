@@ -30,10 +30,12 @@ return {
 
             utility.kmap('n', '<leader>pf', builtin.find_files, '[P]ick [F]ile')
             utility.kmap('n', '<leader>gf', builtin.git_files, '[G]it [F]iles')
-            utility.kmap('n', '<leader>ps', function()
+
+            local grep_search = function()
                 builtin.grep_string({ search = vim.fn.input("Grep > ") });
-            end, '[G]rep in Files')
-            utility.kmap('n', '<leader>sg', '<leader>ps', '[G]rep in Files')
+            end
+            utility.kmap('n', '<leader>ps', grep_search, '[G]rep in Files')
+            utility.kmap('n', '<leader>sg', grep_search, '[G]rep in Files', { remap = true })
 
             utility.kmap('n', '<leader>bf', builtin.buffers, '[F]ind [B]uffer')
         end

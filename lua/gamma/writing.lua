@@ -1,12 +1,12 @@
-local group = vim.api.nvim_create_augroup("Writing Settings", { clear = true })
+local M = {}
 
-vim.api.nvim_create_autocmd("BufEnter", {
-    pattern = { "*.md" },
-    group = group,
-    command = 'Pencil'
-})
+M.group = vim.api.nvim_create_augroup("Writing Settings", { clear = true })
 
--- Auto save
-vim.api.nvim_create_autocmd({ 'FocusLost' }, {
-    command = 'silent! wa'
-})
+if not vim.g.vccode then
+    -- Auto save
+    vim.api.nvim_create_autocmd({ 'FocusLost' }, {
+        command = 'silent! wa'
+    })
+end
+
+return M

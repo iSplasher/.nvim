@@ -7,7 +7,6 @@ local enabled = {
   "tpope/vim-sleuth",
   'tpope/vim-commentary',
   'unblevable/quick-scope',
-
 }
 
 return {

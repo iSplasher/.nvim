@@ -24,6 +24,7 @@ require('lazy').setup("plugins", {
     notify = vim.g.vscode == nil
   },
   defaults = {
+    version = "*", -- by default, only install stable versions
     cond = function(plugin)
       -- When running in VSCode
       if vim.g.vscode then

@@ -1,12 +1,23 @@
 local utility = require('gamma.utility')
 
+local ensure_installed = {
+    'eslint',
+    'diagnosticls',
+    'marksman',
+    'jsonls'
+}
+
 return {
     {
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v3.x',
+        version = false,
         dependencies = {
             -- LSP Support
-            { 'neovim/nvim-lspconfig' }, -- Required
+            {
+                'neovim/nvim-lspconfig',
+                version = false,
+            }, -- Required
             {
                 'folke/neodev.nvim',
                 config = function()
@@ -16,11 +27,15 @@ return {
             {
                 -- Optional
                 'williamboman/mason.nvim',
+                version = false,
                 build = function()
                     pcall(vim.cmd, 'MasonUpdate')
                 end
             },
-            { 'williamboman/mason-lspconfig.nvim' }, -- Optional
+            {
+                'williamboman/mason-lspconfig.nvim',
+                version = false,
+            }, -- Optional
 
             -- Autocompletion
             { 'hrsh7th/nvim-cmp' },     -- Required
@@ -41,12 +56,7 @@ return {
 
             require('mason').setup({})
             require('mason-lspconfig').setup({
-                ensure_installed = {
-                    'eslint',
-                    'diagnosticls',
-                    'marksman',
-                    'jsonls'
-                },
+                ensure_installed = ensure_installed,
                 handlers = {
                     lsp.default_setup,
                     lua_ls = function()

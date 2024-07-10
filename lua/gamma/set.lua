@@ -1,3 +1,6 @@
+-- theme
+vim.g.colors_name = "gruvy"
+
 -- leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","

@@ -1,15 +1,16 @@
 function ColorMyPencils(color)
-	color = color or 'gruvy'
 	vim.cmd.colorscheme(color)
-	vim.g.material_style = "deep ocean"
+	-- vim.g.material_style = "deep ocean"
 
-	-- Transparent background
-	-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+	-- other plugins use this variable to determine colorscheme
+	vim.g.colors_name = color
 end
 
 if vim.g.vscode then
 	return
 end
 
-ColorMyPencils('gruvy')
+if not vim.g.colors_name then
+	error("No colorscheme set (vim.g.colors_name is empty).")
+end
+ColorMyPencils(vim.g.colors_name)
