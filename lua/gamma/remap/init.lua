@@ -10,19 +10,19 @@ local kmap = utility.kmap
 -- kmap("n", "J", "mzJ`z")
 
 -- Keep cursor in the middle when jumping to search terms
-kmap("n", "n", "nzzzv", {remap = true})
-kmap("n", "N", "Nzzzv", {remap = true})
+kmap("n", "n", "nzzzv", { remap = true })
+kmap("n", "N", "Nzzzv", { remap = true })
 
 -- Copy-paste fixes (the mc and `c are to preserve cursor position)
-kmap("x", "p", "\"_dP", {remap = true})
+kmap("x", "p", "\"_dP", { remap = true })
 
-kmap("n", "y", "mc\"+y`c", {remap = true})
-kmap("v", "y", "mc\"+y`c", {remap = true})
-kmap("n", "Y", "mc\"+Y`c", {remap = true})
+kmap("n", "y", "mc\"+y`c", { remap = true })
+kmap("v", "y", "mc\"+y`c", { remap = true })
+kmap("n", "Y", "mc\"+Y`c", { remap = true })
 
 -- Delete into void instead of overwriting previous paste
-kmap("n", "d", "\"_d", {remap = true})
-kmap("v", "d", "\"_d", {remap = true})
+kmap("n", "d", "\"_d", { remap = true })
+kmap("v", "d", "\"_d", { remap = true })
 
 -- X to cut the current line
 kmap('n', 'X', 'dd', { noremap = true })
@@ -44,8 +44,8 @@ kmap("n", "<F5>", function()
 end, "[R]eload current buffer")
 
 -- remap for dealing with word wrap
-kmap('n', 'k', "v:count == 0 ? 'gk' : 'k'", { remap = true, expr = true, silent = true })
-kmap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { remap = true, expr = true, silent = true })
+-- kmap('n', 'k', "v:count == 0 ? 'gk' : 'k'", { remap = true, expr = true, silent = true })
+-- kmap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { remap = true, expr = true, silent = true })
 
 -- provide hjkl movements in Insert mode and Command-line mode via the <Alt> modifier key
 kmap('i', '<A-h>', '<Left>', { noremap = true })

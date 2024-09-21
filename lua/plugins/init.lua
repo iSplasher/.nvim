@@ -68,42 +68,8 @@ return {
     },
 
 
-    -- Classics
 
-    -- 'machakann/vim-sandwich',
-    -- 'tpope/vim-surround',
-    'tpope/vim-commentary',
-    {
-        'unblevable/quick-scope',
-        lazy = false,
-        init = function()
-            vim.g.qs_highlight_on_keys = { 'f', 'F', 't', 'T' }
-            vim.g.qs_buftype_blacklist = { 'terminal', 'nofile' }
-            vim.g.qs_filetype_blacklist = { 'help', 'terminal', 'dashboard' }
-
-            if vim.g.vscode then
-                -- set highlighting groups
-                vim.cmd("highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline")
-                vim.cmd("highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline")
-            end
-        end
-    },
-    {
-        'andymass/vim-matchup',
-        event = 'CursorMoved',
-        config = function()
-            vim.g.matchup_matchparen_offscreen = { method = 'popup' }
-
-            if package.loaded['nvim-treesitter'] then
-                require('nvim-treesitter.configs').setup {
-                    matchup = {
-                        enable = true,
-                    }
-                }
-            end
-        end
-
-    },
+  
     -- Session
     {
         'Shatur/neovim-session-manager',
