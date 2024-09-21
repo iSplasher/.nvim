@@ -1,9 +1,9 @@
 -- theme
 vim.g.colors_name = "gruvy"
 
--- leader key
+-- Set leader key to space
 vim.g.mapleader = " "
-vim.g.maplocalleader = ","
+vim.g.maplocalleader = " "
 
 -- line numbers
 vim.opt.nu = true
@@ -77,8 +77,14 @@ vim.opt.updatetime = 50
 
 -- neovide
 if vim.g.neovide then
+  vim.g.neovide_scale_factor = 1.0
+  vim.g.neovide_window_blurred = true
   vim.g.neovide_transparency = 0.8
   vim.g.neovide_floating_blur_amount_x = 2.0
   vim.g.neovide_floating_blur_amount_y = 2.0
   vim.g.neovide_remember_window_size = true
+  vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_cursor_antialiasing = true
+  vim.g.neovide_cursor_smooth_blink = true
+  vim.g.neovide_detach_on_quit = 'always_quit'
 end

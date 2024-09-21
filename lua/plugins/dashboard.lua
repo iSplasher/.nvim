@@ -1,7 +1,10 @@
+local temp = require('gamma.commands.temp')
+
 return {
   {
     'glepnir/dashboard-nvim',
     event = 'VimEnter',
+    
     priority = 100,
     config = function()
       local header = {
@@ -35,6 +38,7 @@ return {
 
       require('dashboard').setup {
         theme = 'hyper',
+        disable_move = true,
         config = {
           header = header,
           shortcut = {
@@ -59,7 +63,7 @@ return {
               icon = ' ',
               desc = 'Temp File',
               group = 'Label',
-              action = '<leader>nt',
+              action = temp.new_temp_file,
               key = 't',
             },
             {

@@ -1,9 +1,12 @@
 local exclude = {
   "help",
+  "man",
   "alpha",
   "dashboard",
   "neo-tree",
   "Trouble",
+  "lspinfo",
+  "checkhealth",
   "lazy",
   "lsp-installer",
   "termianl",
@@ -12,21 +15,28 @@ local exclude = {
   "notify",
   "toggleterm",
   "lazyterm",
+  "TelescopePrompt",
+  "TelescopeResults",
+  "gitcommit"
 }
 
 return {
   -- Add indentation guides even on blank lines
   {
     'lukas-reineke/indent-blankline.nvim',
+    main = "ibl",
     -- See `:help indent_blankline.txt`
     event = { "BufReadPre", "BufNewFile" },
     config = function()
-      local indent_blankline = require("indent_blankline")
+      local indent_blankline = require("ibl")
       indent_blankline.setup {
-        char = '│',
-        show_trailing_blankline_indent = false,
-        use_treesitter = true,
-        filetype_exclude = exclude,
+        indent = { char = '│' },
+        whitespace = {
+          remove_blankline_trail = true
+        },
+        exclude = {
+          filetypes = exclude,
+        }
       }
     end
   },
@@ -37,6 +47,7 @@ return {
   {
     "echasnovski/mini.indentscope",
     lazy = true,
+    
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       symbol = "╎",

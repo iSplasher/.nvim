@@ -67,37 +67,99 @@ function M.merge_table(a, b)
 end
 
 ---Set a keymap.
----@param mode string @The mode to set the keymap for.
+---@param mode string | table @The mode to set the keymap for.
 ---@param keys string @The keys to set the keymap for.
----@param func string | function @The function to set the keymap for.
----@param desc string | nil @The description to set the keymap for.
+---@param command string | function @The command to set the keymap for.
+---@param desc_or_opts string | table | nil @The description to set the keymap for.
 ---@param opts table | nil @The options to set the keymap for.
-function M.kmap(mode, keys, func, desc, opts)
+---@param opts.noremap boolean | nil @Only remap the keymap if it does not already exist.
+---@param opts.remap boolean | nil @Remap if the keymap already exists. (default: true if noremap is not set)
+---@param opts.silent boolean | nil @Do not echo the command to the command-line.
+---@param opts.expr boolean | nil @Evaluate the given command as an expression to obtain the final map resut.
+---@param opts.nowait boolean | nil @Do not wait for other keymaps after this one.
+---@param opts.cmd boolean | nil @Execute the given command directly when invoked.
+---@param opts.script boolean | nil @Only remap characters that were defined local to a script.
+---@param opts.unique boolean | nil @Do not override a keymap if it already exists.
+---@param opts.buffer boolean | number | nil @Set the keymap for the current buffer only.
+---@param opts.local boolean | nil @Set the keymap for the current buffer only.
+---@note This is a wrapper around `vim.keymap.set` that provides a more user-friendly interface.
+---@example
+---- -- Map to a Lua function:
+---- kmap('n', 'lhs', function() print("real lua function") end, "description", { noremap = true })
+---- -- Map to multiple modes:
+---- kmap({'n', 'v'}, '<leader>lr', vim.lsp.buf.references, "description", { buffer = true })
+---- -- Buffer-local mapping:
+---- kmap('n', '<leader>w', "<cmd>w<cr>", "description", { silent = true, buffer = 5 })
+---- -- Expr mapping:
+---- kmap('i', '<Tab>', function()
+----   return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+---- end, "description", { expr = true })
+---- -- <Plug> mapping:
+---- kmap('n', '[%%', '<Plug>(MatchitNormalMultiBackward)', "description",)
+function M.kmap(mode, keys, command, desc_or_opts, opts)
+  -- if desc_or_opts is not a string, then its opts
+  local desc = nil
+  if opts == nil and type(desc_or_opts) == 'table' then
+    opts = desc_or_opts
+  elseif type(desc_or_opts) == 'string' then
+    desc = desc_or_opts
+  elseif type(desc_or_opts) == 'table' then
+    error("kmap -- desc_or_opts can't be a table when opts is not nil")
+  elseif desc_or_opts ~= nil then
+    M.print_error(desc_or_opts)
+    error("kmap -- desc_or_opts must be a string or table")
+  end
+
   opts = opts or {}
+
   if desc then
     desc = '' .. desc
   end
 
   if opts.noremap == nil and opts.remap == nil then
-    opts.remap = true
+    -- check if already mapped
+    local map_exists = vim.fn.mapcheck(keys, mode)
+
+    if map_exists == "" then
+      opts.remap = true
+    else
+      M.print_error({ keys = keys, mode = mode, command = command, desc = desc})
+      error("WARNING: Keymap already exists (use { [no]remap = true } or to disable this warning)")
+    end
+
   end
 
-  vim.keymap.set(mode, keys, func, { desc = desc, table.unpack(opts) })
+  vim.keymap.set(mode, keys, command, { desc = desc, table.unpack(opts) })
 end
 
 ---Get the current operating system.
 ---@return string @The current operating system. (macos, linux, windows)
 function M.get_os()
   local os_name = vim.loop.os_uname().sysname
-  if os_name == "Darwin" then
+  if os_name:match("Darwin") then
     return "macos"
-  elseif os_name == "Linux" then
+  elseif os_name:match("Linux") then
     return "linux"
-  elseif os_name == "Windows" then
+  elseif os_name:match("Windows") then
     return "windows"
   else
     return os_name
   end
+end
+
+---True if the current operating system is macOS.
+function M.is_macos()
+  return M.get_os() == "macos"
+end
+
+---True if the current operating system is Linux.
+function M.is_linux()
+  return M.get_os() == "linux"
+end
+
+---True if the current operating system is Windows.
+function M.is_windows()
+  return M.get_os() == "windows"
 end
 
 ---Create a callable that will run a command.
@@ -128,15 +190,22 @@ end
 function M.config_path()
   local p = debug.getinfo(1, "S").source:sub(2)
   -- go up directories
-  p = p:gsub("lua/gamma/utility.lua", "")
-  p = p:gsub("lua\\gamma\\utility.lua", "")
+  p = p:gsub("lua/gamma/utility/init.lua", "")
+  p = p:gsub("lua\\gamma\\utility/init.lua", "")
   return p
 end
 
 ---A better require, that supports recursive require of directories.
 ---@param path string @The path to require. Can also be a directory.
 ---@param recursive boolean | nil @Whether or not to require all files in the directory.
-function M.require_dir(path, recursive)
+---@param allow_empty boolean | nil @Whether or not to allow empty directories.
+function M.require_dir(path, recursive, allow_empty)
+  allow_empty = allow_empty or false
+
+  local import_path = path
+  import_path = string.gsub(import_path, "/", ".")
+  import_path = string.gsub(import_path, "\\", ".")
+
   recursive = recursive or false
   -- check if path starts with ./ or ../ or .\ or ..\
 
@@ -149,8 +218,7 @@ function M.require_dir(path, recursive)
 
 
   local dir = M.config_path()
-
-  M.print("dir:" .. dir)
+  dir = vim.fn.fnamemodify(dir, ":p")
 
   -- if all of rel are false, check if a lua require path, e.g. mode.path.file and resolve to file instead
 
@@ -161,6 +229,12 @@ function M.require_dir(path, recursive)
     if path:match(require_pattern) then
       path = path:gsub("%.", "/") -- Replace dots with slashes
     end
+  end
+
+  
+  -- if dir doesn't start with 'lua/', then add it
+  if not string.match(dir, "/lua$") and not string.match(path, "\\lua$") then
+    dir = dir .. "/lua"
   end
 
   if rel.dot_slash then
@@ -175,16 +249,24 @@ function M.require_dir(path, recursive)
   elseif rel.dot_dot_back_slash then
     path = string.gsub(path, "^%.%.\\", "")
     path = dir .. "\\..\\" .. path
+  else
+    path = dir .. "/" .. path
   end
 
 
   -- resolve path
   path = vim.fn.fnamemodify(path, ":p")
 
-  M.print("resolved path" .. path)
+  -- Switch backslashes to forward slashes
+  path = string.gsub(path, "\\", "/")
+  -- Remove trailing slash
+  path = string.gsub(path, "/$", "")
 
   -- if is directory
   if vim.fn.isdirectory(path) == 1 then
+    -- remove config dir from path
+    path = string.gsub(path, dir, "")
+
     -- if recursive
     if recursive then
       -- require all files in directory
@@ -194,14 +276,15 @@ function M.require_dir(path, recursive)
         local file_path = path .. "/" .. file
         if file_path:match("%.lua$") then
           if vim.fn.filereadable(file_path) == 1 then
-            require(file_path:gsub("%.lua$", ""))
+            local import_file_path = import_path .. "." .. file:gsub("%.lua$", "")
+            require(import_file_path)
             req = true
           else
             error("require_dir -- File not readable: " .. file_path)
           end
         end
       end
-      if not req then
+      if not req and not allow_empty then
         error("require_dir -- No lua files found in directory: " .. path)
       end
     else
@@ -230,13 +313,69 @@ end
 ---@param endstr string | nil @The string to print at the end. (default: "\n")
 function M.print(obj, endstr)
   endstr = endstr or "\n"
-  vim.api.nvim_out_write(vim.inspect(obj) .. endstr)
+  if vim.g.vscode then
+    print(vim.inspect(obj) .. endstr)
+  else
+    vim.api.nvim_out_write(vim.inspect(obj) .. endstr)
+  end
 end
 
 ---A helper function to print error messages to the console.
 ---@param obj any @The object to print.
 function M.print_error(obj)
-  vim.api.nvim_err_writeln(vim.inspect(obj))
+  if vim.g.vscode then
+    print(vim.inspect(obj))
+  else
+    vim.api.nvim_err_writeln(vim.inspect(obj))
+  end
+end
+
+
+---Execute shell commands.
+---@param cmd string @The command to execute.
+---@param opts table | nil @The options to execute the command with.
+---@param opts.async boolean | nil @Whether or not to execute the command asynchronously.
+---@param opts.cwd string | nil @The current working directory to execute the command in.
+---@param opts.env table | nil @The environment variables to execute the command with.
+---@param opts.timeout number | nil @The timeout to execute the command with.
+---@param opts.input string | nil @The input to execute the command with.
+---@param opts.silent boolean | nil @Whether or not to execute the command silently.
+---@param opts.on_exit function | nil @The function to execute when the command exits.
+---@return table @{ code = 0, signal = 0, stdout = 'hello', stderr = '' }
+function M.shell(cmd, opts)
+  opts = opts or {}
+  local async = opts.async or false
+  opts.async = nil
+  local on_exit = opts.on_exit or nil
+  opts.on_exit = nil
+  if opts.text == nil then
+    opts.text = true
+  end
+  local silent = opts.silent
+  opts.silent = nil
+  if silent == nil then
+    silent = true
+  end
+
+  function _on_exit(obj)
+    if not silent then
+      if obj.code == 0 then
+        M.print(obj.stdout)
+      else
+        M.print_error(obj.stderr)
+      end
+    end
+
+    if on_exit then
+      on_exit(obj)
+    end
+  end
+
+  if async then
+    return vim.system(cmd, opts, _on_exit)
+  else
+    return vim.system(cmd, opts, _on_exit):wait()
+  end
 end
 
 return M

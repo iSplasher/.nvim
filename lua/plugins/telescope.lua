@@ -3,6 +3,7 @@ local utility = require('gamma.utility')
 return {
     {
         'nvim-telescope/telescope.nvim',
+        
         branch = '0.1.x',
         -- or                            , branch = '0.1.x',
         dependencies = {
@@ -37,7 +38,8 @@ return {
             utility.kmap('n', '<leader>ps', grep_search, '[G]rep in Files')
             utility.kmap('n', '<leader>sg', grep_search, '[G]rep in Files', { remap = true })
 
-            utility.kmap('n', '<leader>bf', builtin.buffers, '[F]ind [B]uffer')
+            utility.kmap('n', '<leader>bf', builtin.buffers, '[F]ind [B]uffer', { remap = true })
+            utility.kmap('n', '<leader>fb', builtin.buffers, '[F]ind [B]uffer', { remap = true })
         end
     },
 }

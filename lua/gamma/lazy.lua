@@ -13,6 +13,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local vscode = require('gamma/vscode')
+local utility = require('gamma/utility')
+utility.require_dir("before/plugin", true, true)
 
 require('lazy').setup("plugins", {
   checker = {
@@ -38,5 +40,12 @@ require('lazy').setup("plugins", {
       end
       return true
     end
-  }
+  },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "matchit",
+      },  
+    },
+  },
 })

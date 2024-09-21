@@ -1,4 +1,5 @@
 local utility = require('gamma.utility')
+local kmap = utility.kmap
 
 return {
 
@@ -8,7 +9,11 @@ return {
         -- follow latest release.
         version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
         -- install jsregexp (optional!).
-        build = "make install_jsregexp"
+        build = function()
+            if not utility.is_windows() then
+                vim.system("make install_jsregexp", {text = true}).wait()
+            end
+        end,
     },
 
     -- better format for hover
@@ -83,44 +88,22 @@ return {
             end
         end
     },
-
     {
-        'Yggdroot/LeaderF',
-        build = ':LeaderfInstallCExtension',
-        init = function()
-            -- these break the plugin for some reason
-            -- vim.g.Lf_ShortcutF = ''
-            -- vim.g.Lf_ShortcutB = ''
-            -- vim.g.Lf_WindowPosition = 'popup'
-            -- vim.g.Lf_CommandMap = { ['<C-K>'] = '<Up>',['<C-J>'] = '<Down>' }
-        end,
+        'andymass/vim-matchup',
+        event = 'CursorMoved',
         config = function()
-            utility.kmap('n', "<leader>f", '<nop>')
-            utility.kmap('n', "<leader>b", '<nop>')
+            vim.g.matchup_matchparen_offscreen = { method = 'popup' }
 
-            utility.kmap('n', "<leader>ff", vim.cmd.LeaderfFile, "Find [F]ile")
-            utility.kmap('n', "<leader>fb", vim.cmd.LeaderfBuffer, "Find [B]uffer")
-            utility.kmap('n', "<leader>fh", vim.cmd.LeaderfHelp, "Find [H]elp")
-            utility.kmap('n', "<leader>fm", vim.cmd.LeaderfMru, "Find [M]ost [R]ecently [U]sed")
-            utility.kmap('n', "<leader>fs", vim.cmd.LeaderfGTagsSymbol, "Find [S]ymbol")
-            utility.kmap('n', "<leader>f#", vim.cmd.LeaderfRgInteractive, "Find Interactive")
-            utility.kmap('n', "<leader>fc", vim.cmd.LeaderfCommand, "Find [C]ommand")
-            utility.kmap('n', "<leader>fw", vim.cmd.LeaderfWindow, "Find [W]indow")
-            utility.kmap('n', "<leader>fl", vim.cmd.LeaderfLine, "Find [L]ine")
+            if package.loaded['nvim-treesitter'] then
+                require('nvim-treesitter.configs').setup {
+                    matchup = {
+                        enable = true,
+                    }
+                }
+            end
         end
+
     },
-
-    {
-        'folke/which-key.nvim',
-        config = function()
-            vim.opt.timeout = true
-            vim.opt.timeoutlen = 300
-            require('which-key').setup {
-
-            }
-        end
-    },
-
     -- Session
     {
         'Shatur/neovim-session-manager',
@@ -152,7 +135,7 @@ return {
                 width = .85
             }
 
-            utility.kmap('n', "<leader>z", vim.cmd.ZenMode, "Toggle [Z]en Mode")
+            kmap('n', "<leader>z", vim.cmd.ZenMode, "Toggle [Z]en Mode")
         end
     },
 
@@ -207,9 +190,9 @@ return {
 
             require('telescope').load_extension 'attempt'
 
-            utility.kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)")
-            utility.kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)")
-            utility.kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files")
+            kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)", {remap = true})
+            kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)", {remap = true})
+            kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files", {remap = true})
         end
     },
 
