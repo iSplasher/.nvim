@@ -7,6 +7,8 @@ local enabled = {
   "tpope/vim-sleuth",
   'tpope/vim-commentary',
   'unblevable/quick-scope',
+  'andymass/vim-matchup',
+  'Rentib/cliff.nvim'
 }
 
 return {
