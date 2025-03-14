@@ -41,7 +41,8 @@ return {
     'kevinhwang91/nvim-hlslens',
     config = function()
       require('hlslens').setup {
-        calm_down = true -- limit number of matches per pattern per buffer
+        calm_down = true,    -- limit number of matches per pattern per buffer
+        nearest_only = true, -- show nearest matches only
       }
 
       local kopts = { noremap = true, silent = true }

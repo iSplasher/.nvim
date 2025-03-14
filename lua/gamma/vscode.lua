@@ -7,8 +7,12 @@ local enabled = {
   "tpope/vim-sleuth",
   'tpope/vim-commentary',
   'unblevable/quick-scope',
+  'ggandor/leap.nvim',
+  'ggandor/flit.nvim',
+  'tpope/vim-repeat',
   'andymass/vim-matchup',
-  'Rentib/cliff.nvim'
+  'Rentib/cliff.nvim',
+  'numToStr/Comment.nvim'
 }
 
 return {

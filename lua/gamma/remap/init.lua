@@ -10,25 +10,25 @@ local kmap = utility.kmap
 -- kmap("n", "J", "mzJ`z")
 
 -- Keep cursor in the middle when jumping to search terms
-kmap("n", "n", "nzzzv", { remap = true })
-kmap("n", "N", "Nzzzv", { remap = true })
+kmap("n", "n", "nzzzv", { remap = true  })
+kmap("n", "N", "Nzzzv", {remap = true  })
 
 -- Copy-paste fixes (the mc and `c are to preserve cursor position)
-kmap("x", "p", "\"_dP", { remap = true })
+kmap("x", "p", "\"_dP", {remap = true  })
 
-kmap("n", "y", "mc\"+y`c", { remap = true })
-kmap("v", "y", "mc\"+y`c", { remap = true })
-kmap("n", "Y", "mc\"+Y`c", { remap = true })
+kmap("n", "y", "mc\"+y`c", { remap = true  })
+kmap("v", "y", "mc\"+y`c", {remap = true  })
+kmap("n", "Y", "mc\"+Y`c", {remap = true  })
 
 -- Delete into void instead of overwriting previous paste
-kmap("n", "d", "\"_d", { remap = true })
-kmap("v", "d", "\"_d", { remap = true })
+kmap("n", "d", "\"_d", {remap = true  })
+kmap("v", "d", "\"_d", {remap = true  })
 
 -- X to cut the current line
-kmap('n', 'X', 'dd', { noremap = true })
+kmap('n', 'X', 'dd', { remap = true  })
 
 -- disable Q
-kmap("n", "Q", "<nop>", { remap = true })
+kmap("n", "Q", "<nop>", { remap = true  })
 
 -- format
 if not vim.g.vscode then
@@ -68,10 +68,8 @@ kmap('v', 'L', '$', { noremap = true })
 kmap('n', 'U', '<C-r>', { noremap = true })
 
 -- buffers
-kmap("n", "<leader>bb", vim.cmd.buffers, "[B]uffers", { remap = true })
-kmap("n", "<leader>bd", vim.cmd.bdelete, "[B]uffer [D]elete", { remap = true })
-kmap("n", "<leader>bn", vim.cmd.bnext, "[B]uffer [N]ext", { remap = true })
-kmap("n", "<leader>bp", vim.cmd.bprevious, "[B]uffer [P]revious", { remap = true })
-kmap("n", "<leader>bl", vim.cmd.blast, "[B]uffer [L]ast", { remap = true })
-kmap("n", "<leader>bs", vim.cmd.bstart, "[B]uffer [S]tart", { remap = true })
-kmap("n", "<leader>bw", vim.cmd.bwipeout, "[B]uffer [W]ipeout", { remap = true })
+kmap("n", "<leader>bb", vim.cmd.buffers, "[B]uffers", {  })
+kmap("n", "<leader>bd", vim.cmd.bdelete, "[B]uffer [D]elete", { })
+kmap("n", "<leader>bn", vim.cmd.bnext, "[B]uffer [N]ext", { })
+kmap("n", "<leader>bp", vim.cmd.bprevious, "[B]uffer [P]revious", { })
+kmap("n", "<leader>b!", vim.cmd.bwipeout, "[B]uffer [W]ipeout", { })

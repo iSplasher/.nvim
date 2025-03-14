@@ -1,26 +1,65 @@
+local utility = require('gamma.utility')
+local kmap = utility.kmap
+
+
 return {
     {
         'nvim-tree/nvim-tree.lua',
-        lazy = true,
-        
+        event = 'VeryLazy',
         dependencies = {
             'nvim-tree/nvim-web-devicons'
         },
+        init = function()
+            -- disable netrw
+            vim.g.loaded_netrw = 1
+            vim.g.loaded_netrwPlugin = 1
+        end,
         config = function()
+            local function open_project_tree()
+                -- Set to cwd
+                local api = require("nvim-tree.api")
+                local global_cwd = vim.fn.getcwd(-1, -1)
+                api.tree.change_root(global_cwd)
+
+                vim.cmd.NvimTreeToggle()
+            end
+
+            kmap("n", "<leader>pt", open_project_tree, "Project Tree")
+
+
             local function on_attach(bufnr)
                 local api = require('nvim-tree.api')
 
-                local function opts(desc)
-                    return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+                local function opts(desc, noremap)
+                    if noremap == nil then
+                        noremap = true
+                    end
+                    return {
+                        desc = 'nvim-tree: ' .. desc,
+                        buffer = bufnr,
+                        noremap = noremap,
+                        silent = true,
+                        nowait = true
+                    }
                 end
 
                 api.config.mappings.default_on_attach(bufnr)
+
+                -- close on esc
+                vim.keymap.set('n', '<Esc>', api.tree.close, opts('Close', false))
 
                 vim.keymap.del('n', 'd', { buffer = bufnr })
 
                 vim.keymap.set('n', '%', api.fs.create, opts('Create file'))
                 vim.keymap.set('n', 'D', api.fs.remove, opts('Delete'))
                 vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
+
+                -- Close tree when opening a file
+                local function open_and_close()
+                    api.node.open.edit(nil, { quit_on_open = true })
+                end
+
+                vim.keymap.set('n', '<CR>', open_and_close, opts('Open file', false))
             end
 
             -- Automatically open file upon creation
@@ -57,6 +96,10 @@ return {
 
 
             require('nvim-tree').setup({
+                view = {
+                    adaptive_size = true,
+                    side = "left",
+                },
                 on_attach = on_attach,
                 sort_by = function(nodes)
                     table.sort(nodes, natural_cmp)

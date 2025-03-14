@@ -2,11 +2,14 @@ return {
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true },
-        
         config = function()
             local cfg = require('lualine').get_config()
 
+            cfg.options.theme = 'horizon'
             cfg.options.icons_enabled = true
+            cfg.options.component_separators = { left = '', right = '' }
+            cfg.options.section_separators = { left = '', right = '' }
+
             cfg.extensions = { 'nvim-tree', 'lazy', 'fugitive' }
 
             -- Show the current keymap in the statusline
@@ -79,7 +82,7 @@ return {
                         mac = 'CR',
                     },
                 },
-                'filetype'
+                'filetype',
             }
 
             cfg.sections.lualine_z = { word_count, 'location' }

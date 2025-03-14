@@ -1,10 +1,11 @@
+local utility = require('gamma.utility')
+local kmap = utility.kmap
 local temp = require('gamma.commands.temp')
 
 return {
   {
     'glepnir/dashboard-nvim',
     event = 'VimEnter',
-    
     priority = 100,
     config = function()
       local header = {
@@ -84,6 +85,9 @@ return {
           },
         },
       }
+
+
+      kmap("n", "<leader>H", vim.cmd.Dashboard, "Dashboard")
     end,
     dependencies = { { 'nvim-tree/nvim-web-devicons' } }
   }

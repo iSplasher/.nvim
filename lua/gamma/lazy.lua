@@ -14,12 +14,20 @@ vim.opt.rtp:prepend(lazypath)
 
 local vscode = require('gamma/vscode')
 local utility = require('gamma/utility')
+local kmap = utility.kmap
+
 utility.require_dir("before/plugin", true, true)
+
+-- install luarocks
+-- TODO: need to fix this
+-- require("gamma/utility/luarocks").setup()
+
 
 require('lazy').setup("plugins", {
   checker = {
     enabled = true,
     notify = false,
+    check_pinned = true,
   },
   change_detection = {
     enabled = true,
@@ -45,7 +53,12 @@ require('lazy').setup("plugins", {
     rtp = {
       disabled_plugins = {
         "matchit",
-      },  
+        "netrwPlugin"
+      },
     },
   },
 })
+
+if not vim.g.vscode then
+  kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager", {})
+end

@@ -2,21 +2,22 @@ require('compat')
 
 local M = {}
 
----A helper function to print a table's contents.
----@param tbl table @The table to print.
----@param depth number @The depth of sub-tables to traverse through and print.
+---A helper function to turn a table into a string.
+---@param tbl table @The table.
+---@param depth number @The depth of sub-tables to traverse through.
 ---@param n number @Do NOT manually set this. This controls formatting through recursion.
-function M.print_table(tbl, depth, n)
+function M.table_to_string(tbl, depth, n)
   n = n or 0;
   depth = depth or 5;
+  str = ""
 
   if (depth == 0) then
-    print(string.rep(' ', n) .. "...");
-    return;
+    str = str .. (string.rep(' ', n) .. "...");
+    return str
   end
 
   if (n == 0) then
-    print(" ");
+    str = str .. (" ");
   end
 
   for key, value in pairs(tbl) do
@@ -25,11 +26,11 @@ function M.print_table(tbl, depth, n)
 
       if (type(value) == "table") then
         if (next(value)) then
-          print(string.rep(' ', n) .. key .. " = {");
-          M.print_table(value, depth - 1, n + 4);
-          print(string.rep(' ', n) .. "},");
+          str = str .. (string.rep(' ', n) .. key .. " = {");
+          str = str .. M.table_to_string(value, depth - 1, n + 4);
+          str = str .. (string.rep(' ', n) .. "},");
         else
-          print(string.rep(' ', n) .. key .. " = {},");
+          str = str .. (string.rep(' ', n) .. key .. " = {},");
         end
       else
         if (type(value) == "string") then
@@ -38,19 +39,27 @@ function M.print_table(tbl, depth, n)
           value = tostring(value);
         end
 
-        print(string.rep(' ', n) .. key .. " = " .. value .. ",");
+        str = str .. (string.rep(' ', n) .. key .. " = " .. value .. ",");
       end
     end
   end
 
   if (n == 0) then
-    print(" ");
+    str = str .. (" ");
   end
+  return str
 end
 
----A helper function to merge two tables.
+---A helper function to print a table's contents.
+---@param tbl table @The table to print.
+---@param depth number @The depth of sub-tables to traverse through and print.
+function M.print_table(tbl, depth)
+  print(M.table_to_string(tbl, depth));
+end
+
+---A helper function to deep merge two tables.
 ---@param a table @The first table to merge.
----@param b table @The second table to merge. (overwrites)
+---@param b table @The second table(s) to merge. (overwrites)
 ---@return table @The merged table.
 function M.merge_table(a, b)
   if type(a) == 'table' and type(b) == 'table' then
@@ -66,9 +75,22 @@ function M.merge_table(a, b)
   return a
 end
 
+---A helper function to deep merge two tables.
+---@param a table @The first table to merge.
+---@param b table[] @The  tables to merge. (overwrites)
+---@return table @The merged table.
+function M.merge_tables(a, b)
+  for _, t in ipairs(b) do
+    a = M.merge_table(a, t)
+  end
+  return a
+end
+
+local _saved_maps = {}
+local _saved_maps_d = {}
 ---Set a keymap.
 ---@param mode string | table @The mode to set the keymap for.
----@param keys string @The keys to set the keymap for.
+---@param keys string | table @The keys to set the keymap for.
 ---@param command string | function @The command to set the keymap for.
 ---@param desc_or_opts string | table | nil @The description to set the keymap for.
 ---@param opts table | nil @The options to set the keymap for.
@@ -110,27 +132,127 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
     error("kmap -- desc_or_opts must be a string or table")
   end
 
+  -- mode to list
+  if type(mode) == 'string' then
+    mode = { mode }
+  end
+
+  -- keys to list
+  if type(keys) == 'string' then
+    keys = { keys }
+  end
   opts = opts or {}
 
   if desc then
     desc = '' .. desc
   end
 
-  if opts.noremap == nil and opts.remap == nil then
-    -- check if already mapped
-    local map_exists = vim.fn.mapcheck(keys, mode)
+  for _, key in ipairs(keys) do
+    -- deep copy opts
+    local k_opts = M.merge_table({}, opts)
 
-    if map_exists == "" then
-      opts.remap = true
-    else
-      M.print_error({ keys = keys, mode = mode, command = command, desc = desc})
-      error("WARNING: Keymap already exists (use { [no]remap = true } or to disable this warning)")
+    if k_opts.noremap == nil and k_opts.remap == nil then
+      -- check if already mapped
+      local err = false
+      -- for each mode
+      local map_exists = M.keymap_exists(mode, key)
+      if map_exists ~= false then
+        if not err then
+          err = true
+          M.print_error({ keys = key, mode = mode, command = command, desc = desc })
+          -- Get the map
+          -- {'lnum': 0, 'script': 0, 'mode': 'i', 'silent': 0, 'callback': function('<lambda>1'), 'noremap': 1, 'lhs': '<CR>', 'lhsr', 'nowait': 0, 'expr': 0, 'sid': -8, 'buffer': 0}
+          local e_map = map_exists
+          local e_map_lhs = e_map.lhs or ""
+          local e_map_rhs = e_map.rhs or e_map.callback or e_map.expr or ""
+          if type(e_map_rhs) == "function" then
+            e_map_rhs = "<function>"
+          end
+          local e_map_desc = e_map.desc or ""
+          local e_map_mode = e_map.mode or ""
+          if type(e_map_mode) == "table" then
+            e_map_mode = table.concat(e_map_mode, ", ")
+          end
+
+          error("\nWARNING: Keymap '" .. key .. "' (" .. desc .. ")" ..
+            " already exists in '" .. M.table_to_string(mode) ..
+            "' mode. (use { [no]remap = true } or to disable this warning)" ..
+            "\n  Existing map: " .. e_map_lhs .. " -> " .. e_map_rhs .. " (" .. e_map_mode .. ") " .. e_map_desc)
+        end
+      else
+        k_opts.remap = true
+      end
     end
 
+    vim.keymap.set(mode, key, command, { desc = desc, table.unpack(k_opts) })
+
+    -- add to saved_maps
+    local map = {
+      mode = mode,
+      keys = key,
+      map = command,
+      desc = desc,
+    }
+    table.insert(_saved_maps, map)
+    _saved_maps_d[key] = map
+  end
+end
+
+---Get a dictionary of all saved keymaps.
+---@return table @The dictionary of all saved keymaps.
+function M.get_saved_maps()
+  -- if saved_maps is empty, then fill it with current mappings
+  if #_saved_maps == 0 then
+    for _, m in ipairs(vim.fn.maplist()) do
+      local map = {
+        mode = m.mode,
+        keys = m.lhs,
+        map = m.rhs,
+        desc = "",
+      }
+      table.insert(_saved_maps, map)
+      _saved_maps_d[m.lhs] = map
+    end
   end
 
-  vim.keymap.set(mode, keys, command, { desc = desc, table.unpack(opts) })
+  return _saved_maps
 end
+
+---Check if a keymap exists.
+---@param mode string @The mode to check the keymap for.
+---@param keys string @The keys to check the keymap for.
+---@return false|table @Whether or not the keymap exists. If it does, return the keymap.
+function M.keymap_exists(mode, keys)
+  if #_saved_maps == 0 then
+    M.get_saved_maps()
+  end
+
+  if type(mode) == 'string' then
+    mode = { mode }
+  end
+
+  for _, m in ipairs(mode) do
+    local r = vim.fn.mapcheck(keys, m) ~= ""
+    if r ~= "" then
+      local m = _saved_maps_d[keys]
+      if m ~= nil then
+        return m
+      end
+    end
+  end
+
+  return false
+end
+
+---Execute keymap as if it was typed.
+---@param keys string @The keys to execute the keymap for.
+---@param mode string @The mode to execute the keymap for.
+function M.type_keymap(keys, mode)
+  mode = mode or "n"
+
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys, true, true, true), mode, false)
+end
+
 
 ---Get the current operating system.
 ---@return string @The current operating system. (macos, linux, windows)
@@ -332,14 +454,15 @@ end
 
 
 ---Execute shell commands.
----@param cmd string @The command to execute.
+---@param cmd string[] @The command to execute.
 ---@param opts table | nil @The options to execute the command with.
 ---@param opts.async boolean | nil @Whether or not to execute the command asynchronously.
 ---@param opts.cwd string | nil @The current working directory to execute the command in.
 ---@param opts.env table | nil @The environment variables to execute the command with.
 ---@param opts.timeout number | nil @The timeout to execute the command with.
 ---@param opts.input string | nil @The input to execute the command with.
----@param opts.silent boolean | nil @Whether or not to execute the command silently.
+---@param opts.verbose boolean | nil @Print the command before executing it, and print the output.
+---@param opts.silent boolean | nil @Do not print the output, or command.
 ---@param opts.on_exit function | nil @The function to execute when the command exits.
 ---@return table @{ code = 0, signal = 0, stdout = 'hello', stderr = '' }
 function M.shell(cmd, opts)
@@ -351,16 +474,20 @@ function M.shell(cmd, opts)
   if opts.text == nil then
     opts.text = true
   end
-  local silent = opts.silent
-  opts.silent = nil
-  if silent == nil then
-    silent = true
+  local verbose = opts.verbose
+  opts.silent = opts.silent
+  if verbose then
+    verbose = true
+    opts.silent = false
+    M.print(string.format("shell: %s", table.concat(cmd, " ")))
   end
 
   function _on_exit(obj)
-    if not silent then
+    if not opts.silent or opts.silent == nil then
       if obj.code == 0 then
-        M.print(obj.stdout)
+        if verbose then
+          M.print(obj.stdout)
+        end
       else
         M.print_error(obj.stderr)
       end

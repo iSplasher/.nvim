@@ -1,20 +1,11 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
+-- In addition to the plugins listed here,
+-- all the other files in this directory
+-- also list and configure plugins.
+
 
 return {
-
-    -- snippets
-    {
-        "L3MON4D3/LuaSnip",
-        -- follow latest release.
-        version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-        -- install jsregexp (optional!).
-        build = function()
-            if not utility.is_windows() then
-                vim.system("make install_jsregexp", {text = true}).wait()
-            end
-        end,
-    },
 
     -- better format for hover
     {
@@ -69,7 +60,7 @@ return {
 
 
 
-  
+
     -- Session
     {
         'Shatur/neovim-session-manager',
@@ -80,8 +71,10 @@ return {
             require('session_manager').setup {
                 autoload_mode = require('session_manager.config').AutoloadMode.Disabled,
                 autosave_ignore_dirs = {
-                    'D:/TEMP',
-                    'D:\\TEMP',
+                    "D:/TEMP",
+                    "D:\\TEMP",
+                    "X:\\TEMP",
+                    "X:/TEMP",
                     "C:/WINDOWS",
                     "C:\\WINDOWS",
                     'C:/Program Files',
@@ -151,14 +144,20 @@ return {
             attempt.setup {
                 autosave = true,
                 list_buffers = true,
-                ext_options = { 'lua', 'js', 'py', 'cpp', 'c', 'txt', '' }
+                ext_options = {
+                    '',
+                    'lua', 'js', 'py',
+                    'cpp', 'c', 'txt',
+                    'json', 'md', 'toml',
+                    'yml', 'sh', 'cmd',
+                    'ps1', 'bat', 'ts' }
             }
 
             require('telescope').load_extension 'attempt'
 
-            kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)", {remap = true})
-            kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)", {remap = true})
-            kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files", {remap = true})
+            kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)", {})
+            kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)", {})
+            kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files", {})
         end
     },
 
