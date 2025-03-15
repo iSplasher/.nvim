@@ -1,6 +1,14 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
 
+local system_open_cmd = ""
+if utility.is_windows() then
+    system_open_cmd = "explorer"
+elseif utility.is_mac() then
+    system_open_cmd = "open"
+else
+    system_open_cmd = "xdg-open"
+end
 
 return {
     {
@@ -9,12 +17,31 @@ return {
         dependencies = {
             'nvim-tree/nvim-web-devicons'
         },
+        opts = {
+            respect_buf_cwd = true,
+            view = {
+                adaptive_size = true,
+                side = "left",
+            },
+            reload_on_bufenter = true,
+            update_focused_file = {
+                enable = true,
+                update_root = true,
+            },
+            filters = {
+                dotfiles = true
+            },
+            system_open = {
+                cmd = system_open_cmd,
+                args = {}
+            },
+        },
         init = function()
             -- disable netrw
             vim.g.loaded_netrw = 1
             vim.g.loaded_netrwPlugin = 1
         end,
-        config = function()
+        config = function(_, opts)
             local function open_project_tree()
                 -- Set to cwd
                 local api = require("nvim-tree.api")
@@ -95,24 +122,12 @@ return {
             end
 
 
-            require('nvim-tree').setup({
-                view = {
-                    adaptive_size = true,
-                    side = "left",
-                },
+            require('nvim-tree').setup(utility.merge_table(opts, {
                 on_attach = on_attach,
                 sort_by = function(nodes)
                     table.sort(nodes, natural_cmp)
                 end,
-                reload_on_bufenter = true,
-                update_focused_file = {
-                    enable = true,
-                    update_root = true,
-                },
-                filters = {
-                    dotfiles = true
-                }
-            })
+            }))
         end
     },
 

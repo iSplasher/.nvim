@@ -14,7 +14,7 @@ return {
       open_mapping = [[<leader>/]],
       direction = 'float',
       float_opts = {
-        border = 'curved',
+        border = 'double',
         winblend = 3,
         highlights = {
           border = "NoiceCmdlinePopupBorder",
@@ -92,18 +92,18 @@ return {
 
       kmap('c', "!", switch_to_terminal_on_shebang, "Run shell command", { remap = true })
 
-      kmap('n', { "<leader>/", "<leader>t/" }, switch_to_terminal, "Open terminal")
-      kmap('n', "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", "Toggle terminal (floating)")
-      kmap('n', "<leader>th", new_terminal_h, "Create terminal (horizontal)")
+      kmap('n', { "<leader>/", "<leader>wt/" }, switch_to_terminal, "Open terminal")
+      kmap('n', "<leader>wtf", "<cmd>ToggleTerm direction=float<CR>", "Toggle terminal (floating)")
+      kmap('n', "<leader>wth", new_terminal_h, "Create terminal (horizontal)")
 
-      kmap('n', "<leader>tv", new_terminal_v, "Create terminal (vertical)")
+      kmap('n', "<leader>wtv", new_terminal_v, "Create terminal (vertical)")
 
       local lazygit = Terminal:new({
         cmd = "lazygit",
         hidden = true,
         direction = "float",
         float_opts = {
-          border = "curved",
+          border = "double",
         },
       })
 

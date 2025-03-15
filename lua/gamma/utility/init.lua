@@ -253,7 +253,6 @@ function M.type_keymap(keys, mode)
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys, true, true, true), mode, false)
 end
 
-
 ---Get the current operating system.
 ---@return string @The current operating system. (macos, linux, windows)
 function M.get_os()
@@ -282,6 +281,13 @@ end
 ---True if the current operating system is Windows.
 function M.is_windows()
   return M.get_os() == "windows"
+end
+
+---Normalize path separators.
+---@param path string @The path to normalize.
+---@return string @The normalized path.
+function M.normalize_path_sep(path)
+  return path:gsub("\\", "/")
 end
 
 ---Create a callable that will run a command.
@@ -322,6 +328,7 @@ end
 function M.data_path()
   return vim.fn.stdpath("data")
 end
+
 ---A better require, that supports recursive require of directories.
 ---@param path string @The path to require. Can also be a directory.
 ---@param recursive boolean | nil @Whether or not to require all files in the directory.
@@ -329,9 +336,7 @@ end
 function M.require_dir(path, recursive, allow_empty)
   allow_empty = allow_empty or false
 
-  local import_path = path
-  import_path = string.gsub(import_path, "/", ".")
-  import_path = string.gsub(import_path, "\\", ".")
+  local dir = M.config_path()
 
   recursive = recursive or false
   -- check if path starts with ./ or ../ or .\ or ..\
@@ -344,8 +349,7 @@ function M.require_dir(path, recursive, allow_empty)
   }
 
 
-  local dir = M.config_path()
-  dir = vim.fn.fnamemodify(dir, ":p")
+
 
   -- if all of rel are false, check if a lua require path, e.g. mode.path.file and resolve to file instead
 
@@ -358,7 +362,7 @@ function M.require_dir(path, recursive, allow_empty)
     end
   end
 
-  
+
   -- if dir doesn't start with 'lua/', then add it
   if not string.match(dir, "/lua$") and not string.match(path, "\\lua$") then
     dir = dir .. "/lua"
@@ -382,18 +386,17 @@ function M.require_dir(path, recursive, allow_empty)
 
 
   -- resolve path
-  path = vim.fn.fnamemodify(path, ":p")
-
+  path = vim.fs.abspath(path)
   -- Switch backslashes to forward slashes
   path = string.gsub(path, "\\", "/")
   -- Remove trailing slash
-  path = string.gsub(path, "/$", "")
+  path = path:gsub("//", "/"):gsub("/$", "")
+  dir = dir:gsub("\\", "/"):gsub("//", "/")
+
+  local import_path = string.gsub(path, dir, ""):gsub("/$", ""):gsub("^/", ""):gsub("/", ".")
 
   -- if is directory
   if vim.fn.isdirectory(path) == 1 then
-    -- remove config dir from path
-    path = string.gsub(path, dir, "")
-
     -- if recursive
     if recursive then
       -- require all files in directory
@@ -401,7 +404,7 @@ function M.require_dir(path, recursive, allow_empty)
       local req = false
       for _, file in ipairs(files) do
         local file_path = path .. "/" .. file
-        if file_path:match("%.lua$") then
+        if vim.fn.isdirectory(file_path) == 0 and file_path:match("%.lua$") then
           if vim.fn.filereadable(file_path) == 1 then
             local import_file_path = import_path .. "." .. file:gsub("%.lua$", "")
             require(import_file_path)
@@ -409,16 +412,17 @@ function M.require_dir(path, recursive, allow_empty)
           else
             error("require_dir -- File not readable: " .. file_path)
           end
+        elseif vim.fn.isdirectory(file_path) == 1 then
+          local next_dir = vim.fs.relpath(dir, file_path)
+          M.require_dir(next_dir, recursive, allow_empty)
         end
       end
       if not req and not allow_empty then
         error("require_dir -- No lua files found in directory: " .. path)
       end
     else
-      -- require init.lua
-      local init_path = path .. "/init.lua"
       if vim.fn.filereadable(init_path) == 1 then
-        require(init_path:gsub("%.lua$", ""))
+        require(import_path)
       else
         error("require_dir -- File not readable: " .. init_path)
       end
@@ -458,7 +462,6 @@ function M.print_error(obj)
     vim.notify(msg, 'error')
   end
 end
-
 
 ---Execute shell commands.
 ---@param cmd string[] @The command to execute.

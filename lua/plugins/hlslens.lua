@@ -1,4 +1,4 @@
-local utility = require('gamma/utility')
+local utility = require('gamma.utility')
 local kmap = utility.kmap
 -- Makes hlslens work with visual-multi
 local M = {}

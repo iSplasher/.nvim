@@ -13,6 +13,7 @@ local disabled_filetypes = {
     "terminal",
     "mason",
     "TelescopePrompt",
+    "noice",
     "TelescopeResults",
 }
 
@@ -30,8 +31,8 @@ return {
         event = "BufRead",
         config = function()
             local cliff = require("cliff")
-            kmap({ 'n', 'v', 'o' }, '<C-j>', cliff.go_down, "Move cursor down", { })
-            kmap({ 'n', 'v', 'o' }, '<C-k>', cliff.go_up, "Move cursor up", { })
+            kmap({ 'n', 'v', 'o' }, '<C-j>', cliff.go_down, "Move cursor down", {})
+            kmap({ 'n', 'v', 'o' }, '<C-k>', cliff.go_up, "Move cursor up", {})
         end
     },
 
@@ -40,9 +41,9 @@ return {
         event = "BufRead",
         dependencies = { "tpope/vim-repeat" },
         config = function()
-            kmap({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', "Leap forward", { })
-            kmap({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)', "Leap backward", { })
-            kmap({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-from-window)', "Leap from window", { })
+            kmap({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', "Leap forward", {})
+            kmap({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)', "Leap backward", {})
+            kmap({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-from-window)', "Leap from window", {})
 
             -- Define equivalence classes for brackets and quotes, in addition to
             -- the default whitespace group.
@@ -105,8 +106,8 @@ return {
         branch = "release-please--branches--main--components--precognition.nvim",
         opts = {
             startVisible = true,
-            -- showBlankVirtLine = true,
-            -- highlightColor = { link = "Comment" },
+            showBlankVirtLine = false,
+            highlightColor = { link = "DiagnosticSignHint" },
             -- hints = {
             --      Caret = { text = "^", prio = 2 },
             --      Dollar = { text = "$", prio = 1 },

@@ -7,7 +7,7 @@ local kmap = utility.kmap
 
 return {
 
-       -- better format for hover
+    -- better format for hover
     {
         "Fildo7525/pretty_hover",
         event = "LspAttach",
@@ -26,7 +26,7 @@ return {
     {
         'mbbill/undotree',
         config = function()
-            kmap('n', "<leader>u", vim.cmd.UndotreeToggle,"Toggle [U]ndo Tree" )
+            kmap('n', "<leader>wu", vim.cmd.UndotreeToggle, "Toggle [U]ndo Tree")
         end
     },
 

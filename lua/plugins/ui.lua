@@ -127,6 +127,13 @@ return {
         },
       },
       routes = {
+        -- Hide annoying bg color warning
+        {
+          filter = {
+            find = "Highlight group 'NotifyBackground' has no background highlight",
+          },
+          opts = { skip = true },
+        },
         -- Always route any messages with more than 10 lines to the split view
         {
           view = "split",

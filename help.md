@@ -1,197 +1,252 @@
-## General
+# Advanced Neovim Movement and Editing Techniques
 
-**Leader key**: ` ` (space)
+This guide covers advanced movement and editing techniques for Neovim, organized by functional categories and tailored to your specific setup.
 
-| Notation | Meaning |
-| -------- | ------- |
-|`<C-…>` | control-key |
-| `<M-…>` | alt-key or meta-key |
-|`<A-…>` | same as <M-…> |
-| `<T-…>` | meta-key when it's not alt |
-| `<D-…>` | command-key or "super" key |
+## 1. Navigation & Movement
 
-#### Running commands
+### 1.1 Cursor Movement
 
-- `:command`: Run a command.
-- `:help [command/<key>]`: Open the help window. [command/<key>] is
-  optional, but can be any command or key combination, e.g. `:help
-  <ctrl-r>`].
+#### Precision Jumping
+- `s{char}{char}` - Jump forward to a position matching these two characters¹
+- `S{char}{char}` - Jump backward to a position matching these two characters¹
+- `gs{char}{char}` - Jump to any visible window (cross-window jump)¹
 
-### Opening files
+#### Horizontal Navigation
+- `f{char}`/`F{char}` - Jump to next/previous occurrence of character (enhanced with highlighting)²
+- `t{char}`/`T{char}` - Jump to before next/previous occurrence of character (enhanced with highlighting)²
+- `H` - Jump to first non-whitespace character in line³
+- `L` - Jump to end of line³
 
-- `:e <path>`: Open a file at `<path>`.
-- `pt`: Open tree view of pwd
-- `pf`: Open file finder
+#### Vertical Navigation
+- `<C-j>` - Move cursor down intelligently⁴
+- `<C-k>` - Move cursor up intelligently⁴
+- `n`/`N` - Next/previous search result (centered on screen)³
 
-### Saving and exiting
+#### Insert Mode Navigation
+- Alt + hjkl - Move cursor while staying in insert mode³
+- Alt + b/w/e - Word movement in insert mode³
 
-- `:w`: Save the current file.
-- `:wq`: Save the current file and exit.
-- `:q!`: Discard changes and exit.
-- `:qa!`: Discard changes and exit all open windows.
+### 1.2 Code Structure Navigation
 
-### Movement
+#### Function/Class Navigation
+- `]f`/`[f` - Go to next/previous function start⁵
+- `]F`/`[F` - Go to next/previous function end⁵
+- `]c`/`[c` - Go to next/previous class start⁵
+- `]C`/`[C` - Go to next/previous class end⁵
 
-- `h`, `j`, `k`, `l`: Move the cursor left, down, up, or right, respectively.
-- `w`, `b`: Move the cursor forward or backward one word, respectively.
-- `0`, `$`: Move the cursor to the beginning or end of the current line, respectively.
-- `gg`, `G`: Move the cursor to the beginning or end of the file, respectively.
-- `H`, `M`, `L`: Move the cursor to the top, middle, or bottom of the screen, respectively.
-- `f` + char: Move the cursor to the next occurrence of the character `char` on the current line.
-- `F` + char: Move the cursor to the previous occurrence of the character `char` on the current line.
-- `t` + char: Move the cursor to just before the next occurrence of the character `char` on the current line.
-- `T` + char: Move the cursor to just after the previous occurrence of the character `char` on the current line.
-- `;`: Repeat the last `f`, `F`, `t`, or `T` command.
-- `,`: Repeat the last `f`, `F`, `t`, or `T` command in the opposite direction.
-- `%`: Jump to the matching bracket or parenthesis.
+#### Block Navigation
+- `][`/`[[` - Go to next/previous block start⁵
+- `]]`/`[]` - Go to next/previous block end⁵
+- `]s`/`[s` - Go to next/previous scope start⁵
+- `]S`/`[S` - Go to next/previous scope end⁵
 
-### Editing
+#### Pair Matching
+- `%` - Jump between matching pairs (brackets, if/endif, etc.) with enhanced capabilities⁶
+- Visual indication of matching pairs, even off-screen⁶
 
-- `i`: Enter insert mode at the current cursor position.
-- `a`: Enter insert mode after the current cursor position.
-- `A`: Enter insert mode at the end of the current line.
-- `o`: Begin a new line below the current line and enter insert mode.
-- `O`: Begin a new line above the current line and enter insert mode.
-- `r`: Replace the character under the cursor with the next character typed.
-- `x`: Cut the character under the cursor.
-- `X`: Cut the current line.
-- `dd`: Delete the current line.
-- `yy`: Copy the current line.
-- `p`: Paste the last deleted or copied text.
-- `u`: Undo the last change.
-- `Ctrl + r`: Redo the last change.
-- `.`: Repeat the last change.
-- `~`: Toggle the case of the character under the cursor.
-- `gU` + motion: Uppercase the selected text.
-- `gu` + motion: Lowercase the selected text.
-- `>`: Indent the selected text one level to the right.
-- `<`: Indent the selected text one level to the left.
-- `=`: Auto-indent the selected text.
-- `Ctrl + v`: Enter visual block mode to select rectangular blocks of text.
-- `I`: Enter insert mode at the beginning of each line in the selection.
-- `A`: Enter insert mode at the end of each line in the selection.
-- `r`: Replace the selected block with a single character.
-- `d`: Delete the selected block.
-- `y`: Yank (copy) the selected block.
-- `!`: Run the selected block as a shell command.
+### 1.3 List Navigation
+- `]q`/`[q` - Next/previous quickfix list item³
+- `<leader>fq` - List items in the quickfix list⁷
+- `<leader>fj` - Jump list⁷
 
-### Searching
+## 2. Text Selection
 
-- `/`: Begin a search for the next occurrence of a pattern.
-- `n`: Move to the next occurrence of the pattern found with `/`.
-- `N`: Move to the previous occurrence of the pattern found with `/`. p
+### 2.1 Semantic Text Objects
 
-### Visual mode
+#### Code Structure Objects
+- `as`/`is` - Select language scope⁵
+- `ac`/`ic` - Select class (outer/inner)⁵
+- `af`/`if` - Select function (outer/inner)⁵
+- `al`/`il` - Select loop (outer/inner)⁵
+- `ab`/`ib` - Select block (outer/inner)⁵
+- `aa`/`ia` - Select argument (outer/inner)⁵
 
-- `v`: Enter visual mode to select characters.
-- `V`: Enter visual line mode to select entire lines.
-- `Ctrl + v`: Enter visual block mode to select rectangular blocks of text.
-- `o`: Toggle the selection between the start and end of the visual block.
-- `gv`: Reselect the last visual block.
-- `I`: Enter insert mode at the beginning of the selected text.
-- `A`: Enter insert mode at the end of the selected text.
-- `r`: Replace the selected text with a single character.
-- `d`: Delete the selected text.
-- `y`: Yank (copy) the selected text.
-- `gU`: Convert the selected text to uppercase.
-- `gu`: Convert the selected text to lowercase.
-- `=`: Auto-indent the selected text.
-- `>`: Indent the selected text one level to the right.
-- `<`: Indent the selected text one level to the left.
-- `!`: Run the selected text as a shell command.
-- `~`: Toggle the case of the selected text.
-- `J`: Join the selected lines.
-- `s`: Substitute the selected text with new text.
-- `Ctrl + a`: Increment the number under the cursor.
-- `Ctrl + x`: Decrement the number under the cursor.
-- `Ctrl + y`: Scroll the view up.
-- `Ctrl + e`: Scroll the view down.
-- `:s/old/new/g`: Substitute all occurrences of `old` with `new`.
+#### Special Text Objects
+- `aB`/`iB` - Select entire buffer⁸
 
-### Indentation
+### 2.2 Visual Mode Enhancements
+- Expand/contract selections using TreeSitter nodes⁵
+- Precognition highlights showing motion targets⁹
 
-- `>>`: Indent the current line one level to the right.
-- `<<`: Indent the current line one level to the left.
-- `==`: Auto-indent the current line.
+## 3. Editing & Manipulation
 
-### Windows `Ctrl + w`
+### 3.1 Text Manipulation
 
-- `Ctrl + w + q`: Quit the current window.`
-- `Ctrl + w + s`: Split the current window horizontally.
-- `Ctrl + w + v`: Split the current window vertically.
-- `Ctrl + w + h`: Move the cursor to the window on the left.
-- `Ctrl + w + j`: Move the cursor to the window below.
-- `Ctrl + w + k`: Move the cursor to the window above.
-- `Ctrl + w + l`: Move the cursor to the window on the right.
+#### Line and Selection Movement
+- `<C-S-h>` / `<C-S-left>` - Move selection/line left¹⁰
+- `<C-S-l>` / `<C-S-right>` - Move selection/line right¹⁰
+- `<C-S-k>` / `<C-S-up>` - Move selection/line up¹⁰
+- `<C-S-j>` / `<C-S-down>` - Move selection/line down¹⁰
 
+#### Clipboard Management
+- `p` in visual mode - Paste without overwriting register³
+- `y` - Copy to system clipboard while preserving cursor position³
+- `d` - Delete to void register instead of overwriting clipboard³
+- `X` - Cut current line³
+- `J` - Join lines while preserving cursor position³
 
-### Buffers
+#### Code Commenting
+- Smart auto-detection of comment styles¹¹
+- Contextual commenting, handles mixed language files¹¹
 
-- `:ls`: List all open buffers.
-- `:bn[ext]`: Move to the next buffer.
-- `:bp[revious]`: Move to the previous buffer.
-- `:bd[elete]`: Delete the current buffer.
-- `:b[uffer] <N>`: Open the buffer with number `<N>`
+### 3.2 Advanced Operators & LSP Integration
 
-### Macros
+#### Operator + Motion Combinations
+- `d]f` - Delete to next function
+- `y]c` - Yank to next class
+- `c][` - Change to next block
 
-- `q` + letter: Start recording a macro to register "letter".
-- `q`: Stop recording the macro.
-- `@` + letter: Replay the macro stored in register "letter".
+#### LSP Code Actions
+- `<leader>rn` - Rename symbol
+- `<leader>ca` - Code action
+- `gd` - Go to definition
+- `gr` - Find references
+- `gI` - Go to implementation
+- `K` - Show hover documentation
 
-### Visual block mode
+#### Repeating Operations
+- `.` - Repeat last change
+- `@:` - Repeat last command
+- `@@` - Repeat last macro
 
-- `Ctrl + v`: Enter visual block mode to select rectangular blocks of text.
-- `I`: Enter insert mode at the beginning of each line in the selection.
-- `A`: Enter insert mode at the end of each line in the selection.
-- `r`: Replace the selected block with a single character.
-- `d`: Delete the selected block.
-- `y`: Yank (copy) the selected block.
-- `!`: Run the selected block as a shell command.
+#### Diagnostic Navigation
+- `<leader>lx` - Toggle Trouble diagnostics panel
+- `<leader>lw` - Workspace diagnostics
+- `<leader>ld` - Document diagnostics
 
-### Multiple cursors
+## 4. Multi-file & Project Navigation
 
-- `Ctrl + v`: Enter visual block mode.
-- Select the text you want to edit with multiple cursors.
-- `Ctrl + g`: Toggle the current selection.
-- Use `j` or `k` to move to the next or previous selection.
-- Edit the text as needed.
+### 4.1 File Navigation
+- `<leader>pf` - Find files⁷
+- `<leader>fs` - Grep in files⁷
+- `<leader>bf` - Find buffers⁷
+- `<leader>b/` - Fuzzy find in current buffer⁷
+- `<leader>pt` - Toggle project file tree¹⁷
 
-### Folding
+### 4.2 Terminal Integration
+- `<leader>/` - Toggle floating terminal¹⁸
+- `<leader>tf` - Toggle floating terminal¹⁸
+- `<leader>th` - Create horizontal terminal¹⁸
+- `<leader>tv` - Create vertical terminal¹⁸
+- `<esc>` or `jk` in terminal mode - Exit terminal mode¹⁸
+- `<C-h/j/k/l>` in terminal mode - Navigate between windows¹⁸
 
-- `za`: Toggle the fold under the cursor.
-- `zc`: Close the fold under the cursor.
-- `zo`: Open the fold under the cursor.
-- `zR`: Open all folds.
-- `zM`: Close all folds.
+### 4.3 Window Management
+- `<C-w>h/j/k/l` - Move cursor to window in that direction¹⁷
+- `<C-w>w` - Move cursor to previous window¹⁷
+- `<C-w></+/->` - Resize window in that direction¹⁷
+- `<C-w>bh/j/k/l` - Swap buffer with window in that direction¹⁷
 
-### Registers
+### 4.4 Advanced Telescope Usage
+- `<C-g>` in Telescope - Choose which window to open the selection in⁷
+- `<esc>` in insert mode - Close Telescope⁷
+- `<leader>fq` - List quickfix items⁷
+- `<leader>fj` - Jump list⁷
+- `<leader>fr` - Browse registers⁷
+- `<leader>fm` - List marks⁷
 
-- `"letter`: Prefix a command with a register letter to use that register. For example, `"ayy` copies the current line to register a.
-- `:reg`: Display the contents of all registers.
+### 4.5 Mark Management
+- Named marks (`ma` through `mz`) for positions within a file
+- File marks with capital letters (`mA` through `mZ`) that work across buffers
+- `<leader>fm` - List and navigate marks⁷
 
-### Marks
+## 5. Search & History Navigation
 
-- `m` + letter: Set a mark at the current cursor position.
-- `'` + letter: Jump to the line containing the mark.
-- ```` + letter: Jump to the exact cursor position of the mark.
+### 5.1 Enhanced Search with Hlslens
+- `n`/`N` - Navigate search results with count indicator¹²
+- `*`/`#` - Search for word under cursor with enhanced visibility¹²
+- `g*`/`g#` - Search for partial word under cursor¹²
 
-## Plugins
+### 5.2 Undo History Navigation
+- `<leader>u` - Toggle undo tree visualization¹³
+- Navigate through complex undo history
+- Restore previous states even after multiple changes
 
-### vim-commentary -- Comment stuff out
-- `gcc`: Comment out the current line.
-- `gc`: Comment out the target of a motion command.
+## 6. Focus & Zen Modes
 
-### vim-surround -- All about surroundings
+### 6.1 Distraction-Free Editing
+- `<leader>z` - Toggle Zen Mode for focused editing¹⁴
+- Control width and appearance of the editing environment
 
-- `cs` + old_char + new_char: Replace the surrounding character `old_char` with `new_char`.
-- `ds` + old_char: Delete the surrounding character `old_char`.
-- `ys` + motion + new_char: Add `new_char` as the new surrounding character around the selected text.
-- `yS` + old_char + new_char: Same as `ys` but the surrounding character is a newline.
+### 6.2 Enhanced Reading
+- Twilight plugin dims inactive portions of code¹⁵
+- No-Neck-Pain provides balanced window layouts¹⁶
 
-### session-manager
+### 6.3 AI Integration
+- `<Tab>` - Accept Copilot suggestion
+- Seamless integration with Copilot for intelligent code completions
 
-- `:SessionManager load_session`: Load a session from a list.
-- `:SessionManager delete_session`: Delete a session from a list.
+## 7. Collaboration & Sessions
 
+### 7.1 Collaborative Editing
+- `<leader>ciu` - Set up collaboration server²³
+- `<leader>ciss` - Stop collaboration server²³
+- `<leader>cij*` - Various commands to join collaborative sessions²³
+- `<leader>cif` - Follow another collaborator²³
 
+### 7.2 Session Management
+- Automatic session saving and loading based on git projects²⁴
+- Preserves window layouts, tab pages, and terminal state
+- Handles session management across different directories
+
+## 8. Git Integration
+
+### 8.1 Neogit Commands
+- `<leader>gs` - Open git status window²⁰
+- `<leader>gc` - Commit changes²⁰
+- `<leader>gp` - Push changes²⁰
+- `<leader>gP` - Pull changes²⁰
+- `<leader>gm` - Merge²⁰
+- Various other git operations accessible through leader mappings²⁰
+
+### 8.2 Diffview
+- `<leader>gd` - Open diff viewer²⁰
+- `<leader>gh` - View file history²⁰
+- Compare changes with powerful interactive interface
+
+## 9. Advanced Techniques & Workflows
+
+### 9.1 Registers and Macros
+- Named registers (`"a` through `"z`) for storing text
+- `<leader>fr` - Browse registers⁷
+- Record complex macros with `q{register}` that use leap, text objects and TreeSitter movements
+
+### 9.2 Command Mode Power Tools
+- `:g/pattern/command` - Execute a command on lines matching a pattern
+- `:v/pattern/command` - Execute a command on lines NOT matching a pattern
+- `:s/pattern/replacement/g` - Substitute text with regex support
+- `:norm! command` - Execute normal mode commands on multiple lines
+
+### 9.3 Composing Complex Commands
+- Use count prefix and complex motions together:
+- `2d2]f` - Delete two functions forward twice
+- `3yaf` - Yank three functions
+- `ct}` - Change until the next closing curly brace
+
+---
+
+**Plugin References:**
+1. leap.nvim
+2. quick-scope
+3. Custom remaps
+4. cliff.nvim
+5. nvim-treesitter-textobjects
+6. vim-matchup
+7. telescope.nvim
+8. mini.ai
+9. precognition.nvim
+10. mini.move
+11. Comment.nvim
+12. nvim-hlslens
+13. undotree
+14. zen-mode.nvim
+15. twilight.nvim
+16. no-neck-pain.nvim
+17. smart-splits.nvim
+18. toggleterm.nvim
+19. nvim-tree.lua
+20. neogit/diffview (git integration)
+21. Trouble.nvim
+22. Copilot.lua
+23. instant.nvim
+24. neovim-session-manager

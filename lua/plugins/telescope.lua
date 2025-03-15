@@ -283,7 +283,7 @@ return {
             },
             opts = {
                 defaults = {
-                    previewer=true,
+                    previewer = true,
                     preview = {
                         filesize_limit = 10, -- MB
                     },
@@ -346,9 +346,6 @@ return {
                     })
                 end, '[/] Fuzzily search in current buffer', {})
 
-
-                kmap('n', '<leader>pf', builtin.find_files, '[P]ick [F]ile')
-
                 local grep_search = function()
                     local grep = builtin.grep_string
                     -- Check if rg command is available
@@ -359,6 +356,10 @@ return {
 
                     grep({ search = vim.fn.input("Grep > ") });
                 end
+
+
+                kmap('n', '<leader>pf', builtin.find_files, '[P]ick [F]ile')
+                kmap('n', '<leader>ff', builtin.find_files, '[P]ick [F]ile')
                 kmap('n', '<leader>fs', grep_search, '[G]rep in files')
                 kmap('n', '<leader>sg', grep_search, '[G]rep in files', {})
 
@@ -372,11 +373,9 @@ return {
                 kmap('n', "<leader>fh", builtin.oldfiles, "List most recently used files", {})
 
 
-                kmap('n', '<leader>?', builtin.help_tags, 'Help', {})
+                kmap('n', '<leader>??', builtin.help_tags, '[F]ind [h]elp', {})
                 kmap('n', '<leader>bs', builtin.lsp_document_symbols, 'Find [s]ymbols in the current buffer', {})
                 kmap('n', '<leader>ps', builtin.lsp_workspace_symbols, 'Find [s]ymbols in the workspace', {})
-
-                kmap('n', '<leader>gf', builtin.git_files, '[G]it [F]iles')
             end
         },
     }

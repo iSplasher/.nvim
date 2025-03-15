@@ -255,38 +255,53 @@ return {
 
             -- Set up diagnostics
             local ds = vim.diagnostic.severity
-            local levels = {
-                [ds.ERROR] = 'error',
-                [ds.WARN] = 'warn',
-                [ds.INFO] = 'info',
-                [ds.HINT] = 'hint'
-            }
             local ds_icons = {
                 [ds.ERROR] = '',
                 [ds.WARN] = '',
                 [ds.HINT] = '',
                 [ds.INFO] = '',
             }
+            local ds_hls = {
+                [ds.ERROR] = 'DiagnosticSignError',
+                [ds.WARN] = 'DiagnosticSignWarn',
+                [ds.HINT] = 'DiagnosticSignHint',
+                [ds.INFO] = 'DiagnosticSignInfo',
+            }
 
-
-            local sign = function(args)
-                if ds_icons[args.name] == nil then
-                    return
-                end
-
-                vim.fn.sign_define(args.hl, {
-                    texthl = args.hl,
-                    text = ds_icons[args.name],
-                    numhl = ''
-                })
-            end
-
-            -- vim.diagnostic.config({ signs = { text = levels } })
-
-            -- sign({ name = 'error', hl = 'DiagnosticSignError' })
-            -- sign({ name = 'warn', hl = 'DiagnosticSignWarn' })
-            -- sign({ name = 'hint', hl = 'DiagnosticSignHint' })
-            -- sign({ name = 'info', hl = 'DiagnosticSignInfo' })
+            vim.diagnostic.config({
+                underline = true,
+                virtual_text = {
+                    severity = { min = ds.INFO },
+                    prefix = function(diagnostic, i, total)
+                        local s = ds_icons[diagnostic.severity] or ''
+                        if i == 1 then
+                            if total == 1 then
+                                return string.format('%s', s)
+                            else
+                                return string.format('%s (%d)', s, total)
+                            end
+                        end
+                        return ''
+                    end,
+                    format = function(diagnostic)
+                        if not diagnostic.source or diagnostic.source == "" then
+                            return string.format('%s', diagnostic.message)
+                        end
+                        local s = diagnostic.source:gsub(' Diagnostics.', '')
+                        return string.format('%s [%s]', diagnostic.message, s)
+                    end,
+                },
+                signs = {
+                    text = ds_icons,
+                    texthl = ds_hls,
+                },
+                update_in_insert = true,
+                severity_sort = true,
+                float = {
+                    source = true,
+                    border = "rounded",
+                },
+            })
 
             -- Auto formatting
             -- Switch for controlling whether you want autoformatting.
@@ -397,7 +412,7 @@ return {
                 end
             })
 
-           
+
             require('mason-lspconfig').setup({
                 ensure_installed = ensure_installed,
                 handlers = {
