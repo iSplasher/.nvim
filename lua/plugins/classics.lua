@@ -6,5 +6,7 @@ return {
     -- 'tpope/vim-surround',
     -- 'tpope/vim-commentary',
    
+  -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-sleuth',
     
 }

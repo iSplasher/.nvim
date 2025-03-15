@@ -7,33 +7,13 @@ local kmap = utility.kmap
 
 return {
 
-    -- better format for hover
+       -- better format for hover
     {
         "Fildo7525/pretty_hover",
         event = "LspAttach",
         opts = {}
     },
 
-    -- Smooth scroll
-    {
-        'karb94/neoscroll.nvim',
-        config = function()
-            require('neoscroll').setup({
-                pre_hook = function()
-                    vim.opt.eventignore:append({
-                        'WinScrolled',
-                        'CursorMoved',
-                    })
-                end,
-                post_hook = function()
-                    vim.opt.eventignore:remove({
-                        'WinScrolled',
-                        'CursorMoved',
-                    })
-                end,
-            })
-        end
-    },
 
     -- Writing
     'preservim/vim-pencil',
@@ -42,50 +22,15 @@ return {
 
     -- 'mg979/vim-visual-multi',
 
-    -- Git related
-    'tpope/vim-fugitive',
-    'tpope/vim-rhubarb',
-    'lewis6991/gitsigns.nvim',
-
-    -- Detect tabstop and shiftwidth automatically
-    'tpope/vim-sleuth',
-
     -- Undo
     {
         'mbbill/undotree',
         config = function()
-            vim.keymap.set('n', "<leader>u", vim.cmd.UndotreeToggle, { desc = "Toggle [U]ndo Tree" })
-        end
-    },
-
-
-
-
-    -- Session
-    {
-        'Shatur/neovim-session-manager',
-        dependencies = {
-            'nvim-lua/plenary.nvim'
-        },
-        config = function()
-            require('session_manager').setup {
-                autoload_mode = require('session_manager.config').AutoloadMode.Disabled,
-                autosave_ignore_dirs = {
-                    "D:/TEMP",
-                    "D:\\TEMP",
-                    "X:\\TEMP",
-                    "X:/TEMP",
-                    "C:/WINDOWS",
-                    "C:\\WINDOWS",
-                    'C:/Program Files',
-                    'C:\\Program Files'
-                }
-            }
+            kmap('n', "<leader>u", vim.cmd.UndotreeToggle,"Toggle [U]ndo Tree" )
         end
     },
 
     -- Buffer
-
     -- Zen mode
     {
         "folke/zen-mode.nvim",

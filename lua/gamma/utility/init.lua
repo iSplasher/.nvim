@@ -317,6 +317,11 @@ function M.config_path()
   return p
 end
 
+--Get the nvim-data directory
+---@return string @The path to the nvim data directory.
+function M.data_path()
+  return vim.fn.stdpath("data")
+end
 ---A better require, that supports recursive require of directories.
 ---@param path string @The path to require. Can also be a directory.
 ---@param recursive boolean | nil @Whether or not to require all files in the directory.
@@ -435,20 +440,22 @@ end
 ---@param endstr string | nil @The string to print at the end. (default: "\n")
 function M.print(obj, endstr)
   endstr = endstr or "\n"
+  local msg = vim.inspect(obj) .. endstr
   if vim.g.vscode then
-    print(vim.inspect(obj) .. endstr)
+    print(msg)
   else
-    vim.api.nvim_out_write(vim.inspect(obj) .. endstr)
+    vim.notify(msg, 'info')
   end
 end
 
 ---A helper function to print error messages to the console.
 ---@param obj any @The object to print.
 function M.print_error(obj)
+  local msg = vim.inspect(obj)
   if vim.g.vscode then
-    print(vim.inspect(obj))
+    print(msg)
   else
-    vim.api.nvim_err_writeln(vim.inspect(obj))
+    vim.notify(msg, 'error')
   end
 end
 

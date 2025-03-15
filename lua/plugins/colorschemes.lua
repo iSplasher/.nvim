@@ -1,9 +1,9 @@
+-- theme
 return {
     {
         'marko-cerovac/material.nvim',
         name = 'material',
         lazy = true,
-        
         priority = 1000,
     },
 
@@ -11,7 +11,6 @@ return {
         'sainnhe/sonokai',
         name = 'sonokai',
         lazy = true,
-        
         priority = 1000,
     },
 
@@ -19,8 +18,7 @@ return {
         'elianiva/gruvy.nvim',
         name = 'gruvy',
         lazy = true,
-        
         priority = 1000,
-        dependencies = {{'rktjmp/lush.nvim'}},
+        dependencies = { { 'rktjmp/lush.nvim' } },
     },
 }

@@ -60,5 +60,5 @@ require('lazy').setup("plugins", {
 })
 
 if not vim.g.vscode then
-  kmap("n", "<leader>l", vim.cmd.Lazy, "Lazy Plugin Manager", {})
+  kmap("n", "<leader>L", vim.cmd.Lazy, "Lazy Plugin Manager", {})
 end

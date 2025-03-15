@@ -1,3 +1,5 @@
+local utility = require('gamma/utility')
+local kmap = utility.kmap
 -- Makes hlslens work with visual-multi
 local M = {}
 local config
@@ -45,18 +47,20 @@ return {
         nearest_only = true, -- show nearest matches only
       }
 
-      local kopts = { noremap = true, silent = true }
+      local kopts = { remap = true, silent = true }
 
-      vim.api.nvim_set_keymap('n', 'n',
+      kmap('n', 'n',
         [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        "Next match",
         kopts)
-      vim.api.nvim_set_keymap('n', 'N',
+      kmap('n', 'N',
         [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        "Previous match",
         kopts)
-      vim.api.nvim_set_keymap('n', '*', [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
-      vim.api.nvim_set_keymap('n', '#', [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)
-      vim.api.nvim_set_keymap('n', 'g*', [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)
-      vim.api.nvim_set_keymap('n', 'g#', [[g#<Cmd>lua require('hlslens').start()<CR>]], kopts)
+      kmap('n', '*', [[*<Cmd>lua require('hlslens').start()<CR>]], "Next match under cursor", kopts)
+      kmap('n', '#', [[#<Cmd>lua require('hlslens').start()<CR>]], "Previous match under cursor", kopts)
+      kmap('n', 'g*', [[g*<Cmd>lua require('hlslens').start()<CR>]], "Next match under cursor (word)", kopts)
+      kmap('n', 'g#', [[g#<Cmd>lua require('hlslens').start()<CR>]], "Previous match under cursor (word)", kopts)
 
       -- visual-multi integration
       --vim.cmd([[
