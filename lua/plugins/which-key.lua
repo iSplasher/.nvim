@@ -31,10 +31,10 @@ return {
             triggers = {
                 { "<auto>", mode = "nxso" },
                 { "*",      mode = { "n", "v" } },
-                { "<C>",    mode = { "n", "v" } },
+                { "<C>",    mode = { "v", "n", "v" } },
             },
             defer = function(ctx)
-                return vim.list_contains({ "<C-V>", "V", 'T', 't', 'C', 'c' }, ctx.mode)
+                return vim.list_contains({ "v", "<C-V>", "V", 'T', 't', 'C', 'c' }, ctx.mode)
             end
         },
         init = function()

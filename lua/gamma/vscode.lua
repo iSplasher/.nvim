@@ -12,7 +12,9 @@ local enabled = {
   'tpope/vim-repeat',
   'andymass/vim-matchup',
   'Rentib/cliff.nvim',
-  'numToStr/Comment.nvim'
+  'numToStr/Comment.nvim',
+  'Rentib/cliff.nvim',
+  'echasnovski/mini.move',
 }
 
 return {

@@ -2,20 +2,21 @@ return {
   {
     "zbirenbaum/copilot.lua",
     lazy = true,
-    
     cmd = 'Copilot',
     event = 'InsertEnter',
     config = function()
       require('copilot').setup {
-        suggestion = {
-          auto_trigger = true,
-          keymap = {
-            accept = '<Tab>',
-          }
-        },
-        panel = {
-          auto_refresh = true,
-        },
+        -- suggestion = {
+        --   auto_trigger = true,
+        --   keymap = {
+        --     accept = '<Tab>',
+        --   }
+        -- },
+        suggestion = { enabled = false }, -- using copilot_cmp
+        --  panel = {
+        --   auto_refresh = true,
+        -- },
+        panel = { enabled = false }, -- using copilot_cmp
         filetypes = {
           yaml = true,
           markdown = true,
@@ -68,4 +69,8 @@ return {
       require("lualine").setup(current_config)
     end
   },
+  {
+    "giuxtaposition/blink-cmp-copilot",
+    dependencies = { 'saghen/blink.cmp', "zbirenbaum/copilot.lua" },
+  }
 }

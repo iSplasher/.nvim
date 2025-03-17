@@ -207,13 +207,15 @@ return {
                         sources = {
                             default = function(ctx)
                                 local success, node = pcall(vim.treesitter.get_node)
+                                local s = { 'copilot' }
                                 if vim.bo.filetype == 'lua' then
-                                    return { 'lazydev', 'lsp', 'path', 'snippets' }
+                                    vim.list_extend(s, { 'lazydev', 'lsp', 'path', 'snippets' })
                                 elseif success and node and vim.tbl_contains({ 'comment', 'line_comment', 'block_comment' }, node:type()) then
-                                    return { 'buffer' }
+                                    vim.list_extend(s, { 'buffer' })
                                 else
-                                    return { 'lsp', 'path', 'snippets', 'buffer' }
+                                    vim.list_extend(s, { 'lsp', 'path', 'snippets', 'buffer' })
                                 end
+                                return s
                             end,
                             providers = {
                                 lazydev = {
@@ -221,6 +223,12 @@ return {
                                     module = "lazydev.integrations.blink",
                                     -- make lazydev completions top priority (see `:h blink.cmp`)
                                     score_offset = 100,
+                                },
+                                copilot = {
+                                    name = "copilot",
+                                    module = "blink-cmp-copilot",
+                                    score_offset = 100,
+                                    async = true,
                                 },
                             },
                         },

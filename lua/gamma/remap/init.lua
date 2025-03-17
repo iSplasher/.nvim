@@ -3,9 +3,6 @@ local utility = require('gamma.utility')
 
 local kmap = utility.kmap
 
--- Remap caps-lock to escape
-kmap({ 'i', 'n' }, '<Caps>', '<Esc>', { remap = true })
-
 -- disable Q
 kmap("n", "Q", "<nop>", { remap = true })
 

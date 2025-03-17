@@ -92,16 +92,17 @@ return {
                 end
             end
 
-            -- -- Toggle comment the whole file
-            -- kmap({ 'n', 'v', 'o' }, '<leader>gcc', function()
-            --     -- save current cursor position
-            --     local cursor = vim.api.nvim_win_get_cursor(0)
-            --     -- select the whole file
-            --     utility.exec_keymap('ggVG')
-            --     utility.exec_keymap(smart_toggle_comment(), 'v')
-            --     -- restore cursor position
-            --     vim.api.nvim_win_set_cursor(0, cursor)
-            -- end, "Toggle comment on the whole file", { silent = true })
+            -- Toggle comment the whole file
+            kmap({ 'n', 'v', 'x', 'o' }, '<leader>cc', function()
+                -- save current cursor position
+                local cursor = vim.api.nvim_win_get_cursor(0)
+                -- select the whole file
+                utility.type_keymap('ggVG')
+
+                utility.exec_keymap(smart_toggle_comment(), 'v')
+                -- restore cursor position
+                vim.api.nvim_win_set_cursor(0, cursor)
+            end, "Toggle comment on the whole file", { silent = true })
 
             -- kmap({'n', 'v', 'o'}, '//', smart_toggle_comment_cmd(smart_toggle_comment()), "Toggle comment line(s)", { silent = true })
             -- kmap({'n', 'v', 'o'}, '<C-k>c', smart_toggle_comment_cmd(smart_toggle_comment()), "Toggle comment line(s)", { silent = true })

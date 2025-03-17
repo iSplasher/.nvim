@@ -3,8 +3,12 @@ local utility = require('gamma.utility')
 local kmap = utility.kmap
 
 -- Keep cursor in the middle when jumping to search terms
-kmap("n", "n", "nzzzv", { remap = true })
-kmap("n", "N", "Nzzzv", { remap = true })
+kmap("n", "n", "nzzzv", "Next search result", { remap = true })
+kmap("n", "N", "Nzzzv", "Previous search result", { remap = true })
+
+--  Keep cursor in the middle when navigating half a page
+kmap('n', '<C-d>', '<C-d>zz', "Half page down")
+kmap('n', '<C-u>', '<C-u>zz', "Half page up")
 
 -- provide hjkl movements in Insert mode and Command-line mode via the <Alt> modifier key
 kmap('i', '<A-h>', '<Left>', { noremap = true })

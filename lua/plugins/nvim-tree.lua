@@ -70,23 +70,31 @@ return {
                     }
                 end
 
+
                 api.config.mappings.default_on_attach(bufnr)
-
-                -- close on esc
-                vim.keymap.set('n', '<Esc>', api.tree.close, opts('Close', false))
-
-                vim.keymap.del('n', 'd', { buffer = bufnr })
-
-                vim.keymap.set('n', '%', api.fs.create, opts('Create file'))
-                vim.keymap.set('n', 'D', api.fs.remove, opts('Delete'))
-                vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
 
                 -- Close tree when opening a file
                 local function open_and_close()
                     api.node.open.edit(nil, { quit_on_open = true })
                 end
+                --
+                -- kmap('n', 'h', function()
+                --     api.node.navigate.parent()
+                --     utility.keypress('<CR>')
+                -- end, opts('Navigate to parent'))
+                -- kmap('n', 'l', open_and_close, opts('Open'))
+                --
+                -- close on esc
+                kmap('n', '<Esc>', api.tree.close, opts('Close', false))
 
-                vim.keymap.set('n', '<CR>', open_and_close, opts('Open file', false))
+                vim.keymap.del('n', 'd', { buffer = bufnr })
+
+                kmap('n', '%', api.fs.create, opts('Create file'))
+                kmap('n', 'D', api.fs.remove, opts('Delete'))
+                kmap('n', '?', api.tree.toggle_help, opts('Help'))
+
+
+                kmap('n', '<CR>', open_and_close, opts('Open file', false))
             end
 
             -- Automatically open file upon creation

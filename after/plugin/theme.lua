@@ -8,7 +8,16 @@ end
 
 if vim.g.vscode then
 	return
+else
+	local function set_highlights()
+		vim.api.nvim_set_hl(0, "LeapMatch", { link = "CharacterHint" })
+		vim.api.nvim_set_hl(0, "LeapLabelPrimary", { link = "CharacterHintSecondary" })
+		vim.api.nvim_set_hl(0, "LeapLabelSecondary", { link = "CharacterHintDimmed" })
+	end
+
+	set_highlights()
 end
+
 
 if not vim.g.colors_name then
 	error("No colorscheme set (vim.g.colors_name is empty).")

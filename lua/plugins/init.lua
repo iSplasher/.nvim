@@ -18,15 +18,11 @@ return {
     -- Writing
     'preservim/vim-pencil',
 
-    -- Search & Highlight
-
-    -- 'mg979/vim-visual-multi',
-
     -- Undo
     {
         'mbbill/undotree',
         config = function()
-            kmap('n', "<leader>wu", vim.cmd.UndotreeToggle, "Toggle [U]ndo Tree")
+            kmap('n', "<leader>wu", vim.cmd.UndotreeToggle, "Open Undo Tree")
         end
     },
 
@@ -34,23 +30,43 @@ return {
     -- Zen mode
     {
         "folke/zen-mode.nvim",
+        dependencies = {
+
+            {
+                "folke/twilight.nvim",
+                opts = {
+                    alpa = 0.10,
+                    context = 20,
+                    termbg = nil
+                }
+            },
+
+        },
         config = function()
+            vim.api.nvim_set_hl(0, "ZenBg", { ctermbg = 0 })
+
             require("zen-mode").setup {
-                width = .85
+                width = .85,
+                backdrop = .95,
+                -- Vertical padding
+                window = {
+                    height = function()
+                        return vim.api.nvim_win_get_height(0) - 2
+                    end,
+                },
+                plugins = {
+                    neovide = {
+                        enabled = vim.g.neovide or false,
+                        scale = 1.15,
+                        disable_animations = false
+                    },
+                },
+                on_open = function(win)
+                    vim.api.nvim_set_hl(0, "ZenBg", { ctermbg = 0 })
+                end,
             }
 
-            kmap('n', "<leader>z", vim.cmd.ZenMode, "Toggle [Z]en Mode")
-        end
-    },
-
-    {
-        "folke/twilight.nvim",
-        config = function()
-            require("twilight").setup {
-                -- your configuration comes here
-                -- or leave it empty to use the default settings
-                -- refer to the configuration section below
-            }
+            kmap('n', "<leader>tz", vim.cmd.ZenMode, "Toggle [Z]en Mode")
         end
     },
 
@@ -109,26 +125,27 @@ return {
 
     -- Collab
 
-    {
-        'jbyuki/instant.nvim',
-        config = function()
-            vim.g.instant_username = "Twiddly"
-
-            vim.keymap.set('n', "<leader>ciu", ":InstantStartServer 0.0.0.0 7899", { desc = "Set[u]p Collab Server" })
-            vim.keymap.set('n', "<leader>ciss", ":InstantStopServer", { desc = "[S]top Collab [S]erver" })
-            vim.keymap.set('n', "<leader>cijf", ":InstantStartSingle 127.0.0.1 7899",
-                { desc = "Join Collab Single Buffer ([F]irst client)" })
-            vim.keymap.set('n', "<leader>cijc", ":InstantJoinSingle 127.0.0.1 7899",
-                { desc = "Join Collab Single Buffer ([C]lient)" })
-            vim.keymap.set('n', "<leader>cijsf", ":InstantStartSession 127.0.0.1 7899",
-                { desc = "Join Collab Session ([F]irst client)" })
-            vim.keymap.set('n', "<leader>cijsc", ":InstantJoinSession 127.0.0.1 7899",
-                { desc = "Join Collab Session ([C]lient)" })
-            vim.keymap.set('n', "<leader>cis", "<nop>", { desc = "[S]top Collab" })
-            vim.keymap.set('n', "<leader>cisc", ":InstantStop", { desc = "[S]top Collab [C]lient" })
-            vim.keymap.set('n', "<leader>cif", ":InstantFollow Ignotak", { desc = "[F]ollow Collab User" })
-            vim.keymap.set('n', "<leader>cisf", ":InstantStopFollow", { desc = "[S]top [F]ollowing Collab User" })
-        end
-    },
-
+    -- {
+    --     'jbyuki/instant.nvim',
+    --     event = "VeryLazy",
+    --     config = function()
+    --         vim.g.instant_username = "Twiddly"
+    --
+    --         vim.keymap.set('n', "<leader>ciu", ":InstantStartServer 0.0.0.0 7899", { desc = "Set[u]p Collab Server" })
+    --         vim.keymap.set('n', "<leader>ciss", ":InstantStopServer", { desc = "[S]top Collab [S]erver" })
+    --         vim.keymap.set('n', "<leader>cijf", ":InstantStartSingle 127.0.0.1 7899",
+    --             { desc = "Join Collab Single Buffer ([F]irst client)" })
+    --         vim.keymap.set('n', "<leader>cijc", ":InstantJoinSingle 127.0.0.1 7899",
+    --             { desc = "Join Collab Single Buffer ([C]lient)" })
+    --         vim.keymap.set('n', "<leader>cijsf", ":InstantStartSession 127.0.0.1 7899",
+    --             { desc = "Join Collab Session ([F]irst client)" })
+    --         vim.keymap.set('n', "<leader>cijsc", ":InstantJoinSession 127.0.0.1 7899",
+    --             { desc = "Join Collab Session ([C]lient)" })
+    --         vim.keymap.set('n', "<leader>cis", "<nop>", { desc = "[S]top Collab" })
+    --         vim.keymap.set('n', "<leader>cisc", ":InstantStop", { desc = "[S]top Collab [C]lient" })
+    --         vim.keymap.set('n', "<leader>cif", ":InstantFollow Ignotak", { desc = "[F]ollow Collab User" })
+    --         vim.keymap.set('n', "<leader>cisf", ":InstantStopFollow", { desc = "[S]top [F]ollowing Collab User" })
+    --     end
+    -- },
+    --
 }
