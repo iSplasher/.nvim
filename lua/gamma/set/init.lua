@@ -1,3 +1,5 @@
+vim.cmd("language en_US")
+
 vim.g.backupdir = vim.fn.stdpath('data') .. '/backup'
 -- create the directories if they don't exist
 vim.fn.system('mkdir -p "' .. vim.g.backupdir .. '"')

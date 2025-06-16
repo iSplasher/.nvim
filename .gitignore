@@ -1,2 +1,5 @@
 error.log
 venv/
+.venv/
+.claude/
+CLAUDE.md
