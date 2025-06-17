@@ -11,13 +11,16 @@ function M.auto_cwd()
     local bufname = vim.fn.bufname(vim.fn.bufnr('%'))
     local bufdir = vim.fn.fnamemodify(bufname, ':h')
 
-    utility.print("Automatically setting cwd to " .. bufdir)
+    utility.print_debug("Automatically setting cwd to " .. bufdir)
 
     vim.api.nvim_command('cd ' .. bufdir)
   end
 end
 
 function M.setup_autocmds()
+  if vim.g.vscode then
+    return
+  end
   vim.api.nvim_create_augroup("AutoWorkingDirectory", { clear = true })
   vim.api.nvim_create_autocmd(
     { "VimEnter" },

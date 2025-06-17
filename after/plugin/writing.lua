@@ -1,4 +1,4 @@
-local writing = require('gamma.writing')
+local writing = require('gamma.settings.writing')
 
 
 if package.loaded.pencil then

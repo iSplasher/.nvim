@@ -10,11 +10,12 @@ local function get_window_dimensions()
     return { width = width, height = height, row = row, col = col }
 end
 
+---@class gamma.popup.FloatingContentOpts
+---@field title string: Title for the floating window
+---@field content? string: Content for the floating window
+---@field path? string: Path to the file to load in the floating window
+---@param opts gamma.popup.FloatingContentOpts: Options for the floating window
 ---Create a floating window with content
----@param opts table: Options for the floating window
----@field opts.title string: Title for the floating window
----@field opts.content string?: Content for the floating window
----@field opts.path string?: Path to the file to load in the floating window
 function M.floating_content(opts)
     local dim = get_window_dimensions()
 

@@ -1,0 +1,10 @@
+{
+    "Lua.workspace.library": [
+        "C:/Program Files/Neovim/share/nvim/runtime",
+        "/usr/share/nvim/runtime",
+    ],
+    "Lua.diagnostics.globals": [
+        "vim"
+    ],
+    "Lua.runtime.version": "LuaJIT"
+}

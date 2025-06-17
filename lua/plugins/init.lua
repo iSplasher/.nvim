@@ -123,7 +123,7 @@ return {
 
             kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)", {})
             kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)", {})
-            kmap('n', "<leader>ft", utility.cmd('Telescope attempt'), "Find [T]emp files", {})
+            kmap('n', "<leader>ft", utility.create_cmd('Telescope attempt'), "Find [T]emp files", {})
         end
     },
 

@@ -4,12 +4,13 @@ local M = {}
 
 ---A helper function to turn a table into a string.
 ---@param tbl table @The table.
----@param depth number @The depth of sub-tables to traverse through.
----@param n number @Do NOT manually set this. This controls formatting through recursion.
+---@param depth? number @The depth of sub-tables to traverse through.
+---@param n? number @Do NOT manually set this. This controls formatting through recursion.
+---@return string @The string representation of the table.
 function M.table_to_string(tbl, depth, n)
   n = n or 0;
   depth = depth or 5;
-  str = ""
+  local str = ""
 
   if (depth == 0) then
     str = str .. (string.rep(' ', n) .. "...");
@@ -52,7 +53,7 @@ end
 
 ---A helper function to print a table's contents.
 ---@param tbl table @The table to print.
----@param depth number @The depth of sub-tables to traverse through and print.
+---@param depth? number @The depth of sub-tables to traverse through and print.
 function M.print_table(tbl, depth)
   print(M.table_to_string(tbl, depth));
 end
@@ -88,36 +89,33 @@ end
 
 local _saved_maps = {}
 local _saved_maps_d = {}
----Set a keymap.
----@param mode string | table @The mode to set the keymap for.
----@param keys string | table @The keys to set the keymap for.
+---@class gamma.utility.kmap_opts
+---@field noremap? boolean Only remap the keymap if it does not already exist.
+---@field remap? boolean Remap if the keymap already exists. (default: true if noremap is not set)
+---@field silent? boolean Do not echo the command to the command-line.
+---@field expr? boolean Evaluate the given command as an expression to obtain the final map resut.
+---@field nowait? boolean Do not wait for other keymaps after this one.
+---@field cmd? boolean Execute the given command directly when invoked.
+---@field script? boolean Only remap characters that were defined local to a script.
+---@field unique? boolean Do not override a keymap if it already exists.
+---@field buffer? boolean | number Set the keymap for the current buffer only.
+---@field local? boolean Set the keymap for the current buffer only.
+--- Set a keymap
+---@param mode string | string[] @The mode to set the keymap for.
+---@param keys string | string[]  @The keys to set the keymap for.
 ---@param command string | function @The command to set the keymap for.
----@param desc_or_opts string | table | nil @The description to set the keymap for.
----@param opts table | nil @The options to set the keymap for.
----@param opts.noremap boolean | nil @Only remap the keymap if it does not already exist.
----@param opts.remap boolean | nil @Remap if the keymap already exists. (default: true if noremap is not set)
----@param opts.silent boolean | nil @Do not echo the command to the command-line.
----@param opts.expr boolean | nil @Evaluate the given command as an expression to obtain the final map resut.
----@param opts.nowait boolean | nil @Do not wait for other keymaps after this one.
----@param opts.cmd boolean | nil @Execute the given command directly when invoked.
----@param opts.script boolean | nil @Only remap characters that were defined local to a script.
----@param opts.unique boolean | nil @Do not override a keymap if it already exists.
----@param opts.buffer boolean | number | nil @Set the keymap for the current buffer only.
----@param opts.local boolean | nil @Set the keymap for the current buffer only.
+---@param desc_or_opts? string | table The description to set the keymap for.
+---@param opts? gamma.utility.kmap_opts The options to set the keymap for.
 ---@note This is a wrapper around `vim.keymap.set` that provides a more user-friendly interface.
 ---@example
----- -- Map to a Lua function:
----- kmap('n', 'lhs', function() print("real lua function") end, "description", { noremap = true })
----- -- Map to multiple modes:
----- kmap({'n', 'v'}, '<leader>lr', vim.lsp.buf.references, "description", { buffer = true })
----- -- Buffer-local mapping:
----- kmap('n', '<leader>w', "<cmd>w<cr>", "description", { silent = true, buffer = 5 })
----- -- Expr mapping:
----- kmap('i', '<Tab>', function()
-----   return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
----- end, "description", { expr = true })
----- -- <Plug> mapping:
----- kmap('n', '[%%', '<Plug>(MatchitNormalMultiBackward)', "description",)
+---- Map to a Lua function: kmap('n', 'lhs', function() print("real lua function") end, "description", { noremap = true })
+---- Map to multiple modes: kmap({'n', 'v'}, '<leader>lr', vim.lsp.buf.references, "description", { buffer = true })
+---- Buffer-local mapping: kmap('n', '<leader>w', "<cmd>w<cr>", "description", { silent = true, buffer = 5 })
+---- Expr mapping:
+-- kmap('i', '<Tab>', function()
+--   return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+-- end, "description", { expr = true })
+-- <Plug> mapping: kmap('n', '[%%', '<Plug>(MatchitNormalMultiBackward)', "description",)
 function M.kmap(mode, keys, command, desc_or_opts, opts)
   -- if desc_or_opts is not a string, then its opts
   local desc = nil
@@ -133,8 +131,13 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
   end
 
   -- mode to list
+  local _mode = {}
   if type(mode) == 'string' then
-    mode = { mode }
+    _mode = { mode }
+  elseif type(mode) == 'table' then
+    _mode = mode
+  else
+    error("kmap -- mode parameter must be a string or table")
   end
 
   -- keys to list
@@ -155,11 +158,11 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       -- check if already mapped
       local err = false
       -- for each mode
-      local map_exists = M.keymap_exists(mode, key)
+      local map_exists = M.keymap_exists(_mode, key)
       if map_exists ~= false then
         if not err then
           err = true
-          M.print_error({ keys = key, mode = mode, command = command, desc = desc })
+          M.print_error({ keys = key, mode = _mode, command = command, desc = desc })
           -- Get the map
           -- {'lnum': 0, 'script': 0, 'mode': 'i', 'silent': 0, 'callback': function('<lambda>1'), 'noremap': 1, 'lhs': '<CR>', 'lhsr', 'nowait': 0, 'expr': 0, 'sid': -8, 'buffer': 0}
           local e_map = map_exists
@@ -175,7 +178,7 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
           end
 
           error("\nWARNING: Keymap '" .. key .. "' (" .. desc .. ")" ..
-            " already exists in '" .. M.table_to_string(mode) ..
+            " already exists in '" .. M.table_to_string(_mode) ..
             "' mode. (use { [no]remap = true } or to disable this warning)" ..
             "\n  Existing map: " .. e_map_lhs .. " -> " .. e_map_rhs .. " (" .. e_map_mode .. ") " .. e_map_desc)
         end
@@ -184,11 +187,11 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       end
     end
 
-    vim.keymap.set(mode, key, command, { desc = desc, table.unpack(k_opts) })
+    vim.keymap.set(_mode, key, command, { desc = desc, table.unpack(k_opts) })
 
     -- add to saved_maps
     local map = {
-      mode = mode,
+      mode = _mode,
       keys = key,
       map = command,
       desc = desc,
@@ -219,7 +222,7 @@ function M.get_saved_maps()
 end
 
 ---Check if a keymap exists.
----@param mode string @The mode to check the keymap for.
+---@param mode string | string[] @The mode to check the keymap for.
 ---@param keys string @The keys to check the keymap for.
 ---@return false|table @Whether or not the keymap exists. If it does, return the keymap.
 function M.keymap_exists(mode, keys)
@@ -227,11 +230,16 @@ function M.keymap_exists(mode, keys)
     M.get_saved_maps()
   end
 
+  local _mode = {}
   if type(mode) == 'string' then
-    mode = { mode }
+    _mode = { mode }
+  elseif type(mode) == 'table' then
+    _mode = mode
+  else
+    error("keymap_exists -- mode parameter must be a string or table")
   end
 
-  for _, m in ipairs(mode) do
+  for _, m in ipairs(_mode) do
     local r = vim.fn.mapcheck(keys, m) ~= ""
     if r ~= "" then
       local m = _saved_maps_d[keys]
@@ -287,49 +295,67 @@ end
 ---@param path string @The path to normalize.
 ---@return string @The normalized path.
 function M.normalize_path_sep(path)
-  return path:gsub("\\", "/")
+  local p = string.gsub(path, "\\", "/")
+  return p
 end
 
 ---Create a callable that will run a command.
 ---@param command string @The command to run.
----@param opts table | nil @The options to run the command with.
+---@param args? string[] The options to run the command with.
 ---@return function @The function that will run the command.
 ---@note This is useful for setting up keymaps that run commands.
 ---      Instead of remembering "<cmd>Some-command<cr>"
-function M.cmd(command, opts)
+function M.create_cmd(command, args)
   return function()
-    if opts == nil then
+    if args == nil then
       return vim.cmd(command)
     else
-      return vim.cmd { cmd = command, args = opts }
+      return vim.cmd { cmd = command, args = args }
     end
   end
 end
 
+---Get an environment variable.
+---@param name string @The name of the environment variable to get.
+---@return string | nil @The value of the environment variable, or nil if it does not exist.
+function M.get_env(name)
+  local value = os.getenv(name)
+  if value == nil then
+    return nil
+  end
+  return value
+end
+
+M.env = M.get_env -- Alias for get_env
 
 ---Reliably get nvim config path
 ---@return string @The path to the nvim config directory.
 function M.config_path()
   local p = debug.getinfo(1, "S").source:sub(2)
   -- go up directories
+  -- backslash to forward slash
+  p = p:gsub("\\", "/")
   p = p:gsub("lua/gamma/utility/init.lua", "")
-  p = p:gsub("lua\\gamma\\utility/init.lua", "")
   return p
 end
 
 --Get the nvim-data directory
 ---@return string @The path to the nvim data directory.
 function M.data_path()
-  return vim.fn.stdpath("data")
+  local p = vim.fn.stdpath("data"):gsub("\\", "/")
+  return p
 end
 
 ---A better require, that supports recursive require of directories.
 ---@param path string @The path to require. Can also be a directory.
----@param recursive boolean | nil @Whether or not to require all files in the directory.
----@param allow_empty boolean | nil @Whether or not to allow empty directories.
+---@param recursive? boolean Whether or not to require all files in the directory.
+---@param allow_empty? boolean Whether or not to allow empty directories.
 function M.require_dir(path, recursive, allow_empty)
   allow_empty = allow_empty or false
 
+  if path == nil or path == "" then
+    error("require_dir -- Path cannot be nil or empty")
+  end
   local dir = M.config_path()
 
   recursive = recursive or false
@@ -408,13 +434,16 @@ function M.require_dir(path, recursive, allow_empty)
           end
         elseif vim.fn.isdirectory(file_path) == 1 then
           local next_dir = vim.fs.relpath(dir, file_path)
-          M.require_dir(next_dir, recursive, allow_empty)
+          if next_dir ~= nil then
+            M.require_dir(next_dir, recursive, allow_empty)
+          end
         end
       end
       if not req and not allow_empty then
         error("require_dir -- No lua files found in directory: " .. path)
       end
     else
+      local init_path = path .. "/init.lua"
       if vim.fn.filereadable(init_path) == 1 then
         require(import_path)
       else
@@ -435,14 +464,14 @@ end
 
 ---A helper function to print something to the console.
 ---@param obj any @The object to print.
----@param endstr string | nil @The string to print at the end. (default: "\n")
+---@param endstr? string The string to print at the end. (default: "\n")
 function M.print(obj, endstr)
   endstr = endstr or "\n"
   local msg = vim.inspect(obj) .. endstr
   if vim.g.vscode then
     print(msg)
   else
-    vim.notify(msg, 'info')
+    vim.notify(msg, vim.log.levels.INFO)
   end
 end
 
@@ -453,24 +482,39 @@ function M.print_error(obj)
   if vim.g.vscode then
     print(msg)
   else
-    vim.notify(msg, 'error')
+    vim.notify(msg, vim.log.levels.ERROR)
   end
 end
 
----Execute shell commands.
+---A helper function to print debug messages to the console.
+---@param obj any @The object to print.
+function M.print_debug(obj)
+  local msg = vim.inspect(obj)
+  if vim.g.vscode then
+    print(msg)
+  else
+    vim.notify(msg, vim.log.levels.DEBUG)
+  end
+end
+
+---@class gamma.utility.shell_opts
+---@field async? boolean Whether or not to execute the command asynchronously.
+---@field cwd? string The current working directory to execute the command in.
+---@field env? table The environment variables to execute the command with.
+---@field timeout? number The timeout to execute the command with.
+---@field input? string The input to execute the command with.
+---@field text? boolean Whether or not to return the output as text. (default: true)
+---@field verbose? boolean Print the command before executing it, and print the output.
+---@field silent? boolean Do not print the output, or command.
+---@field on_exit? function The function to execute when the command exits. (optional)
+---A helper function to execute shell commands.
 ---@param cmd string[] @The command to execute.
----@param opts table | nil @The options to execute the command with.
----@param opts.async boolean | nil @Whether or not to execute the command asynchronously.
----@param opts.cwd string | nil @The current working directory to execute the command in.
----@param opts.env table | nil @The environment variables to execute the command with.
----@param opts.timeout number | nil @The timeout to execute the command with.
----@param opts.input string | nil @The input to execute the command with.
----@param opts.verbose boolean | nil @Print the command before executing it, and print the output.
----@param opts.silent boolean | nil @Do not print the output, or command.
----@param opts.on_exit function | nil @The function to execute when the command exits.
----@return table @{ code = 0, signal = 0, stdout = 'hello', stderr = '' }
+---@param opts? gamma.utility.shell_opts The options to execute the command with.
+---@return vim.SystemObj | vim.SystemCompleted
 function M.shell(cmd, opts)
   opts = opts or {}
+
+  
   local async = opts.async or false
   opts.async = nil
   local on_exit = opts.on_exit or nil
@@ -486,26 +530,45 @@ function M.shell(cmd, opts)
     M.print(string.format("shell: %s", table.concat(cmd, " ")))
   end
 
-  function _on_exit(obj)
+  local function _on_exit(obj)
     if not opts.silent or opts.silent == nil then
       if obj.code == 0 then
         if verbose then
           M.print(obj.stdout)
+          if obj.stderr and obj.stderr ~= "" then
+            M.print(obj.stderr)
+          end
         end
       else
-        M.print_error(obj.stderr)
+        M.print_error(M.print_table(obj))
       end
     end
-
+    
     if on_exit then
       on_exit(obj)
     end
+    return obj
   end
 
+  ---@type vim.SystemOpts
+  ---@diagnostic disable-next-line: assign-type-mismatch
+  local _opts = opts
   if async then
-    return vim.system(cmd, opts, _on_exit)
+    return vim.system(cmd, _opts, _on_exit)
   else
-    return vim.system(cmd, opts, _on_exit):wait()
+    return vim.system(cmd, _opts, _on_exit):wait()
+  end
+end
+
+---Check if a command exists and is executable and returns its abspath
+---@param cmd string @The command to check.
+---@return string | nil @The absolute path to the command if it exists, otherwise nil.
+function M.which(cmd)
+  local p = vim.fn.resolve(vim.fn.exepath(cmd))
+  if p ~= "" then
+    return p
+  else
+    return nil
   end
 end
 

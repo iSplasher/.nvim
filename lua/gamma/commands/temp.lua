@@ -11,6 +11,9 @@ function M.new_temp_file()
         local tmpf = vim.fn.tempname()
         vim.cmd('e ' .. tmpf)
     end
+
 end
+
+
 
 return M
