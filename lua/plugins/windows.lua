@@ -3,6 +3,7 @@ local kmap = utility.kmap
 
 return {
   "mrjones2014/smart-splits.nvim",
+  event = "VeryLazy",
   config = function()
     require('smart-splits').setup({
       ignored_filetypes = {

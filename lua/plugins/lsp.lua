@@ -45,7 +45,8 @@ return {
     {
         -- Optional
         'williamboman/mason.nvim',
-        lazy = false,
+        lazy = true,
+        event = "VeryLazy",
         config = true,
         opts = {},
         build = function()
@@ -54,7 +55,8 @@ return {
     },
     {
         'williamboman/mason-lspconfig.nvim',
-        lazy = false,
+        lazy = true,
+        event = "VeryLazy",
         dependences = {
             'williamboman/mason.nvim',
         }
@@ -65,7 +67,7 @@ return {
         cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
         event = { 'BufReadPre', 'BufNewFile' },
         dependencies = {
-
+            'williamboman/mason-lspconfig.nvim',
             {
                 "folke/lazydev.nvim",
                 version = '*',

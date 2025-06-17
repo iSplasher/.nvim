@@ -2,9 +2,9 @@ local utility = require('gamma.utility')
 local kmap = utility.kmap
 
 return {
-   'tpope/vim-fugitive',
-   'tpope/vim-rhubarb',
-   'lewis6991/gitsigns.nvim',
+   { 'tpope/vim-fugitive',      event = 'VeryLazy' },
+   { 'tpope/vim-rhubarb',       event = 'VeryLazy' },
+   { 'lewis6991/gitsigns.nvim', event = { 'BufReadPre', 'BufNewFile' } },
 
    {
       "sindrets/diffview.nvim",

@@ -5,6 +5,7 @@ return {
     {
         'Yggdroot/LeaderF',
         build = ':LeaderfInstallCExtension',
+        cmd = { 'Leaderf', 'LeaderfInstallCExtension' },
         init = function()
             -- these break the plugin for some reason
             -- vim.g.Lf_ShortcutF = ''

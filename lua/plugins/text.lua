@@ -6,7 +6,7 @@ return {
     ---Comment and uncomment code
     {
         'numToStr/Comment.nvim',
-        event = "BufRead",
+        event = "BufReadPost",
         config = function()
             local comment = require('Comment')
             comment.setup {
@@ -113,6 +113,7 @@ return {
     {
         'echasnovski/mini.move',
         version = '*',
+        event = 'BufEnter',
         config = function()
             require('mini.move').setup(
                 {

@@ -5,6 +5,7 @@ return {
   -- Session
   {
     'Shatur/neovim-session-manager',
+    event = 'VimEnter',
     dependencies = {
       'nvim-lua/plenary.nvim'
     },

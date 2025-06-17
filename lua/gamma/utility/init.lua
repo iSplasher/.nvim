@@ -306,12 +306,6 @@ function M.cmd(command, opts)
   end
 end
 
----Check if a plugin is loaded.
----@param plugin_name string @The name of the plugin to check.
----@return boolean @Whether or not the plugin is loaded.
-function M.is_plugin_loaded(plugin_name)
-  return package.loaded[plugin_name] ~= nil
-end
 
 ---Reliably get nvim config path
 ---@return string @The path to the nvim config directory.

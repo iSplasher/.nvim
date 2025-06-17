@@ -28,7 +28,7 @@ return {
 
     {
         "Rentib/cliff.nvim",
-        event = "BufRead",
+        event = "BufReadPost",
         config = function()
             local cliff = require("cliff")
             kmap({ 'n', 'v', 'o' }, '<C-j>', cliff.go_down, "Move cursor down", {})
@@ -38,7 +38,7 @@ return {
 
     {
         'ggandor/leap.nvim',
-        event = "BufRead",
+        event = "BufReadPost",
         dependencies = { "tpope/vim-repeat" },
         config = function()
             kmap({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', "Leap forward", {})
@@ -63,7 +63,7 @@ return {
 
     {
         'unblevable/quick-scope',
-        lazy = false,
+        event = "BufReadPost",
         init = function()
             vim.g.qs_highlight_on_keys = { 'f', 'F', 't', 'T' }
             vim.g.qs_buftype_blacklist = { 'terminal', 'nofile' }

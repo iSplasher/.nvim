@@ -5,6 +5,7 @@ return {
   -- to be able to change font size on the fly
   {
     "tenxsoydev/size-matters.nvim",
+    event = "VeryLazy",
     cond = function()
       return vim.g.neovide or vim.g.goneovim or vim.g.nvui or vim.g.gnvim
     end,
@@ -30,6 +31,7 @@ return {
   -- Smooth scroll
   {
     'karb94/neoscroll.nvim',
+    event = "VeryLazy",
     cond = function()
       return vim.g.neovide
     end,

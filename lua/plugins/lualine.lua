@@ -2,10 +2,15 @@ return {
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons', lazy = true },
+        event = 'VeryLazy',
         config = function()
             local cfg = require('lualine').get_config()
 
-            cfg.options.theme = 'horizon'
+            if vim.g.colors_name == 'gruvbox_material' then
+                cfg.options.theme = 'gruvbox_material'
+            else
+                cfg.options.theme = 'horizon'
+            end
             cfg.options.icons_enabled = true
             cfg.options.component_separators = { left = '', right = '' }
             cfg.options.section_separators = { left = '', right = '' }

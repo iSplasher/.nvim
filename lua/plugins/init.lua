@@ -16,11 +16,15 @@ return {
 
 
     -- Writing
-    'preservim/vim-pencil',
+    {
+        'preservim/vim-pencil',
+        ft = { 'markdown', 'text', 'rst', 'tex', 'asciidoc', 'typst' },
+    },
 
     -- Undo
     {
         'mbbill/undotree',
+        cmd = { "UndotreeToggle" },
         config = function()
             kmap('n', "<leader>wu", vim.cmd.UndotreeToggle, "Open Undo Tree")
         end
@@ -95,6 +99,7 @@ return {
     -- Temp files/buffers
     {
         'm-demare/attempt.nvim',
+        event = "VimEnter",
         dependencies = {
             { 'nvim-lua/plenary.nvim' }
         },
