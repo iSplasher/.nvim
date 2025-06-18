@@ -4,6 +4,8 @@ local kmap = utility.kmap
 local disabled_completion = {
     'TelescopePrompt',
     'spectre_panel',
+    'dashboard',
+    'lazy',
 }
 
 -- https://github.com/williamboman/mason-lspconfig.nvim?tab=readme-ov-file#available-lsp-servers

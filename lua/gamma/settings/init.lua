@@ -1,4 +1,12 @@
-vim.cmd("language en_US")
+---@diagnostic disable-next-line: param-type-mismatch
+local _cmd_ok, _ = pcall(vim.cmd, "language en_US.UTF-8")
+if not _cmd_ok then
+  ---@diagnostic disable-next-line: param-type-mismatch
+  _cmd_ok, _ = pcall(vim.cmd, "language en_US")
+  if not _cmd_ok then
+    print("Failed to set language to en_US.UTF-8 or en_US")
+  end
+end
 
 vim.g.backupdir = vim.fn.stdpath('data') .. '/backup'
 -- create the directories if they don't exist
@@ -9,6 +17,8 @@ vim.g.backupdir = vim.g.backupdir .. '//,.' -- fallback
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.opt.encoding = "utf-8"
+vim.opt.ffs = "unix,dos,mac" -- fileformats
 -- line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -19,7 +29,9 @@ vim.opt.tabstop = indent
 vim.opt.softtabstop = indent
 vim.opt.shiftwidth = indent
 vim.opt.expandtab = true
+vim.opt.smarttab = true
 
+vim.opt.autoindent = true
 vim.opt.smartindent = true
 vim.opt.breakindent = true
 
@@ -35,6 +47,7 @@ vim.opt.completeopt = 'menuone,noselect'
 
 -- wrap
 vim.opt.wrap = false
+vim.opt.wrapmargin = 2
 
 -- sync with system clipboard
 vim.opt.clipboard = "unnamedplus"
@@ -48,7 +61,12 @@ end
 vim.opt.incsearch = true
 
 -- colors
-vim.opt.termguicolors = true
+-- check if termguicolors is supported
+if vim.fn.has("termguicolors") == 1 then
+  vim.opt.termguicolors = true
+else
+  vim.opt.termguicolors = false
+end
 -- vim.opt.colorcolumn = "120"
 
 -- Show a few lines of context around the cursor. Note that this makes the

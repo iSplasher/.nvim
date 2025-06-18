@@ -136,20 +136,20 @@ return {
     --     config = function()
     --         vim.g.instant_username = "Twiddly"
     --
-    --         vim.keymap.set('n', "<leader>ciu", ":InstantStartServer 0.0.0.0 7899", { desc = "Set[u]p Collab Server" })
-    --         vim.keymap.set('n', "<leader>ciss", ":InstantStopServer", { desc = "[S]top Collab [S]erver" })
-    --         vim.keymap.set('n', "<leader>cijf", ":InstantStartSingle 127.0.0.1 7899",
+    --         kmap('n', "<leader>ciu", ":InstantStartServer 0.0.0.0 7899", { desc = "Set[u]p Collab Server" })
+    --         kmap('n', "<leader>ciss", ":InstantStopServer", { desc = "[S]top Collab [S]erver" })
+    --         kmap('n', "<leader>cijf", ":InstantStartSingle 127.0.0.1 7899",
     --             { desc = "Join Collab Single Buffer ([F]irst client)" })
-    --         vim.keymap.set('n', "<leader>cijc", ":InstantJoinSingle 127.0.0.1 7899",
+    --         kmap('n', "<leader>cijc", ":InstantJoinSingle 127.0.0.1 7899",
     --             { desc = "Join Collab Single Buffer ([C]lient)" })
-    --         vim.keymap.set('n', "<leader>cijsf", ":InstantStartSession 127.0.0.1 7899",
+    --         kmap('n', "<leader>cijsf", ":InstantStartSession 127.0.0.1 7899",
     --             { desc = "Join Collab Session ([F]irst client)" })
-    --         vim.keymap.set('n', "<leader>cijsc", ":InstantJoinSession 127.0.0.1 7899",
+    --         kmap('n', "<leader>cijsc", ":InstantJoinSession 127.0.0.1 7899",
     --             { desc = "Join Collab Session ([C]lient)" })
-    --         vim.keymap.set('n', "<leader>cis", "<nop>", { desc = "[S]top Collab" })
-    --         vim.keymap.set('n', "<leader>cisc", ":InstantStop", { desc = "[S]top Collab [C]lient" })
-    --         vim.keymap.set('n', "<leader>cif", ":InstantFollow Ignotak", { desc = "[F]ollow Collab User" })
-    --         vim.keymap.set('n', "<leader>cisf", ":InstantStopFollow", { desc = "[S]top [F]ollowing Collab User" })
+    --         kmap('n', "<leader>cis", "<nop>", { desc = "[S]top Collab" })
+    --         kmap('n', "<leader>cisc", ":InstantStop", { desc = "[S]top Collab [C]lient" })
+    --         kmap('n', "<leader>cif", ":InstantFollow Ignotak", { desc = "[F]ollow Collab User" })
+    --         kmap('n', "<leader>cisf", ":InstantStopFollow", { desc = "[S]top [F]ollowing Collab User" })
     --     end
     -- },
     --

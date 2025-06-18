@@ -28,7 +28,11 @@ return {
     -- See `:help indent_blankline.txt`
     event = { "BufReadPre", "BufNewFile" },
     config = function()
-      local indent_blankline = require("ibl")
+      local ok, indent_blankline = pcall(require, "ibl")
+      if not ok then
+        print("Failed to load indent_blankline plugin: " .. indent_blankline)
+        return
+      end
       indent_blankline.setup {
         indent = { char = '│' },
         whitespace = {

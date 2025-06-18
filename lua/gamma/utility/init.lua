@@ -87,8 +87,19 @@ function M.merge_tables(a, b)
   return a
 end
 
-local _saved_maps = {}
-local _saved_maps_d = {}
+---@class gamma.utility.saved_kmap
+---@field mode string | string[] The mode the keymap is set for.
+---@field keys string The keys the keymap is set for.
+---@field map string | function The command the keymap is set for.
+---@field desc string The description of the keymap.
+
+
+---Custom keymaps set throughout will be inserted here.
+---@type gamma.utility.saved_kmap[]
+M.saved_maps = {}
+---Custom keymaps set throughout will be inserted here.
+---@type gamma.utility.saved_kmap[]
+M.saved_maps_d = {}
 ---@class gamma.utility.kmap_opts
 ---@field noremap? boolean Only remap the keymap if it does not already exist.
 ---@field remap? boolean Remap if the keymap already exists. (default: true if noremap is not set)
@@ -100,11 +111,12 @@ local _saved_maps_d = {}
 ---@field unique? boolean Do not override a keymap if it already exists.
 ---@field buffer? boolean | number Set the keymap for the current buffer only.
 ---@field local? boolean Set the keymap for the current buffer only.
+---@field desc? string The description of the keymap. (default: nil)
 --- Set a keymap
 ---@param mode string | string[] @The mode to set the keymap for.
 ---@param keys string | string[]  @The keys to set the keymap for.
 ---@param command string | function @The command to set the keymap for.
----@param desc_or_opts? string | table The description to set the keymap for.
+---@param desc_or_opts? string | table The description to set the keymap for or the options to set the keymap for.
 ---@param opts? gamma.utility.kmap_opts The options to set the keymap for.
 ---@note This is a wrapper around `vim.keymap.set` that provides a more user-friendly interface.
 ---@example
@@ -146,6 +158,9 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
   end
   opts = opts or {}
 
+  if desc == nil then
+    desc = opts.desc or nil
+  end
   if desc then
     desc = '' .. desc
   end
@@ -196,8 +211,8 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       map = command,
       desc = desc,
     }
-    table.insert(_saved_maps, map)
-    _saved_maps_d[key] = map
+    table.insert(M.saved_maps, map)
+    M.saved_maps_d[key] = map
   end
 end
 
@@ -205,7 +220,7 @@ end
 ---@return table @The dictionary of all saved keymaps.
 function M.get_saved_maps()
   -- if saved_maps is empty, then fill it with current mappings
-  if #_saved_maps == 0 then
+  if #M.saved_maps == 0 then
     for _, m in ipairs(vim.fn.maplist()) do
       local map = {
         mode = m.mode,
@@ -213,12 +228,12 @@ function M.get_saved_maps()
         map = m.rhs,
         desc = "",
       }
-      table.insert(_saved_maps, map)
-      _saved_maps_d[m.lhs] = map
+      table.insert(M.saved_maps, map)
+      M.saved_maps_d[m.lhs] = map
     end
   end
 
-  return _saved_maps
+  return M.saved_maps
 end
 
 ---Check if a keymap exists.
@@ -226,7 +241,7 @@ end
 ---@param keys string @The keys to check the keymap for.
 ---@return false|table @Whether or not the keymap exists. If it does, return the keymap.
 function M.keymap_exists(mode, keys)
-  if #_saved_maps == 0 then
+  if #M.saved_maps == 0 then
     M.get_saved_maps()
   end
 
@@ -242,7 +257,7 @@ function M.keymap_exists(mode, keys)
   for _, m in ipairs(_mode) do
     local r = vim.fn.mapcheck(keys, m) ~= ""
     if r ~= "" then
-      local m = _saved_maps_d[keys]
+      local m = M.saved_maps_d[keys]
       if m ~= nil then
         return m
       end
@@ -280,6 +295,7 @@ end
 function M.is_macos()
   return M.get_os() == "macos"
 end
+M.is_mac = M.is_macos -- Alias for is_macos
 
 ---True if the current operating system is Linux.
 function M.is_linux()
@@ -405,8 +421,13 @@ function M.require_dir(path, recursive, allow_empty)
   end
 
 
-  -- resolve path
-  path = vim.fs.abspath(path)
+  -- resolve path (with compatibility fallback)
+  if vim.fs and vim.fs.abspath then
+    path = vim.fs.abspath(path)
+  else
+    -- Fallback for older Neovim versions
+    path = vim.fn.fnamemodify(path, ':p')
+  end
   -- Switch backslashes to forward slashes
   path = string.gsub(path, "\\", "/")
   -- Remove trailing slash
@@ -471,7 +492,11 @@ function M.print(obj, endstr)
   if vim.g.vscode then
     print(msg)
   else
-    vim.notify(msg, vim.log.levels.INFO)
+    local ok, _ = pcall(vim.notify, msg, vim.log.levels.INFO)
+    if not ok then
+      -- Fallback to print if notify fails
+      print(msg)
+    end
   end
 end
 
@@ -482,7 +507,11 @@ function M.print_error(obj)
   if vim.g.vscode then
     print(msg)
   else
-    vim.notify(msg, vim.log.levels.ERROR)
+    local ok, _ = pcall(vim.notify, msg, vim.log.levels.ERROR)
+    if not ok then
+      -- Fallback to print if notify fails
+      print(msg)
+    end
   end
 end
 

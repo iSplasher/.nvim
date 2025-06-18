@@ -17,7 +17,7 @@ function M.setup_env(root_dir)
   vim.g.python_host_prog = python_exe
 
   local py_exe = "python3"
-  if vim.fn.executable(py_exe) == 0 then
+  if not utility.which(py_exe) then
     py_exe = "python"
   end
 

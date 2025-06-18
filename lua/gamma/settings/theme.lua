@@ -1,6 +1,7 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
 
+vim.opt.background = "dark"
 vim.g.colors_name = "gruvbox-material"
 
 if vim.g.neovide then

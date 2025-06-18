@@ -11,21 +11,21 @@ kmap('n', '<C-d>', '<C-d>zz', "Half page down")
 kmap('n', '<C-u>', '<C-u>zz', "Half page up")
 
 -- provide hjkl movements in Insert mode and Command-line mode via the <Alt> modifier key
-kmap('i', '<A-h>', '<Left>', { noremap = true })
-kmap('i', '<A-j>', '<Down>', { noremap = true })
-kmap('i', '<A-k>', '<Up>', { noremap = true })
-kmap('i', '<A-l>', '<Right>', { noremap = true })
+kmap('i', '<A-h>', '<Left>', "Move cursor left", { noremap = true })
+kmap('i', '<A-j>', '<Down>', "Move cursor down", { noremap = true })
+kmap('i', '<A-k>', '<Up>', "Move cursor up", { noremap = true })
+kmap('i', '<A-l>', '<Right>', "Move cursor right", { noremap = true })
 
 -- word motion in insert mode
-kmap('i', '<A-b>', '<C-o>b', { noremap = true })
-kmap('i', '<A-w>', '<C-o>w', { noremap = true })
-kmap('i', '<A-e>', '<C-o>e', { noremap = true })
+kmap('i', '<A-b>', '<C-o>b', "Move to beginning of word", { noremap = true })
+kmap('i', '<A-w>', '<C-o>w', "Move to next word", { noremap = true })
+kmap('i', '<A-e>', '<C-o>e', "Move to end of word", { noremap = true })
 
 -- H and L to move to the beginning and end of the line
-kmap('n', 'H', '^', { noremap = true })
-kmap('v', 'H', '^', { noremap = true })
-kmap('n', 'L', '$', { noremap = true })
-kmap('v', 'L', '$', { noremap = true })
+kmap('n', 'H', '^', "Move to beginning of line", { noremap = true })
+kmap('v', 'H', '^', "Move to beginning of line", { noremap = true })
+kmap('n', 'L', '$', "Move to end of line", { noremap = true })
+kmap('v', 'L', '$', "Move to end of line", { noremap = true })
 
 -- Navigate quickfix list
 kmap('n', ']q', ':cnext<CR>', "Next quickfix item", { remap = true, silent = true })

@@ -5,6 +5,7 @@ return {
     {
         'Yggdroot/LeaderF',
         build = ':LeaderfInstallCExtension',
+        cmd = { 'Leaderf', 'LeaderfInstallCExtension' },
         init = function()
             -- these break the plugin for some reason
             -- vim.g.Lf_ShortcutF = ''
@@ -31,10 +32,10 @@ return {
             triggers = {
                 { "<auto>", mode = "nxso" },
                 { "*",      mode = { "n", "v" } },
-                { "<C>",    mode = { "n", "v" } },
+                { "<C>",    mode = { "v", "n", "v" } },
             },
             defer = function(ctx)
-                return vim.list_contains({ "<C-V>", "V", 'T', 't', 'C', 'c' }, ctx.mode)
+                return vim.list_contains({ "v", "<C-V>", "V", 'T', 't', 'C', 'c' }, ctx.mode)
             end
         },
         init = function()
@@ -65,7 +66,7 @@ return {
                         return require("which-key.extras").expand.buf()
                     end
                 },
-                { "<leader>f", group = "[F]ind | [F]iles",     icon = { name = 'file', icon = '', color = 'azure' } },
+                { "<leader>f", group = "[F]ind | [F]iles", icon = { name = 'file', icon = '', color = 'azure' } },
                 { "<leader>t", group = "[T]oggles" },
                 { "<leader>r", group = "[R]un | [R]ename" },
                 { "<leader>p", group = "[P]roject | Workspace" },
@@ -74,16 +75,17 @@ return {
                 { "<leader>k", group = "[K]ill" },
                 { "<leader>a", group = "[A]ctions" },
                 { "<leader>i", group = "[I]nteractive" },
-                { "<leader>g", group = "[G]it | [G]lobal",     icon = { name = 'git', icon = '', color = 'red' } },
+                { "<leader>g", group = "[G]it | [G]lobal", icon = { name = 'git', icon = '', color = 'red' } },
                 { "<leader>d", group = "[D]ebug" },
                 { "<leader>h", group = "[H]istory" },
                 { "<leader>l", group = "[L]SP" },
+                { "<leader>n", group = "[N]ew" },
                 { "<leader>z", group = "[Z]en" },
                 { "<leader>o", group = "[O]pen" },
                 { "<leader>s", group = "[S]earch" },
                 { "<leader>c", group = "[C]ode" },
                 { "<leader>v", group = "[V]im" },
-                { "<leader>v", group = "[V]im" },
+                { "<leader>wt", group = "[T]erminal" },
                 { "<leader>;", group = "[C]ommands" },
                 { "<leader>?", group = "Help" },
                 { "<leader>@", group = "Registers" },

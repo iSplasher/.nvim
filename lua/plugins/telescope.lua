@@ -37,7 +37,6 @@ local telescope_ui_cfg = function()
     local Layout = require("nui.layout")
     local Popup = require("nui.popup")
 
-    local telescope = require("telescope")
     local TSLayout = require("telescope.pickers.layout")
 
     local function make_popup(options)

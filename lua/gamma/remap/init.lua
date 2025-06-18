@@ -4,7 +4,7 @@ local utility = require('gamma.utility')
 local kmap = utility.kmap
 
 -- disable Q
-kmap("n", "Q", "<nop>", { remap = true })
+kmap("n", "Q", "<nop>", "Disable quit via Q", { remap = true })
 
 -- refresh/reload buffers
 kmap("n", "<F5>", function()
@@ -17,4 +17,4 @@ end, "[R]eload current buffer")
 -- kmap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { remap = true, expr = true, silent = true })
 
 -- U to redo
-kmap('n', 'U', '<C-r>', { noremap = true })
+kmap('n', 'U', '<C-r>', "Redo", { noremap = true })

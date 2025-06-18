@@ -1,3 +1,5 @@
+local utility = require('gamma.utility')
+local kmap = utility.kmap
 -- Advanced guide floating window
 local M = {}
 
@@ -95,12 +97,12 @@ function M.floating_content(opts)
 
     -- Add keymaps for closing the window
     local keymaps = {
-        { 'n', 'q',     close_window, { nowait = true, buffer = buf } },
-        { 'n', '<Esc>', close_window, { nowait = true, buffer = buf } },
+        { 'n', 'q',     close_window, { nowait = true, buffer = buf }, "Close window" },
+        { 'n', '<Esc>', close_window, { nowait = true, buffer = buf }, "Close window" },
     }
 
     for _, map in ipairs(keymaps) do
-        vim.keymap.set(map[1], map[2], map[3], map[4])
+        kmap(map[1], map[2], map[3], map[4])
     end
 
     -- Center on the beginning of the content
