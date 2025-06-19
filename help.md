@@ -14,17 +14,32 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 #### Horizontal Navigation
 - `f{char}`/`F{char}` - Jump to next/previous occurrence of character (enhanced with highlighting)²
 - `t{char}`/`T{char}` - Jump to before next/previous occurrence of character (enhanced with highlighting)²
+- `;`/`,` - Repeat previous f/t/F/T movement forward/backward
+- `ge`/`gE` - Jump backwards to end of word (WORD)
+- `g_` - Jump to last non-blank character of line
+- `0` - Jump to start of line
+- `^` - Jump to first non-blank character of line
 - `H` - Jump to first non-whitespace character in line³
 - `L` - Jump to end of line³
 
 #### Vertical Navigation
+- `gj`/`gk` - Move cursor down/up (multi-line text, respects wrapping)
 - `<C-j>` - Move cursor down intelligently⁴
 - `<C-k>` - Move cursor up intelligently⁴
+- `zz`/`zt`/`zb` - Center/top/bottom cursor on screen
+- `Ctrl+e`/`Ctrl+y` - Scroll screen down/up one line (cursor stays)
+- `Ctrl+d`/`Ctrl+u` - Move cursor and screen down/up 1/2 page
 - `n`/`N` - Next/previous search result (centered on screen)³
 
 #### Insert Mode Navigation
-- Alt + hjkl - Move cursor while staying in insert mode³
-- Alt + b/w/e - Word movement in insert mode³
+- `Alt` + `h/j/k/l` - Move cursor while staying in insert mode³
+- `Alt` + `b/w/e` - Word movement in insert mode³
+- `Ctrl+h` - Delete character before cursor during insert
+- `Ctrl+w` - Delete word before cursor during insert
+- `Ctrl+t`/`Ctrl+d` - Indent/de-indent line during insert
+- `Ctrl+n`/`Ctrl+p` - Auto-complete next/previous match
+- `Ctrl+r{register}` - Insert contents of register
+- `Ctrl+o{command}` - Execute one normal mode command, return to insert
 
 ### 1.2 Code Structure Navigation
 
@@ -63,10 +78,17 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 
 #### Special Text Objects
 - `aB`/`iB` - Select entire buffer⁸
+- `at`/`it` - A/inner block with <> tags
+- `ab`/`ib` - A/inner block with () (same as a(/i()
+- `aw`/`iw` - A/inner word
 
 ### 2.2 Visual Mode Enhancements
 - Expand/contract selections using TreeSitter nodes⁵
 - Precognition highlights showing motion targets⁹
+- `o` - Move to other end of visual selection
+- `O` - Move to other corner of visual block
+- `u`/`U` - Change selected text to lowercase/uppercase
+- `~` - Switch case of selected text
 
 ## 3. Editing & Manipulation
 
@@ -84,6 +106,15 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 - `d` - Delete to void register instead of overwriting clipboard³
 - `X` - Cut current line³
 - `J` - Join lines while preserving cursor position³
+- `gJ` - Join line below without adding space
+- `gp`/`gP` - Paste and leave cursor after new text
+
+#### Advanced Text Manipulation
+- `R` - Replace mode (keep typing to replace characters)
+- `xp` - Transpose two letters (delete and paste)
+- `U` - Restore last changed line
+- `gwip` - Reflow paragraph
+- `g~`/`gu`/`gU` - Switch case/lowercase/uppercase up to motion
 
 #### Code Commenting
 - Smart auto-detection of comment styles¹¹
@@ -136,6 +167,10 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 - `<C-w>w` - Move cursor to previous window¹⁷
 - `<C-w></+/->` - Resize window in that direction¹⁷
 - `<C-w>bh/j/k/l` - Swap buffer with window in that direction¹⁷
+- `Ctrl+wT` - Move current split to new tab
+- `#gt` - Move to tab number #
+- `:tabmove #` - Move current tab to position #
+- `:tabdo command` - Run command on all tabs
 
 ### 4.4 Advanced Telescope Usage
 - `<C-g>` in Telescope - Choose which window to open the selection in⁷
@@ -150,6 +185,18 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 - File marks with capital letters (`mA` through `mZ`) that work across buffers
 - `<leader>fm` - List and navigate marks⁷
 
+#### Special Marks
+- `` `0 `` - Position where Vim was last exited
+- `` `" `` - Position when last editing this file
+- `` `. `` - Position of last change in this file
+- `` `` `` - Position before last jump
+
+#### Jump & Change Lists
+- `:jumps` - List of jumps
+- `Ctrl+i`/`Ctrl+o` - Go to newer/older position in jump list
+- `:changes` - List of changes
+- `g,`/`g;` - Go to newer/older position in change list
+
 ## 5. Search & History Navigation
 
 ### 5.1 Enhanced Search with Hlslens
@@ -161,6 +208,11 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 - `<leader>u` - Toggle undo tree visualization¹³
 - Navigate through complex undo history
 - Restore previous states even after multiple changes
+
+### 5.3 Advanced Search Operations
+- `:vimgrep /pattern/ **/*` - Search pattern in all files
+- `:cn`/`:cp` - Jump to next/previous match in quickfix
+- `:copen`/`:cclose` - Open/close quickfix window
 
 ## 6. Focus & Zen Modes
 
@@ -204,20 +256,60 @@ This guide covers advanced movement and editing techniques for Neovim, organized
 - `<leader>gh` - View file history²⁰
 - Compare changes with powerful interactive interface
 
-## 9. Advanced Techniques & Workflows
+## 9. Indentation & Formatting
 
-### 9.1 Registers and Macros
+### 9.1 Smart Indentation
+- `>>` / `<<` - Indent/de-indent line one shiftwidth
+- `>%` / `<%` - Indent/de-indent block with cursor on brace
+- `>ib` / `<ib` - Indent/de-indent inner block with ()
+- `>at` / `<at` - Indent/de-indent block with <> tags
+- `3==` - Re-indent 3 lines
+- `=%` - Re-indent block with cursor on brace
+- `=iB` - Re-indent inner block with {}
+- `gg=G` - Re-indent entire buffer
+- `]p` - Paste and adjust indent to current line
+
+## 10. Advanced Techniques & Workflows
+
+### 10.1 Registers and Macros
 - Named registers (`"a` through `"z`) for storing text
 - `<leader>fr` - Browse registers⁷
 - Record complex macros with `q{register}` that use leap, text objects and TreeSitter movements
+- `:registers` - Show all register contents
 
-### 9.2 Command Mode Power Tools
+#### Special Registers
+- `"0p` - Paste last yank (not affected by deletes)
+- `"%` - Current file name register
+- `"#` - Alternate file name register
+- `"*` - Primary clipboard (X11)
+- `"+` - System clipboard
+- `"/` - Last search pattern
+- `":` - Last command-line
+- `".` - Last inserted text
+- `"-` - Last small delete
+- `"=` - Expression register (calculate expressions)
+- `"_` - Black hole register (delete without storing)
+
+### 10.2 Command Mode Power Tools
 - `:g/pattern/command` - Execute a command on lines matching a pattern
 - `:v/pattern/command` - Execute a command on lines NOT matching a pattern
 - `:s/pattern/replacement/g` - Substitute text with regex support
 - `:norm! command` - Execute normal mode commands on multiple lines
+- `\vpattern` - Very magic pattern (no escaping needed for regex)
+- `:nohl` - Remove search highlighting
 
-### 9.3 Composing Complex Commands
+#### Bulk Operations
+- `:g/{pattern}/d` - Delete all lines containing pattern
+- `:g!/{pattern}/d` - Delete all lines NOT containing pattern
+- `:.,$d` - Delete from current line to end of file
+- `:.,1d` - Delete from current line to beginning
+
+#### File Operations
+- `:saveas file` - Save file with new name
+- `:w !sudo tee %` - Write file using sudo
+- `K` - Open man page for word under cursor
+
+### 10.3 Composing Complex Commands
 - Use count prefix and complex motions together:
 - `2d2]f` - Delete two functions forward twice
 - `3yaf` - Yank three functions

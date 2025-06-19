@@ -45,6 +45,28 @@ end
 
 return {
     {
+        "bassamsdata/namu.nvim",
+        config = function()
+            require("namu").setup({
+                -- Enable the modules you want
+                namu_symbols = {
+                    enable = true,
+                    options = {}, -- here you can configure namu
+                },
+                -- Optional: Enable other modules if needed
+                ui_select = { enable = false }, -- vim.ui.select() wrapper
+            })
+            kmap("n", "<leader>b#", ":Namu symbols<cr>", {
+                desc = "Jump to [L]SP [s]ymbol",
+                silent = true,
+            })
+            kmap("n", "<leader>p#", ":Namu workspace<cr>", {
+                desc = "[L]SP Symbols - [W]orkspace",
+                silent = true,
+            })
+        end,
+    },
+    {
         -- Optional
         'williamboman/mason.nvim',
         lazy = true,
@@ -446,7 +468,6 @@ return {
 
     {
         "folke/trouble.nvim",
-        event = "BufRead",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         cmd = "Trouble",
         config = function()
@@ -483,11 +504,12 @@ return {
                 },
             }
 
-            kmap("n", "<leader>lx", "<cmd>TroubleToggle<cr>", { desc = "Toggle Trouble" })
-            kmap("n", "<leader>lw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { desc = "Workspace Diagnostics" })
-            kmap("n", "<leader>ld", "<cmd>TroubleToggle document_diagnostics<cr>", { desc = "Document Diagnostics" })
-            kmap("n", "<leader>ll", "<cmd>TroubleToggle loclist<cr>", { desc = "Location List" })
-            kmap("n", "<leader>lq", "<cmd>TroubleToggle quickfix<cr>", { desc = "Quickfix List" })
+            kmap("n", "<leader>lx", "<cmd>Trouble<cr>", { desc = "Toggle Trouble" })
+            kmap("n", "<leader>lw", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Workspace Diagnostics" })
+            kmap("n", "<leader>ld", "<cmd>Trouble diagnostics toggle focus=false filter.buf=0<cr>",
+                { desc = "Buffer Diagnostics" })
+            kmap("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List" })
+            kmap("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List" })
         end
     }
 }

@@ -3,6 +3,67 @@ local kmap = utility.kmap
 
 return {
 
+    {
+        "gbprod/yanky.nvim",
+        opts = {
+            ring = { storage = "sqlite" },
+        },
+        cmd = {
+            "YankyRingHistory",
+            "Telescope yank_history",
+        },
+        dependencies = {
+            "kkharji/sqlite.lua",
+            "nvim-telescope/telescope.nvim",
+        },
+        config = function(opts)
+            require("yanky").setup({
+                picker = {
+                    select = {
+                        action = nil, -- nil to use default put action
+                    },
+                    telescope = {
+                        mappings = nil, -- nil to use default mappings
+                    },
+                },
+            })
+
+            require("telescope").load_extension("yank_history")
+
+            -- Yanky keymaps
+            local yanky_keymaps = {
+                { "y",     "<Plug>(YankyYank)",                      mode = { "n", "x" },                                desc = "Yank text" },
+                { "p",     "<Plug>(YankyPutAfter)",                  mode = { "n", "x" },                                desc = "Put yanked text after cursor" },
+                { "P",     "<Plug>(YankyPutBefore)",                 mode = { "n", "x" },                                desc = "Put yanked text before cursor" },
+                { "gp",    "<Plug>(YankyGPutAfter)",                 mode = { "n", "x" },                                desc = "Put yanked text after selection" },
+                { "gP",    "<Plug>(YankyGPutBefore)",                mode = { "n", "x" },                                desc = "Put yanked text before selection" },
+                { "<c-p>", "<Plug>(YankyPreviousEntry)",             desc = "Select previous entry through yank history" },
+                { "<c-n>", "<Plug>(YankyNextEntry)",                 desc = "Select next entry through yank history" },
+                { "]p",    "<Plug>(YankyPutIndentAfterLinewise)",    desc = "Put indented after cursor (linewise)" },
+                { "[p",    "<Plug>(YankyPutIndentBeforeLinewise)",   desc = "Put indented before cursor (linewise)" },
+                { "]P",    "<Plug>(YankyPutIndentAfterLinewise)",    desc = "Put indented after cursor (linewise)" },
+                { "[P",    "<Plug>(YankyPutIndentBeforeLinewise)",   desc = "Put indented before cursor (linewise)" },
+                { ">p",    "<Plug>(YankyPutIndentAfterShiftRight)",  desc = "Put and indent right" },
+                { "<p",    "<Plug>(YankyPutIndentAfterShiftLeft)",   desc = "Put and indent left" },
+                { ">P",    "<Plug>(YankyPutIndentBeforeShiftRight)", desc = "Put before and indent right" },
+                { "<P",    "<Plug>(YankyPutIndentBeforeShiftLeft)",  desc = "Put before and indent left" },
+                { "=p",    "<Plug>(YankyPutAfterFilter)",            desc = "Put after applying a filter" },
+                { "=P",    "<Plug>(YankyPutBeforeFilter)",           desc = "Put before applying a filter" },
+            }
+
+            for _, keymap in ipairs(yanky_keymaps) do
+                kmap(keymap.mode or "n", keymap[1], keymap[2], keymap.desc)
+            end
+
+            kmap(
+                { "n", "x" },
+                "<leader>y",
+                utility.create_cmd("Telescope", { "yank_history" }),
+                "Open Yank History",
+                { silent = true }
+            )
+        end,
+    },
     ---Comment and uncomment code
     {
         'numToStr/Comment.nvim',
