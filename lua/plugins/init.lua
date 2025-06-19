@@ -15,12 +15,6 @@ return {
     },
 
 
-    -- Writing
-    {
-        'preservim/vim-pencil',
-        ft = { 'markdown', 'text', 'rst', 'tex', 'asciidoc', 'typst' },
-    },
-
     -- Undo
     {
         'mbbill/undotree',

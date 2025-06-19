@@ -43,7 +43,7 @@ return {
         config = {
           header = header,
           shortcut = {
-            { desc = '󱑒 Last Session', group = 'DiagnosticOk', action = 'SessionManager load_last_session', key = 'r' },
+            { desc = '󱑒 Last Session', group = '@string', action = 'SessionManager load_last_session', key = 'r' },
             { desc = '󱑒 Sessions',     group = 'Title',        action = 'SessionManager load_session',      key = 's' },
             { desc = ' Lazy',          group = '@property',    action = 'Lazy',                             key = 'l' },
             {
@@ -56,7 +56,7 @@ return {
             },
             {
               desc = ' Dev',
-              group = 'DiagnosticHint',
+              group = '@function',
               action = 'cd C:/dev | :Telescope find_files',
               key = 'h',
             },

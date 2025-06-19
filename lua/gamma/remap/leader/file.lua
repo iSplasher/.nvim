@@ -13,3 +13,6 @@ end, "Save and quit")
 
 -- Quick quit
 kmap('n', '<leader>qq', vim.cmd.quit, "Quit")
+
+-- Rename file
+kmap("n", "<leader>fe", utility.create_cmd("file"), "Rename file")

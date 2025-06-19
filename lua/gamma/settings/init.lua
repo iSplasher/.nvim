@@ -3,7 +3,9 @@ local _cmd_ok, _ = pcall(vim.cmd, "language en_US.UTF-8")
 if not _cmd_ok then
   ---@diagnostic disable-next-line: param-type-mismatch
   _cmd_ok, _ = pcall(vim.cmd, "language en_US")
-  if not _cmd_ok then
+  if _cmd_ok then
+    vim.cmd("set nospell")
+  else
     print("Failed to set language to en_US.UTF-8 or en_US")
   end
 end
@@ -23,6 +25,8 @@ vim.opt.ffs = "unix,dos,mac" -- fileformats
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
+-- disable spell checking by default
+vim.opt.spell = false
 -- indents
 local indent = 4
 vim.opt.tabstop = indent
@@ -67,7 +71,7 @@ if vim.fn.has("termguicolors") == 1 then
 else
   vim.opt.termguicolors = false
 end
--- vim.opt.colorcolumn = "120"
+vim.opt.colorcolumn = "120"
 
 -- Show a few lines of context around the cursor. Note that this makes the
 -- text scroll if you mouse-click near the start or end of the window.

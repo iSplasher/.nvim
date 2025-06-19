@@ -62,6 +62,12 @@ function M.setup(opts)
             lazy = false,  -- lazy load plugins by default
             version = "*", -- by default, only install stable versions
             cond = function(plugin)
+                -- Check if plugin is disabled via debug system
+                local debug_ok, debug_plugin = pcall(require, 'gamma.debug.plugin')
+                if debug_ok and not debug_plugin.should_load_plugin(plugin.name) then
+                    return false
+                end
+                
                 -- When running in VSCode
                 if vim.g.vscode then
                     for _, name in ipairs(editor_plugins) do

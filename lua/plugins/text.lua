@@ -7,6 +7,14 @@ return {
         "gbprod/yanky.nvim",
         opts = {
             ring = { storage = "sqlite" },
+            picker = {
+                select = {
+                    action = nil, -- nil to use default put action
+                },
+                telescope = {
+                    mappings = nil, -- nil to use default mappings
+                },
+            },
         },
         cmd = {
             "YankyRingHistory",
@@ -16,17 +24,8 @@ return {
             "kkharji/sqlite.lua",
             "nvim-telescope/telescope.nvim",
         },
-        config = function(opts)
-            require("yanky").setup({
-                picker = {
-                    select = {
-                        action = nil, -- nil to use default put action
-                    },
-                    telescope = {
-                        mappings = nil, -- nil to use default mappings
-                    },
-                },
-            })
+        config = function(_, opts)
+            require("yanky").setup(opts)
 
             require("telescope").load_extension("yank_history")
 

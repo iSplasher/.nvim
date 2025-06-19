@@ -131,6 +131,9 @@ M.saved_maps_d = {}
 function M.kmap(mode, keys, command, desc_or_opts, opts)
   -- if desc_or_opts is not a string, then its opts
   local desc = nil
+  if type(desc_or_opts) == 'string' then
+    desc = desc_or_opts
+  end
   if opts == nil and type(desc_or_opts) == 'table' then
     opts = desc_or_opts
   elseif type(desc_or_opts) == 'string' then

@@ -1,0 +1,436 @@
+*help.txt*	Advanced Neovim Movement and Editing Techniques
+
+==============================================================================
+TABLE OF CONTENTS					*gamma-help-contents*
+
+    1. Navigation & Movement .......................... |gamma-navigation|
+        1.1 Cursor Movement ........................... |gamma-cursor|
+        1.2 Code Structure Navigation ................ |gamma-code-nav|
+        1.3 List Navigation ........................... |gamma-list-nav|
+    2. Text Selection ................................. |gamma-selection|
+        2.1 Semantic Text Objects .................... |gamma-text-objects|
+        2.2 Visual Mode Enhancements ................. |gamma-visual|
+    3. Editing & Manipulation ........................ |gamma-editing|
+        3.1 Text Manipulation ........................ |gamma-text-manip|
+        3.2 Advanced Operators & LSP ................. |gamma-operators|
+    4. Multi-file & Project Navigation ............... |gamma-project|
+        4.1 File Navigation .......................... |gamma-files|
+        4.2 Terminal Integration ..................... |gamma-terminal|
+        4.3 Window Management ........................ |gamma-windows|
+        4.4 Advanced Telescope Usage ................. |gamma-telescope|
+        4.5 Mark Management .......................... |gamma-marks|
+    5. Search & History Navigation ................... |gamma-search|
+        5.1 Enhanced Search with Hlslens ............. |gamma-hlslens|
+        5.2 Undo History Navigation .................. |gamma-undo|
+        5.3 Advanced Search Operations ............... |gamma-search-ops|
+    6. Focus & Zen Modes ............................. |gamma-focus|
+        6.1 Distraction-Free Editing ................. |gamma-zen|
+        6.2 Enhanced Reading .......................... |gamma-reading|
+        6.3 AI Integration ........................... |gamma-ai|
+    7. Collaboration & Sessions ...................... |gamma-collab|
+        7.1 Collaborative Editing .................... |gamma-instant|
+        7.2 Session Management ....................... |gamma-sessions|
+    8. Git Integration ............................... |gamma-git|
+        8.1 Neogit Commands .......................... |gamma-neogit|
+        8.2 Diffview ................................. |gamma-diffview|
+    9. Indentation & Formatting ...................... |gamma-indent|
+        9.1 Smart Indentation ........................ |gamma-smart-indent|
+    10. Advanced Techniques & Workflows .............. |gamma-advanced|
+        10.1 Registers and Macros .................... |gamma-registers|
+        10.2 Command Mode Power Tools ................ |gamma-commands|
+        10.3 Composing Complex Commands .............. |gamma-complex|
+
+==============================================================================
+1. NAVIGATION & MOVEMENT				*gamma-navigation*
+
+------------------------------------------------------------------------------
+1.1 CURSOR MOVEMENT					*gamma-cursor*
+
+Precision Jumping ~
+    s{char}{char}               Jump forward to a position matching these two
+                                characters (leap.nvim)
+    S{char}{char}               Jump backward to a position matching these two
+                                characters (leap.nvim)
+    gs{char}{char}              Jump to any visible window (cross-window jump)
+
+Horizontal Navigation ~                         *gamma-horizontal*
+    f{char}/F{char}             Jump to next/previous occurrence of character
+                                (enhanced with highlighting)
+    t{char}/T{char}             Jump to before next/previous occurrence of
+                                character (enhanced with highlighting)
+    ;/,                         Repeat previous f/t/F/T movement forward/backward
+    ge/gE                       Jump backwards to end of word (WORD)
+    g_                          Jump to last non-blank character of line
+    0                           Jump to start of line
+    ^                           Jump to first non-blank character of line
+    H                           Jump to first non-whitespace character in line
+    L                           Jump to end of line
+
+Vertical Navigation ~                           *gamma-vertical*
+    gj/gk                       Move cursor down/up (multi-line text, respects
+                                wrapping)
+    <C-j>                       Move cursor down intelligently (cliff.nvim)
+    <C-k>                       Move cursor up intelligently (cliff.nvim)
+    zz/zt/zb                    Center/top/bottom cursor on screen
+    <C-e>/<C-y>                 Scroll screen down/up one line (cursor stays)
+    <C-d>/<C-u>                 Move cursor and screen down/up 1/2 page
+    n/N                         Next/previous search result (centered on screen)
+
+Insert Mode Navigation ~                        *gamma-insert-nav*
+    <A-h/j/k/l>                 Move cursor while staying in insert mode
+    <A-b/w/e>                   Word movement in insert mode
+    <C-h>                       Delete character before cursor during insert
+    <C-w>                       Delete word before cursor during insert
+    <C-t>/<C-d>                 Indent/de-indent line during insert
+    <C-n>/<C-p>                 Auto-complete next/previous match
+    <C-r>{register}             Insert contents of register
+    <C-o>{command}              Execute one normal mode command, return to insert
+
+------------------------------------------------------------------------------
+1.2 CODE STRUCTURE NAVIGATION				*gamma-code-nav*
+
+Function/Class Navigation ~
+    ]f/[f                       Go to next/previous function start
+    ]F/[F                       Go to next/previous function end
+    ]c/[c                       Go to next/previous class start
+    ]C/[C                       Go to next/previous class end
+
+Block Navigation ~
+    ][/[[                       Go to next/previous block start
+    ]]/[]                       Go to next/previous block end
+    ]s/[s                       Go to next/previous scope start
+    ]S/[S                       Go to next/previous scope end
+
+Pair Matching ~
+    %                           Jump between matching pairs (brackets, if/endif,
+                                etc.) with enhanced capabilities (vim-matchup)
+
+------------------------------------------------------------------------------
+1.3 LIST NAVIGATION					*gamma-list-nav*
+    ]q/[q                       Next/previous quickfix list item
+    <leader>fq                  List items in the quickfix list (telescope)
+    <leader>fj                  Jump list (telescope)
+
+==============================================================================
+2. TEXT SELECTION					*gamma-selection*
+
+------------------------------------------------------------------------------
+2.1 SEMANTIC TEXT OBJECTS				*gamma-text-objects*
+
+Code Structure Objects ~
+    as/is                       Select language scope
+    ac/ic                       Select class (outer/inner)
+    af/if                       Select function (outer/inner)
+    al/il                       Select loop (outer/inner)
+    ab/ib                       Select block (outer/inner)
+    aa/ia                       Select argument (outer/inner)
+
+Special Text Objects ~
+    aB/iB                       Select entire buffer (mini.ai)
+    at/it                       A/inner block with <> tags
+    ab/ib                       A/inner block with () (same as a(/i()
+    aw/iw                       A/inner word
+
+------------------------------------------------------------------------------
+2.2 VISUAL MODE ENHANCEMENTS				*gamma-visual*
+    o                           Move to other end of visual selection
+    O                           Move to other corner of visual block
+    u/U                         Change selected text to lowercase/uppercase
+    ~                           Switch case of selected text
+
+Note: Visual selections expand/contract using TreeSitter nodes and include
+precognition highlights showing motion targets.
+
+==============================================================================
+3. EDITING & MANIPULATION				*gamma-editing*
+
+------------------------------------------------------------------------------
+3.1 TEXT MANIPULATION					*gamma-text-manip*
+
+Line and Selection Movement ~
+    <C-S-h>/<C-S-left>          Move selection/line left (mini.move)
+    <C-S-l>/<C-S-right>         Move selection/line right (mini.move)
+    <C-S-k>/<C-S-up>            Move selection/line up (mini.move)
+    <C-S-j>/<C-S-down>          Move selection/line down (mini.move)
+
+Clipboard Management ~                          *gamma-clipboard*
+    p                           Paste without overwriting register (visual mode)
+    y                           Copy to system clipboard while preserving cursor
+    d                           Delete to void register instead of overwriting
+    X                           Cut current line
+    J                           Join lines while preserving cursor position
+    gJ                          Join line below without adding space
+    gp/gP                       Paste and leave cursor after new text
+
+Advanced Text Manipulation ~                    *gamma-text-advanced*
+    R                           Replace mode (keep typing to replace characters)
+    xp                          Transpose two letters (delete and paste)
+    U                           Restore last changed line
+    gwip                        Reflow paragraph
+    g~/gu/gU                    Switch case/lowercase/uppercase up to motion
+
+Code Commenting ~
+Smart auto-detection of comment styles with contextual commenting that handles
+mixed language files (Comment.nvim).
+
+------------------------------------------------------------------------------
+3.2 ADVANCED OPERATORS & LSP INTEGRATION		*gamma-operators*
+
+Operator + Motion Combinations ~
+    d]f                         Delete to next function
+    y]c                         Yank to next class
+    c][                         Change to next block
+
+LSP Code Actions ~                              *gamma-lsp*
+    <leader>rn                  Rename symbol
+    <leader>ca                  Code action
+    gd                          Go to definition
+    gr                          Find references
+    gI                          Go to implementation
+    K                           Show hover documentation
+
+Repeating Operations ~
+    .                           Repeat last change
+    @:                          Repeat last command
+    @@                          Repeat last macro
+
+Diagnostic Navigation ~
+    <leader>lx                  Toggle Trouble diagnostics panel
+    <leader>lw                  Workspace diagnostics
+    <leader>ld                  Document diagnostics
+
+==============================================================================
+4. MULTI-FILE & PROJECT NAVIGATION			*gamma-project*
+
+------------------------------------------------------------------------------
+4.1 FILE NAVIGATION					*gamma-files*
+    <leader>pf                  Find files (telescope)
+    <leader>fs                  Grep in files (telescope)
+    <leader>bf                  Find buffers (telescope)
+    <leader>b/                  Fuzzy find in current buffer (telescope)
+    <leader>pt                  Toggle project file tree (nvim-tree)
+
+------------------------------------------------------------------------------
+4.2 TERMINAL INTEGRATION				*gamma-terminal*
+    <leader>/                   Toggle floating terminal (toggleterm)
+    <leader>tf                  Toggle floating terminal (toggleterm)
+    <leader>th                  Create horizontal terminal (toggleterm)
+    <leader>tv                  Create vertical terminal (toggleterm)
+    <Esc> or jk                 Exit terminal mode (in terminal)
+    <C-h/j/k/l>                 Navigate between windows (in terminal)
+
+------------------------------------------------------------------------------
+4.3 WINDOW MANAGEMENT					*gamma-windows*
+    <C-w>h/j/k/l                Move cursor to window in that direction
+    <C-w>w                      Move cursor to previous window
+    <C-w></+/->                 Resize window in that direction
+    <C-w>bh/j/k/l               Swap buffer with window in that direction
+    <C-w>T                      Move current split to new tab
+    #gt                         Move to tab number #
+    :tabmove #                  Move current tab to position #
+    :tabdo command              Run command on all tabs
+
+------------------------------------------------------------------------------
+4.4 ADVANCED TELESCOPE USAGE				*gamma-telescope*
+    <C-g>                       Choose which window to open selection in
+    <Esc>                       Close Telescope (in insert mode)
+    <leader>fq                  List quickfix items
+    <leader>fj                  Jump list
+    <leader>fr                  Browse registers
+    <leader>fm                  List marks
+
+------------------------------------------------------------------------------
+4.5 MARK MANAGEMENT					*gamma-marks*
+Named marks (ma through mz) for positions within a file and file marks with
+capital letters (mA through mZ) that work across buffers.
+
+    <leader>fm                  List and navigate marks (telescope)
+
+Special Marks ~					*gamma-special-marks*
+    `0                          Position where Vim was last exited
+    `"                          Position when last editing this file
+    `.                          Position of last change in this file
+    ``                          Position before last jump
+
+Jump & Change Lists ~                           *gamma-jumps*
+    :jumps                      List of jumps
+    <C-i>/<C-o>                 Go to newer/older position in jump list
+    :changes                    List of changes
+    g,/g;                       Go to newer/older position in change list
+
+==============================================================================
+5. SEARCH & HISTORY NAVIGATION				*gamma-search*
+
+------------------------------------------------------------------------------
+5.1 ENHANCED SEARCH WITH HLSLENS			*gamma-hlslens*
+    n/N                         Navigate search results with count indicator
+    */#                         Search for word under cursor with enhanced
+                                visibility
+    g*/g#                       Search for partial word under cursor
+
+------------------------------------------------------------------------------
+5.2 UNDO HISTORY NAVIGATION				*gamma-undo*
+    <leader>u                   Toggle undo tree visualization (undotree)
+
+Navigate through complex undo history and restore previous states even after
+multiple changes.
+
+------------------------------------------------------------------------------
+5.3 ADVANCED SEARCH OPERATIONS				*gamma-search-ops*
+    :vimgrep /pattern/ **/*     Search pattern in all files
+    :cn/:cp                     Jump to next/previous match in quickfix
+    :copen/:cclose              Open/close quickfix window
+
+==============================================================================
+6. FOCUS & ZEN MODES					*gamma-focus*
+
+------------------------------------------------------------------------------
+6.1 DISTRACTION-FREE EDITING				*gamma-zen*
+    <leader>z                   Toggle Zen Mode for focused editing
+
+Control width and appearance of the editing environment.
+
+------------------------------------------------------------------------------
+6.2 ENHANCED READING					*gamma-reading*
+Twilight plugin dims inactive portions of code and No-Neck-Pain provides
+balanced window layouts.
+
+------------------------------------------------------------------------------
+6.3 AI INTEGRATION					*gamma-ai*
+    <Tab>                       Accept Copilot suggestion
+
+Seamless integration with Copilot for intelligent code completions.
+
+==============================================================================
+7. COLLABORATION & SESSIONS				*gamma-collab*
+
+------------------------------------------------------------------------------
+7.1 COLLABORATIVE EDITING				*gamma-instant*
+    <leader>ciu                 Set up collaboration server
+    <leader>ciss                Stop collaboration server
+    <leader>cij*                Various commands to join collaborative sessions
+    <leader>cif                 Follow another collaborator
+
+------------------------------------------------------------------------------
+7.2 SESSION MANAGEMENT					*gamma-sessions*
+Automatic session saving and loading based on git projects. Preserves window
+layouts, tab pages, and terminal state. Handles session management across
+different directories.
+
+==============================================================================
+8. GIT INTEGRATION					*gamma-git*
+
+------------------------------------------------------------------------------
+8.1 NEOGIT COMMANDS					*gamma-neogit*
+    <leader>gs                  Open git status window
+    <leader>gc                  Commit changes
+    <leader>gp                  Push changes
+    <leader>gP                  Pull changes
+    <leader>gm                  Merge
+Various other git operations are accessible through leader mappings.
+
+------------------------------------------------------------------------------
+8.2 DIFFVIEW						*gamma-diffview*
+    <leader>gd                  Open diff viewer
+    <leader>gh                  View file history
+
+Compare changes with powerful interactive interface.
+
+==============================================================================
+9. INDENTATION & FORMATTING				*gamma-indent*
+
+------------------------------------------------------------------------------
+9.1 SMART INDENTATION					*gamma-smart-indent*
+    >>/<<                       Indent/de-indent line one shiftwidth
+    >%/<%                       Indent/de-indent block with cursor on brace
+    >ib/<ib                     Indent/de-indent inner block with ()
+    >at/<at                     Indent/de-indent block with <> tags
+    3==                         Re-indent 3 lines
+    =%                          Re-indent block with cursor on brace
+    =iB                         Re-indent inner block with {}
+    gg=G                        Re-indent entire buffer
+    ]p                          Paste and adjust indent to current line
+
+==============================================================================
+10. ADVANCED TECHNIQUES & WORKFLOWS			*gamma-advanced*
+
+------------------------------------------------------------------------------
+10.1 REGISTERS AND MACROS				*gamma-registers*
+Named registers ("a through "z) for storing text.
+
+    <leader>fr                  Browse registers (telescope)
+    :registers                  Show all register contents
+
+Record complex macros with q{register} that use leap, text objects and
+TreeSitter movements.
+
+Special Registers ~                             *gamma-special-registers*
+    "0p                         Paste last yank (not affected by deletes)
+    "%                          Current file name register
+    "#                          Alternate file name register
+    "*                          Primary clipboard (X11)
+    "+                          System clipboard
+    "/                          Last search pattern
+    ":                          Last command-line
+    ".                          Last inserted text
+    "-                          Last small delete
+    "=                          Expression register (calculate expressions)
+    "_                          Black hole register (delete without storing)
+
+------------------------------------------------------------------------------
+10.2 COMMAND MODE POWER TOOLS				*gamma-commands*
+    :g/pattern/command          Execute a command on lines matching a pattern
+    :v/pattern/command          Execute a command on lines NOT matching a pattern
+    :s/pattern/replacement/g    Substitute text with regex support
+    :norm! command              Execute normal mode commands on multiple lines
+    \vpattern                   Very magic pattern (no escaping needed for regex)
+    :nohl                       Remove search highlighting
+
+Bulk Operations ~                               *gamma-bulk-ops*
+    :g/{pattern}/d              Delete all lines containing pattern
+    :g!/{pattern}/d             Delete all lines NOT containing pattern
+    :.,$d                       Delete from current line to end of file
+    :.,1d                       Delete from current line to beginning
+
+File Operations ~                               *gamma-file-ops*
+    :saveas file                Save file with new name
+    :w !sudo tee %              Write file using sudo
+    K                           Open man page for word under cursor
+
+------------------------------------------------------------------------------
+10.3 COMPOSING COMPLEX COMMANDS			*gamma-complex*
+Use count prefix and complex motions together:
+    2d2]f                       Delete two functions forward twice
+    3yaf                        Yank three functions
+    ct}                         Change until the next closing curly brace
+
+==============================================================================
+PLUGIN REFERENCES					*gamma-plugin-refs*
+
+1. leap.nvim                - Precision jumping
+2. quick-scope              - Enhanced f/t highlighting
+3. Custom remaps            - Various custom keybindings
+4. cliff.nvim               - Intelligent cursor movement
+5. nvim-treesitter-textobjects - Semantic text objects
+6. vim-matchup              - Enhanced pair matching
+7. telescope.nvim           - Fuzzy finder
+8. mini.ai                  - Additional text objects
+9. precognition.nvim        - Motion target hints
+10. mini.move               - Line/selection movement
+11. Comment.nvim            - Smart commenting
+12. nvim-hlslens            - Enhanced search
+13. undotree                - Undo history visualization
+14. zen-mode.nvim           - Distraction-free editing
+15. twilight.nvim           - Code dimming
+16. no-neck-pain.nvim       - Balanced layouts
+17. smart-splits.nvim       - Window management
+18. toggleterm.nvim         - Terminal integration
+19. nvim-tree.lua           - File tree
+20. neogit/diffview         - Git integration
+21. Trouble.nvim            - Diagnostics
+22. Copilot.lua             - AI assistance
+23. instant.nvim            - Collaborative editing
+24. neovim-session-manager  - Session management
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

@@ -9,3 +9,8 @@ kmap("n", "<leader>bd", vim.cmd.bdelete, "[B]uffer [D]elete", {})
 kmap("n", "<leader>bn", vim.cmd.bnext, "[B]uffer [N]ext", {})
 kmap("n", "<leader>bp", vim.cmd.bprevious, "[B]uffer [P]revious", {})
 kmap("n", "<leader>b!", vim.cmd.bwipeout, "[B]uffer [W]ipeout", {})
+
+-- format
+kmap("n", "<leader>=", function()
+    vim.lsp.buf.format()
+end, "[F]ormat current buffer")
