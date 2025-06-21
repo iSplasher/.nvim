@@ -267,7 +267,6 @@ return {
             dependencies = {
                 { 'nvim-lua/plenary.nvim' },
                 'nvim-treesitter/nvim-treesitter',
-                'nvim-tree/nvim-web-devicons',
                 'nvim-telescope/telescope-ui-select.nvim',
                 'MunifTanjim/nui.nvim',
                 {
@@ -357,24 +356,21 @@ return {
                 end
 
 
-                kmap('n', '<leader>pf', builtin.find_files, '[P]ick [F]ile')
-                kmap('n', '<leader>ff', builtin.find_files, '[P]ick [F]ile')
-                kmap('n', '<leader>fs', grep_search, '[G]rep in files')
-                kmap('n', '<leader>sg', grep_search, '[G]rep in files', {})
+                kmap('n', '<leader>ff', builtin.find_files, '[F]ind [f]ile')
+                kmap('n', '<leader>fs', grep_search, '[S]earch in files',
+                    { icon = { name = 'search', icon = '', color = 'green' } })
 
                 kmap('n', '<leader>bf', builtin.buffers, '[F]ind [b]uffer', {})
-                kmap('n', '<leader>fb', builtin.buffers, '[F]ind [b]uffer', {})
-                kmap('n', '<leader>fq', builtin.quickfix, 'List items in the [q]uick[f]ix list', {})
-                kmap('n', '<leader>fj', builtin.jumplist, 'List [j]ump List entries', {})
-                kmap('n', '<leader>fr', builtin.registers, 'List vim [r]egisters', {})
-                kmap('n', "<leader>f:", builtin.commands, "List [c]ommands", {})
-                kmap('n', "<leader>fm", builtin.marks, "List vim [m]arks and their value", {})
+                kmap('n', '<leader>cf', builtin.quickfix, 'List items in the [q]uick[f]ix list', {})
+                kmap('n', '<leader>jf', builtin.jumplist, 'List [j]ump List entries', {})
+                kmap('n', '<leader>@f', builtin.registers, 'List vim [r]egisters', {})
+                kmap('n', "<leader>;f", builtin.commands, "List [c]ommands", {})
+                kmap('n', "<leader>mf", builtin.marks, "List vim [m]arks and their value", {})
                 kmap('n', "<leader>fh", builtin.oldfiles, "List most recently used files", {})
 
 
                 kmap('n', '<leader>??', builtin.help_tags, '[F]ind [h]elp', {})
-                kmap('n', '<leader>bs', builtin.lsp_document_symbols, 'Find [s]ymbols in the current buffer', {})
-                kmap('n', '<leader>ps', builtin.lsp_workspace_symbols, 'Find [s]ymbols in the workspace', {})
+                kmap('n', '<leader>lw#', builtin.lsp_workspace_symbols, '[W]orkspace symbols', {})
             end
         },
     }

@@ -7,6 +7,16 @@ local kmap = utility.kmap
 
 return {
 
+    {
+        'echasnovski/mini.icons',
+        version = '*',
+        lazy = false,
+        priority = 500,
+        config = function(_, opts)
+            require('mini.icons').setup(opts)
+            MiniIcons.mock_nvim_web_devicons()
+        end
+    },
     -- better format for hover
     {
         "Fildo7525/pretty_hover",
@@ -115,9 +125,8 @@ return {
 
             require('telescope').load_extension 'attempt'
 
-            kmap('n', "<leader>nt", attempt.new_select, "New [T]emp file (ext)", {})
-            kmap('n', "<leader>ni", attempt.new_input_ext, "New Temp file ([i]nput ext)", {})
-            kmap('n', "<leader>ft", utility.create_cmd('Telescope attempt'), "Find [T]emp files", {})
+            kmap('n', "<leader>f#", attempt.new_select, "New [T]emp file (ext)", {})
+            kmap('n', "<leader>ft", attempt.new_input_ext, "New Temp file (input ext)", {})
         end
     },
 

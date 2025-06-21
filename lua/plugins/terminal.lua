@@ -1,5 +1,6 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
+local default_direction = 'horizontal'
 return {
   {
     'akinsho/toggleterm.nvim',
@@ -10,9 +11,9 @@ return {
       size = 10,
       close_on_exit = true,
       shell = vim.o.shell,
-      -- <leader>/ to toggle the terminal
-      open_mapping = [[<leader>/]],
-      direction = 'float',
+      -- <leader>// to toggle the terminal
+      open_mapping = [[<leader>//]],
+      direction = default_direction,
       float_opts = {
         border = 'double',
         winblend = 3,
@@ -24,11 +25,24 @@ return {
     config = function(_, opts)
       local tt = require('toggleterm')
       tt.setup(opts)
+      local function prev_window()
+        vim.cmd('stopinsert')
+        -- Move to previous window
+        vim.cmd('wincmd p')
+      end
+      local function close_terminal()
+        vim.cmd('stopinsert')
+        vim.cmd('q')
+      end
       -- Terminal keybindings
       function _G.set_terminal_keymaps()
         local opts = { buffer = 0, noremap = true }
+        kmap('n', '<esc>', prev_window, "Focus previous window", opts)
+        kmap('n', '<tab>', prev_window, "Focus previous window", opts)
+        kmap({ 'n', 'v' }, 'q', close_terminal, "Close terminal", opts)
+
+        -- Terminal mode keybindings
         kmap('t', '<esc>', [[<C-\><C-n>]], "Exit terminal mode", opts)
-        kmap('t', 'jk', [[<C-\><C-n>]], "Exit terminal mode", opts)
         kmap('t', '<C-h>', [[<Cmd>wincmd h<CR>]], "Move left", opts)
         kmap('t', '<C-j>', [[<Cmd>wincmd j<CR>]], "Move down", opts)
         kmap('t', '<C-k>', [[<Cmd>wincmd k<CR>]], "Move up", opts)
@@ -66,7 +80,7 @@ return {
           if f then
             id = f.id
           end
-          t = term.get_or_create_term(id, nil, 'float')
+          t = term.get_or_create_term(id, nil, default_direction)
         end
         if not t:is_open() then
           t:open()
@@ -92,11 +106,11 @@ return {
 
       kmap('c', "!", switch_to_terminal_on_shebang, "Run shell command", { remap = true })
 
-      kmap('n', { "<leader>/", "<leader>wt/" }, switch_to_terminal, "Open terminal")
-      kmap('n', "<leader>wtf", "<cmd>ToggleTerm direction=float<CR>", "Toggle terminal (floating)")
-      kmap('n', "<leader>wth", new_terminal_h, "Create terminal (horizontal)")
+      kmap('n', "<leader>//", switch_to_terminal, "Open terminal", { remap = true })
+      kmap('n', "<leader>/f", "<cmd>ToggleTerm direction=float<CR>", "Toggle terminal (floating)")
+      kmap('n', "<leader>/h", new_terminal_h, "Create terminal (horizontal)")
 
-      kmap('n', "<leader>wtv", new_terminal_v, "Create terminal (vertical)")
+      kmap('n', "<leader>/v", new_terminal_v, "Create terminal (vertical)")
 
       local lazygit = Terminal:new({
         cmd = "lazygit",

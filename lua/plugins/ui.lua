@@ -89,7 +89,7 @@ return {
       local function open_history()
         require('telescope').extensions.notify.notify(opts)
       end
-      kmap("n", "<leader>hn", open_history, "Show [n]otification [h]istory")
+      kmap("n", "<leader>?n", open_history, "Show [n]otification history")
     end,
   },
   {
@@ -200,7 +200,7 @@ return {
     config = function(_, opts)
       require("noice").setup(opts)
       require("telescope").load_extension("noice")
-      kmap('n', '<leader>dn', function()
+      kmap('n', '<leader>qn', function()
         vim.cmd.NoiceDismiss()
       end, "[D]ismiss all [n]otifications")
     end,

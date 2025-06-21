@@ -5,7 +5,7 @@ require('compat')
 ---@field [2] string Commentary
 
 ---@class gamma.context.PluginOpts
----@field [1] string Name of the plugin (first positional element).
+---@field [1] string Name of the plugin (first positional element). Will get installed with `Plug` command in the vimrc file.
 ---@field enabled? boolean Whether the plugin is enabled. defaults to true.
 ---@field context? string[] Context in which the plugin should be enabled
 ---                         in the vimrc file and will be tested with `has()`.
@@ -63,7 +63,35 @@ local M = {
         -- 'shell', 'shellcmdflag', 'shellredir', 'shellpipe', 'shellquote', 'shellxquote'
     },
 
-    mappings = {},
+    mappings = {
+        -- Buffer operations
+        { 'nnoremap <leader>bb :buffers<CR>', 'List buffers' },
+        { 'nnoremap <leader>bd :bdelete<CR>', 'Delete buffer' },
+        { 'nnoremap <leader>bn :bnext<CR>', 'Next buffer' },
+        { 'nnoremap <leader>bp :bprevious<CR>', 'Previous buffer' },
+        { 'nnoremap <leader>b! :bwipeout<CR>', 'Wipeout buffer' },
+        { 'nnoremap <leader>b/ :BLines<CR>', 'Search buffer lines' },
+        
+        -- Toggle operations
+        { 'nnoremap <leader>tr :set relativenumber!<CR>', 'Toggle relative numbers' },
+        { 'nnoremap <leader>ts :set spell!<CR>', 'Toggle spell check' },
+        { 'nnoremap <leader>tw :set wrap!<CR>', 'Toggle line wrap' },
+        
+        -- Quick operations
+        { 'nnoremap <leader>qw :w<CR>', 'Quick write' },
+        { 'nnoremap <leader>qq :q<CR>', 'Quick quit' },
+        { 'nnoremap <leader>qa :qa<CR>', 'Quit all' },
+        
+        -- Movement enhancements
+        { 'nnoremap <C-d> <C-d>zz', 'Scroll down and center' },
+        { 'nnoremap <C-u> <C-u>zz', 'Scroll up and center' },
+        { 'nnoremap n nzzzv', 'Next search result centered' },
+        { 'nnoremap N Nzzzv', 'Previous search result centered' },
+        
+        -- Text manipulation
+        { 'vnoremap J :m \'>+1<CR>gv=gv', 'Move selection down' },
+        { 'vnoremap K :m \'<-2<CR>gv=gv', 'Move selection up' },
+    },
     plugs = {},
     -- Keys to exclude from vimrc export (format: "mode:keys")
     exclude_mappings = {},
@@ -254,12 +282,11 @@ plugins {
     { 'junegunn/fzf',
         plug = { ["do"] = "{ -> fzf#install() }" },
         mappings = {
-            'nnoremap <leader>pf :Files<CR>',
             'nnoremap <leader>ff :Files<CR>',
-            'nnoremap <leader>fb :Buffers<CR>',
-            'nnoremap <leader>fh :History<CR>',
             'nnoremap <leader>fs :Rg<CR>',
-            'nnoremap <leader>sg :Rg<CR>'
+            'nnoremap <leader>bf :Buffers<CR>',
+            'nnoremap <leader>fh :History<CR>',
+            'nnoremap <leader>fr :file<CR>'
         }
     },
     'junegunn/fzf.vim',
@@ -278,7 +305,7 @@ plugins {
     { 'preservim/nerdtree',
         context = { '!ide' },
         mappings = {
-            '" nnoremap <leader>pt :NERDTreeToggle<CR>'
+            'nnoremap <leader><tab> :NERDTreeToggle<CR>'
         }
     },
     { 'vim-airline/vim-airline',

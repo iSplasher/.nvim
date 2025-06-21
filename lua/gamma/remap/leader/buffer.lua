@@ -4,11 +4,10 @@ local kmap = utility.kmap
 
 
 -- buffers
-kmap("n", "<leader>bb", vim.cmd.buffers, "[B]uffers", {})
-kmap("n", "<leader>bd", vim.cmd.bdelete, "[B]uffer [D]elete", {})
-kmap("n", "<leader>bn", vim.cmd.bnext, "[B]uffer [N]ext", {})
-kmap("n", "<leader>bp", vim.cmd.bprevious, "[B]uffer [P]revious", {})
-kmap("n", "<leader>b!", vim.cmd.bwipeout, "[B]uffer [W]ipeout", {})
+kmap("n", "<leader>bq", utility.create_cmd("bdelete"), "Delete current [b]uffer ", {})
+kmap("n", "<leader>bn", utility.create_cmd("bnext"), "Switch to [n]ext [b]uffer", {})
+kmap("n", "<leader>bp", utility.create_cmd("bprevious"), "Switch to [p]revious [b]uffer", {})
+kmap("n", "<leader>b!", utility.create_cmd("bwipeout"), "[B]uffer [W]ipeout", {})
 
 -- format
 kmap("n", "<leader>=", function()

@@ -2,17 +2,19 @@ local utility = require('gamma.utility')
 
 local kmap = utility.kmap
 
--- Quick save
-kmap('n', '<leader>qw', vim.cmd.write, "Save file")
-
 -- Quick save and quit
-kmap('n', '<leader>qqw', function()
+kmap('n', '<leader>qw', function()
   vim.cmd.write()
   vim.cmd.quit()
-end, "Save and quit")
+end, "Save file & quit")
+
+-- Force quit
+kmap('n', { '<leader>!q', '<leader>q!' }, function()
+  vim.cmd.quit({ bang = true })
+end, "Force quit")
 
 -- Quick quit
-kmap('n', '<leader>qq', vim.cmd.quit, "Quit")
+kmap('n', '<leader>qq', vim.cmd.quit, "Quit/Close")
 
 -- Rename file
-kmap("n", "<leader>fe", utility.create_cmd("file"), "Rename file")
+kmap("n", "<leader>fr", utility.create_cmd("file"), "[R]ename file")

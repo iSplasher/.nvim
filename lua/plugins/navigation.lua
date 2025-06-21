@@ -21,10 +21,11 @@ return {
       end, "Add buffer to Harpoon")
 
       -- Navigate So specific marked buffers
-      kmap("n", "<leader>1", function() harpoon:list():select(1) end, "Harpoon buffer 1")
-      kmap("n", "<leader>2", function() harpoon:list():select(2) end, "Harpoon buffer 2")
-      kmap("n", "<leader>3", function() harpoon:list():select(3) end, "Harpoon buffer 3")
-      kmap("n", "<leader>4", function() harpoon:list():select(4) end, "Harpoon buffer 4")
+      kmap("n", "<leader>b1", function() harpoon:list():select(1) end, "Harpoon buffer 1")
+      kmap("n", "<leader>b2", function() harpoon:list():select(2) end, "Harpoon buffer 2")
+      kmap("n", "<leader>b3", function() harpoon:list():select(3) end, "Harpoon buffer 3")
+      kmap("n", "<leader>b4", function() harpoon:list():select(4) end, "Harpoon buffer 4")
+      kmap("n", "<leader>b5", function() harpoon:list():select(5) end, "Harpoon buffer 5")
 
       -- Quick navigation between marked buffers
       kmap({ "n", 'v', 'i', 'x', }, "<C-S-P>", function() harpoon:list():prev() end, "Previous Harpoon mark",

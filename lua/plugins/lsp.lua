@@ -15,14 +15,11 @@ local M = {
                 -- Optional: Enable other modules if needed
                 ui_select = { enable = false }, -- vim.ui.select() wrapper
             })
-            kmap("n", "<leader>b#", ":Namu symbols<cr>", {
-                desc = "Jump to [L]SP [s]ymbol",
+            kmap("n", "<leader>l#", ":Namu symbols<cr>", {
+                desc = "Jump to symbol",
                 silent = true,
             })
-            kmap("n", "<leader>p#", ":Namu workspace<cr>", {
-                desc = "[L]SP Symbols - [W]orkspace",
-                silent = true,
-            })
+           
         end,
     },
     {
@@ -70,7 +67,6 @@ local M = {
     },
     {
         "folke/trouble.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
         lazy = true,
         cmd = "Trouble",
         config = function()
@@ -108,7 +104,7 @@ local M = {
             }
 
             kmap("n", "<leader>lx", "<cmd>Trouble<cr>", { desc = "Toggle Trouble" })
-            kmap("n", "<leader>lw", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Workspace Diagnostics" })
+            kmap("n", "<leader>lwd", "<cmd>Trouble diagnostics toggle<cr>", { desc = "[W]orkspace [D]iagnostics" })
             kmap("n", "<leader>ld", "<cmd>Trouble diagnostics toggle focus=false filter.buf=0<cr>",
                 { desc = "Buffer Diagnostics" })
             kmap("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List" })

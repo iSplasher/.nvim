@@ -27,11 +27,22 @@ else
 				vim.api.nvim_set_hl(0, 'MiniIndentscopeSymbol', theme.Conceal)
 			end
 		end
+		-- Leap
 		vim.api.nvim_set_hl(0, "LeapMatch", { link = "CharacterHint" })
 		vim.api.nvim_set_hl(0, "LeapLabel", { link = "CharacterHintSecondary" })
-		--
+		-- QuickScope highlights
 		vim.api.nvim_set_hl(0, "QuickScopePrimary", { link = "CharacterHintLabel" })
 		vim.api.nvim_set_hl(0, "QuickScopeSecondary", { link = "CharacterHintSecondary" })
+		-- WhichKey highlights
+		vim.api.nvim_set_hl(0, "WhichKeyIconAzure", { link = "Azure" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconBlue", { link = "Blue" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconCyan", { link = "Cyan" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconGreen", { link = "Green" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconGrey", { link = "Normal" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconOrange", { link = "Orange" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconPurple", { link = "Purple" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconRed", { link = "Red" })
+		vim.api.nvim_set_hl(0, "WhichKeyIconYellow", { link = "Yellow" })
 	end
 
 	-- Set up autocommand to run after colorscheme loads

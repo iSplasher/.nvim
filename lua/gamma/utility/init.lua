@@ -5,52 +5,138 @@ local M = {}
 ---A helper function to turn a table into a string.
 ---@param tbl table @The table.
 ---@param depth? number @The depth of sub-tables to traverse through.
----@param n? number @Do NOT manually set this. This controls formatting through recursion.
+---@param indent? number @Do NOT manually set this. This controls formatting through recursion.
 ---@return string @The string representation of the table.
-function M.table_to_string(tbl, depth, n)
-  n = n or 0;
-  depth = depth or 5;
+function M.table_to_string(tbl, depth, indent)
+  indent = indent or 0
+  depth = depth or 5
   local str = ""
-
-  if (depth == 0) then
-    str = str .. (string.rep(' ', n) .. "...");
-    return str
+  
+  if depth == 0 then
+    return string.rep("  ", indent) .. "..."
   end
 
-  if (n == 0) then
-    str = str .. (" ");
+  if type(tbl) ~= "table" then
+    return tostring(tbl)
   end
 
-  for key, value in pairs(tbl) do
-    if (key and type(key) == "number" or type(key) == "string") then
-      key = string.format("[\"%s\"]", key);
+  -- Check if table is empty
+  if next(tbl) == nil then
+    return "{}"
+  end
 
-      if (type(value) == "table") then
-        if (next(value)) then
-          str = str .. (string.rep(' ', n) .. key .. " = {");
-          str = str .. M.table_to_string(value, depth - 1, n + 4);
-          str = str .. (string.rep(' ', n) .. "},");
-        else
-          str = str .. (string.rep(' ', n) .. key .. " = {},");
-        end
-      else
-        if (type(value) == "string") then
-          value = string.format("\"%s\"", value);
-        else
-          value = tostring(value);
-        end
+  -- Check if table is array-like
+  local is_array = true
+  local max_index = 0
+  for k, _ in pairs(tbl) do
+    if type(k) ~= "number" or k <= 0 or k ~= math.floor(k) then
+      is_array = false
+      break
+    end
+    max_index = math.max(max_index, k)
+  end
 
-        str = str .. (string.rep(' ', n) .. key .. " = " .. value .. ",");
+  -- For arrays, check if indices are contiguous
+  if is_array then
+    for i = 1, max_index do
+      if tbl[i] == nil then
+        is_array = false
+        break
       end
     end
   end
 
-  if (n == 0) then
-    str = str .. (" ");
+  str = str .. "{\n"
+
+  if is_array then
+    -- Format as array
+    for i = 1, max_index do
+      local value = tbl[i]
+      str = str .. string.rep("  ", indent + 1)
+
+      if type(value) == "table" then
+        str = str .. M.table_to_string(value, depth - 1, indent + 1)
+      elseif type(value) == "string" then
+        str = str .. string.format("%q", value)
+      elseif type(value) == "function" then
+        str = str .. "<function>"
+      elseif type(value) == "nil" then
+        str = str .. "nil"
+      elseif type(value) == "boolean" then
+        str = str .. tostring(value)
+      else
+        str = str .. tostring(value)
+      end
+
+      if i < max_index then
+        str = str .. ","
+      end
+      str = str .. "\n"
+    end
+  else
+    -- Format as dictionary
+    local keys = {}
+    for k, _ in pairs(tbl) do
+      table.insert(keys, k)
+    end
+
+    -- Sort keys for consistent output
+    table.sort(keys, function(a, b)
+      local ta, tb = type(a), type(b)
+      if ta == tb then
+        if ta == "string" or ta == "number" then
+          return tostring(a) < tostring(b)
+        end
+      end
+      return ta < tb
+    end)
+
+    for i, key in ipairs(keys) do
+      local value = tbl[key]
+      str = str .. string.rep("  ", indent + 1)
+
+      -- Format key
+      if type(key) == "string" then
+        if key:match("^[%a_][%w_]*$") then
+          str = str .. key -- Valid identifier, no quotes needed
+        else
+          str = str .. "[" .. string.format("%q", key) .. "]"
+        end
+      elseif type(key) == "number" then
+        str = str .. "[" .. tostring(key) .. "]"
+      else
+        str = str .. "[" .. tostring(key) .. "]"
+      end
+
+      str = str .. " = "
+
+      -- Format value
+      if type(value) == "table" then
+        str = str .. M.table_to_string(value, depth - 1, indent + 1)
+      elseif type(value) == "string" then
+        str = str .. string.format("%q", value)
+      elseif type(value) == "function" then
+        str = str .. "<function>"
+      elseif type(value) == "nil" then
+        str = str .. "nil"
+      elseif type(value) == "boolean" then
+        str = str .. tostring(value)
+      else
+        str = str .. tostring(value)
+      end
+
+      if i < #keys then
+        str = str .. ","
+      end
+      str = str .. "\n"
+    end
   end
+
+  str = str .. string.rep("  ", indent) .. "}"
   return str
 end
 
+M.format_table = M.table_to_string -- Alias for table_to_string
 ---A helper function to print a table's contents.
 ---@param tbl table @The table to print.
 ---@param depth? number @The depth of sub-tables to traverse through and print.
@@ -92,14 +178,26 @@ end
 ---@field keys string The keys the keymap is set for.
 ---@field map string | function The command the keymap is set for.
 ---@field desc string The description of the keymap.
+---@field icon? gamma.utility.kmap_icon_opts The icon options for the keymap.
 
 
 ---Custom keymaps set throughout will be inserted here.
 ---@type gamma.utility.saved_kmap[]
 M.saved_maps = {}
 ---Custom keymaps set throughout will be inserted here.
+
+
+
+
 ---@type gamma.utility.saved_kmap[]
 M.saved_maps_d = {}
+--
+---@class gamma.utility.kmap_icon_opts
+---@field hl? string The highlight group to use for the icon.
+---@field color? string The color to use for the icon, can be azure|blue|cyan|green|grey|orange|purple|red|yellow.
+---@field cat? string The category of the icon, can be file|filetype|extension.
+---@field name? string The name of the icon in the specified category.
+--
 ---@class gamma.utility.kmap_opts
 ---@field noremap? boolean Only remap the keymap if it does not already exist.
 ---@field remap? boolean Remap if the keymap already exists. (default: true if noremap is not set)
@@ -109,9 +207,18 @@ M.saved_maps_d = {}
 ---@field cmd? boolean Execute the given command directly when invoked.
 ---@field script? boolean Only remap characters that were defined local to a script.
 ---@field unique? boolean Do not override a keymap if it already exists.
----@field buffer? boolean | number Set the keymap for the current buffer only.
+---@field buffer? boolean | number Set the keymap for a given buffer only.
 ---@field local? boolean Set the keymap for the current buffer only.
----@field desc? string The description of the keymap. (default: nil)
+---@field desc? string The description of the keymap.
+---@field icon? string | gamma.utility.kmap_icon_opts The icon to use for the keymap.
+---@field group? string The group to use for the keymap, used by which-key.
+
+
+
+local _deferred_wk_args = {}
+
+--
+--
 --- Set a keymap
 ---@param mode string | string[] @The mode to set the keymap for.
 ---@param keys string | string[]  @The keys to set the keymap for.
@@ -119,15 +226,6 @@ M.saved_maps_d = {}
 ---@param desc_or_opts? string | table The description to set the keymap for or the options to set the keymap for.
 ---@param opts? gamma.utility.kmap_opts The options to set the keymap for.
 ---@note This is a wrapper around `vim.keymap.set` that provides a more user-friendly interface.
----@example
----- Map to a Lua function: kmap('n', 'lhs', function() print("real lua function") end, "description", { noremap = true })
----- Map to multiple modes: kmap({'n', 'v'}, '<leader>lr', vim.lsp.buf.references, "description", { buffer = true })
----- Buffer-local mapping: kmap('n', '<leader>w', "<cmd>w<cr>", "description", { silent = true, buffer = 5 })
----- Expr mapping:
--- kmap('i', '<Tab>', function()
---   return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
--- end, "description", { expr = true })
--- <Plug> mapping: kmap('n', '[%%', '<Plug>(MatchitNormalMultiBackward)', "description",)
 function M.kmap(mode, keys, command, desc_or_opts, opts)
   -- if desc_or_opts is not a string, then its opts
   local desc = nil
@@ -205,22 +303,58 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       end
     end
 
+    if type(k_opts.icon) == 'string' then
+      -- if icon is a string, then convert it to a table
+      k_opts.icon = {
+        name = k_opts.icon,
+      }
+    elseif type(k_opts.icon) ~= 'table' and k_opts.icon ~= nil then
+      M.print_error("kmap -- icon must be a string or table, got " .. type(k_opts.icon))
+      error("kmap -- icon must be a string or table")
+    end
+
+    -- set the keymap
     vim.keymap.set(_mode, key, command, { desc = desc, table.unpack(k_opts) })
 
+    -- add to which-key
+    --  defer the call BufReadPost because whick-key might not be loaded yet, we defer the call
+    table.insert(_deferred_wk_args, {
+      key,
+      mode = _mode,
+      desc = desc,
+      buffer = k_opts.buffer,
+      icon = k_opts.icon,
+      group = k_opts.group,
+    })
     -- add to saved_maps
     local map = {
       mode = _mode,
       keys = key,
       map = command,
       desc = desc,
+      icon = k_opts.icon,
+      group = k_opts.group,
     }
     table.insert(M.saved_maps, map)
     M.saved_maps_d[key] = map
+    
+    
+
   end
 end
 
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function()
+    local ok, wk = pcall(require, "which-key")
+    if ok and wk and vim.tbl_count(_deferred_wk_args) > 0 then
+      wk.add(_deferred_wk_args)
+    else
+      M.warn("kmap -- which-key not loaded, cannot add icon to keymaps")
+    end
+  end,
+})
 ---Get a dictionary of all saved keymaps.
----@return table @The dictionary of all saved keymaps.
+---@return gamma.utility.saved_kmap[] @The saved keymaps.
 function M.get_saved_maps()
   -- if saved_maps is empty, then fill it with current mappings
   if #M.saved_maps == 0 then
@@ -242,7 +376,7 @@ end
 ---Check if a keymap exists.
 ---@param mode string | string[] @The mode to check the keymap for.
 ---@param keys string @The keys to check the keymap for.
----@return false|table @Whether or not the keymap exists. If it does, return the keymap.
+---@return false|gamma.utility.saved_kmap @Whether or not the keymap exists. If it does, return the keymap.
 function M.keymap_exists(mode, keys)
   if #M.saved_maps == 0 then
     M.get_saved_maps()
@@ -486,47 +620,50 @@ function M.require_dir(path, recursive, allow_empty)
   return true
 end
 
+M._print = vim.schedule_wrap(function(obj, endstr, level)
+  endstr = endstr or "\n"
+  local msg = vim.inspect(obj) .. endstr
+  local p = print
+  if level == vim.log.levels.ERROR then
+    p = error
+  elseif level == vim.log.levels.WARN then
+    msg = "WARN: " .. msg
+  elseif level == vim.log.levels.DEBUG then
+    msg = "DEBUG: " .. msg
+  end
+  if vim.g.vscode then
+    p(msg)
+  else
+    local ok, _ = pcall(vim.notify, msg, level)
+    if not ok then
+      -- Fallback to print if notify fails
+      p(msg)
+    end
+  end
+end)
+
 ---A helper function to print something to the console.
 ---@param obj any @The object to print.
 ---@param endstr? string The string to print at the end. (default: "\n")
 function M.print(obj, endstr)
-  endstr = endstr or "\n"
-  local msg = vim.inspect(obj) .. endstr
-  if vim.g.vscode then
-    print(msg)
-  else
-    local ok, _ = pcall(vim.notify, msg, vim.log.levels.INFO)
-    if not ok then
-      -- Fallback to print if notify fails
-      print(msg)
-    end
-  end
+  M._print(obj, endstr, vim.log.levels.INFO)
 end
 
 ---A helper function to print error messages to the console.
 ---@param obj any @The object to print.
 function M.print_error(obj)
-  local msg = vim.inspect(obj)
-  if vim.g.vscode then
-    print(msg)
-  else
-    local ok, _ = pcall(vim.notify, msg, vim.log.levels.ERROR)
-    if not ok then
-      -- Fallback to print if notify fails
-      print(msg)
-    end
-  end
+  M._print(obj, nil, vim.log.levels.ERROR)
 end
 
+---A helper function to print warning messages to the console.
+---@param obj any @The object to print.
+function M.print_warn(obj)
+  M._print(obj, nil, vim.log.levels.WARN)
+end
 ---A helper function to print debug messages to the console.
 ---@param obj any @The object to print.
 function M.print_debug(obj)
-  local msg = vim.inspect(obj)
-  if vim.g.vscode then
-    print(msg)
-  else
-    vim.notify(msg, vim.log.levels.DEBUG)
-  end
+  M._print(obj, nil, vim.log.levels.DEBUG)
 end
 
 ---@class gamma.utility.shell_opts
@@ -604,4 +741,36 @@ function M.which(cmd)
   end
 end
 
+---@class gamma.utility.termcodes_opts
+---@field replace_leader? boolean Replace <leader> with the value of vim.g.mapleader. Default: true
+---@field replace_localleader? boolean Replace <localleader> with the value of vim.g.maplocalleader. Default: true
+---@field special? boolean Replace keycodes, e.g. <CR> becomes a "\r" char. Default: true
+
+
+---Get the termcodes for a keymapping
+---@param keys string @The keys to get the termcodes for.
+---@gamma.utility.termcodes_opts? opts The options to use when getting the termcodes.
+---@return string @The termcodes for the keys.
+function M.get_termcodes(keys, opts)
+  opts = opts or {}
+  if keys == nil or keys == "" then
+    return ""
+  end
+  if type(keys) ~= "string" then
+    error("get_termcodes -- keys must be a string, not " .. type(keys))
+  end
+  if opts.replace_leader ~= false and keys and string.find(keys, "<leader>") then
+    keys = string.gsub(keys, "<leader>", vim.g.mapleader or "\\")
+  end
+  if opts.replace_localleader ~= false and keys and string.find(keys, "<localleader>") then
+    keys = string.gsub(keys, "<localleader>", vim.g.maplocalleader or "\\")
+  end
+
+  return vim.api.nvim_replace_termcodes(keys, true, true, opts.special ~= false)
+end
+
+M.transkey = M.get_termcodes         -- Alias for get_termcodes
+M.get_key = M.get_termcodes          -- Alias for get_termcodes
+M.canonicalize_key = M.get_termcodes -- Alias for get_termcodes
 return M
+

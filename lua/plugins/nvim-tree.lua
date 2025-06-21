@@ -15,7 +15,6 @@ return {
         'nvim-tree/nvim-tree.lua',
         event = 'VeryLazy',
         dependencies = {
-            'nvim-tree/nvim-web-devicons'
         },
         opts = {
             respect_buf_cwd = true,
@@ -51,7 +50,7 @@ return {
                 vim.cmd.NvimTreeToggle()
             end
 
-            kmap("n", "<leader>pt", open_project_tree, "Project Tree")
+            kmap("n", "<leader><tab>", open_project_tree, "Toggle file browser")
 
 
             local function on_attach(bufnr)

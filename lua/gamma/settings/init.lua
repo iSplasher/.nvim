@@ -17,7 +17,8 @@ vim.g.backupdir = vim.g.backupdir .. '//,.' -- fallback
 
 -- Set leader key to space
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+-- Set localleader key to comma
+vim.g.maplocalleader = ","
 
 vim.opt.encoding = "utf-8"
 vim.opt.ffs = "unix,dos,mac" -- fileformats

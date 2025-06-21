@@ -24,10 +24,9 @@ return {
     },
 
     {
-        'folke/which-key.nvim',
+        'isplasher-forks/which-key.nvim',
         event = 'VeryLazy',
         priorty = 200,
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
         opts = wkcfg.opts,
         config = wkcfg.config,
         init = function()
