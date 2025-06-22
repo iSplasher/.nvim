@@ -71,7 +71,9 @@ function M.notify(message, level, opts)
       vim.notify(message, level, notify_opts)
     end, defer_ms)
   else
-    vim.notify(message, level, notify_opts)
+    vim.schedule(function()
+      vim.notify(message, level, notify_opts)
+    end)
   end
 end
 

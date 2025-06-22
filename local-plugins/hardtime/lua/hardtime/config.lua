@@ -115,6 +115,9 @@ M.config = {
       end
       return message
    end,
+   disabled_message = function(key)
+      return "The " .. key .. " key is disabled!"
+   end,
    ui = {
       enter = true,
       focusable = true,

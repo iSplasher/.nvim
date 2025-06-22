@@ -77,7 +77,11 @@ local function handler(key)
    if config.config.disabled_keys[key] then
       if config.config.notification and should_reset_notification then
          vim.schedule(function()
-            util.notify("The " .. key .. " key is disabled!")
+            local message = "The " .. key .. " key is disabled!"
+            if config.config.disabled_message then
+               message = config.config.disabled_message(key)
+            end
+            util.notify(message)
          end)
       end
       return ""

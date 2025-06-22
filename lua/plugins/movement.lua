@@ -1,32 +1,8 @@
 local utility = require('gamma.utility')
+local cfg = require('config')
+local hardtime_cfg = require('config.hardtime')
 local kmap = utility.kmap
 
-local disabled_ui_filetypes = {
-    "startify",
-    "dashboard",
-    "neo-tree",
-    "qf",
-    "netrw",
-    "NvimTree",
-    "lazy",
-    "mason",
-    "terminal",
-    "mason",
-    "TelescopePrompt",
-    "noice",
-    "TelescopeResults",
-}
-
-local disabled_hard_time_filetypes = {
-    "log",
-    table.unpack(disabled_ui_filetypes),
-}
-local equivalence_classes = {
-    ' \t\r\n',
-    '([{<',
-    ')]}>',
-    '\'"`',
-}
 
 return {
 
@@ -51,7 +27,7 @@ return {
 
             -- Define equivalence classes for brackets and quotes, in addition to
             -- the default whitespace group.
-            require('leap').opts.equivalence_classes = equivalence_classes
+            require('leap').opts.equivalence_classes = cfg.equivalence_classes
 
             -- Use the traversal keys to repeat the previous motion without explicitly
             -- invoking Leap.
@@ -94,52 +70,7 @@ return {
         dev = true,
         event = "VimEnter",
         dependencies = { "MunifTanjim/nui.nvim" },
-        opts = {
-            max_count = 5,
-            disable_mouse = false,
-            disabled_filetypes = { table.unpack(disabled_hard_time_filetypes) },
-            -- Remove <Up> keys and append <Space> to the disabled_keys
-            disabled_keys = {
-                ["<Up>"] = { "n", "v" },
-                ["<Down>"] = { "n", "v" },
-                ["<Left>"] = { "n", "v" },
-                ["<Right>"] = { "n", "v" },
-            },
-            message = function(key, key_count)
-                local base_message = "⚡ Hardtime: " .. key .. " pressed too frequently!"
-
-                -- Customized messages for different keys
-                if key == "k" then
-                    return base_message .. " Try " .. key_count .. "k or Ctrl-U to scroll up efficiently."
-                elseif key == "j" then
-                    return base_message .. " Try " .. key_count .. "j or Ctrl-D to scroll down efficiently."
-                elseif key == "h" then
-                    return base_message .. " Consider: b/B/ge/gE/F/T/0/^ for leftward movement."
-                elseif key == "l" then
-                    return base_message .. " Consider: w/W/e/E/f/t/$/A for rightward movement."
-                elseif key == "x" then
-                    return base_message .. " Consider: dw/de/db for more efficient deletion."
-                elseif key == "X" then
-                    return base_message .. " Consider: d0/d^ for deleting to line start."
-                elseif key == "y" then
-                    return base_message .. " Consider: yw/ye/yb or visual selection for copying."
-                elseif key == "Y" then
-                    return base_message .. " Y copies the whole line - use it wisely!"
-                elseif key == "J" then
-                    return base_message .. " J joins lines - consider if multiple joins are needed."
-                elseif key == "d" then
-                    return base_message .. " Consider: dw/de/dd/d$/d0 for targeted deletion."
-                elseif key == "c" then
-                    return base_message .. " Consider: cw/ce/cc/c$/c0 for efficient editing."
-                elseif key == "p" then
-                    return base_message .. " Multiple pastes? Consider visual mode or counts."
-                elseif key == "P" then
-                    return base_message .. " Pasting before cursor - use thoughtfully."
-                else
-                    return base_message .. " Consider more efficient alternatives."
-                end
-            end,
-        }
+        opts = hardtime_cfg.opts
     },
 
     {
@@ -168,7 +99,7 @@ return {
             --     PrevParagraph = { text = "{", prio = 8 },
             --     NextParagraph = { text = "}", prio = 8 },
             -- },
-            disabled_fts = { table.unpack(disabled_ui_filetypes) },
+            disabled_fts = { table.unpack(cfg.ui_filetypes) },
         },
     },
 
@@ -184,10 +115,12 @@ return {
             set({ "n", "x" }, "gm", mc.operator, "Add cursors to operator motion", { noremap = true })
 
             -- Add or skip cursor above/below the main cursor.
-            set({ "n", "x", "v" }, "<C-up>", function() mc.lineAddCursor(-1) end, "Add cursor above", {})
-            set({ "n", "x", "v" }, "<C-down>", function() mc.lineAddCursor(1) end, "Add cursor below", {})
-            set({ "n", "x", "v" }, "<leader><up>", function() mc.lineSkipCursor(-1) end, "Skip cursor above", {})
-            set({ "n", "x", "v" }, "<leader><down>", function() mc.lineSkipCursor(1) end, "Skip cursor below", {})
+            set({ "n", "x", "v" }, "<C-up>", function() mc.lineAddCursor(-1) end, "MultiCursor: Add cursor above", {})
+            set({ "n", "x", "v" }, "<C-down>", function() mc.lineAddCursor(1) end, "MultiCursor: Add cursor below", {})
+            set({ "n", "x", "v" }, "<leader><up>", function() mc.lineSkipCursor(-1) end, "MultiCursor: Skip cursor above",
+                {})
+            set({ "n", "x", "v" }, "<leader><down>", function() mc.lineSkipCursor(1) end,
+                "MultiCursor: Skip cursor below", {})
 
             -- Add or skip adding a new cursor by matching word/selection
             -- set({ "n", "x" }, "<leader>n", function() mc.matchAddCursor(1) end)
@@ -196,9 +129,10 @@ return {
             -- set({ "n", "x" }, "<leader>S", function() mc.matchSkipCursor(-1) end)
 
             -- Add and remove cursors with control + left click.
-            set({ "n", "v" }, "<c-leftmouse>", mc.handleMouse, "Add cursor with mouse", { silent = true })
-            set({ "n", "v" }, "<c-leftdrag>", mc.handleMouseDrag, "Add cursor with mouse drag", { silent = true })
-            set({ "n", "v" }, "<c-leftrelease>", mc.handleMouseRelease, "Add cursor with mouse release",
+            set({ "n", "v" }, "<c-leftmouse>", mc.handleMouse, "MultiCursor: Add cursor with mouse", { silent = true })
+            set({ "n", "v" }, "<c-leftdrag>", mc.handleMouseDrag, "MultiCursor: Add cursor with mouse drag",
+                { silent = true })
+            set({ "n", "v" }, "<c-leftrelease>", mc.handleMouseRelease, "MultiCursor: Add cursor with mouse release",
                 { silent = true })
 
             -- Disable and enable cursors.
@@ -220,11 +154,11 @@ return {
             -- multiple cursors. This lets you have overlapping mappings.
             mc.addKeymapLayer(function(layerSet)
                 -- Select a different cursor as the main one.
-                layerSet({ "n", "x" }, "<left>", mc.prevCursor, { desc = "Select previous cursor" })
-                layerSet({ "n", "x" }, "<right>", mc.nextCursor, { desc = "Select next cursor" })
+                layerSet({ "n", "x" }, "<left>", mc.prevCursor, { desc = "MultiCursor: Select previous cursor" })
+                layerSet({ "n", "x" }, "<right>", mc.nextCursor, { desc = "MultiCursor: Select next cursor" })
 
                 -- Delete the main cursor.
-                layerSet({ "n", "x" }, "<C-x>", mc.deleteCursor, { desc = "Delete main cursor" })
+                layerSet({ "n", "x" }, "<C-x>", mc.deleteCursor, { desc = "MultiCursor: Delete main cursor" })
 
                 -- Enable and clear cursors using escape.
                 layerSet("n", "<esc>", function()
@@ -233,7 +167,7 @@ return {
                     else
                         mc.clearCursors()
                     end
-                end, { desc = "Enable or clear cursors" })
+                end, { desc = "MultiCursor: Enable or clear cursors" })
             end)
 
             -- Customize how cursors look.
