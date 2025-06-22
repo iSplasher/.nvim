@@ -272,15 +272,17 @@ function M.enable()
 
    -- Send notification that hardtime is enabled (if enabled in config)
    if config.config.start_notification then
-      vim.notify(
+      vim.defer_fn(function()
+         vim.notify(
          "⚡ Hardtime enabled!",
          vim.log.levels.INFO,
          {
             title = "⚡ Hardtime Training",
             icon = "⚡",
-            timeout = 3000,
+               timeout = 1000,
          }
       )
+      end, 1500)
    end
 end
 

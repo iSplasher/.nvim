@@ -1,4 +1,5 @@
 local utility = require('gamma.utility')
+local deferred_wk_args = require('gamma.utility.keymap')._deferred_wk_args
 local kmap = utility.kmap
 
 -- buftypes that should not show whick-key
@@ -160,8 +161,8 @@ local M = {
             { "<leader>#", group = "[#]" },
             { "<leader>+", group = "[+]" },
         })
-        if vim.tbl_count(utility._deferred_wk_args) > 0 then
-            wk.add(utility._deferred_wk_args)
+        if vim.tbl_count(deferred_wk_args) > 0 then
+            wk.add(deferred_wk_args)
         end
     end
 }
