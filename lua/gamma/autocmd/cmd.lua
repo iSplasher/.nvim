@@ -12,6 +12,7 @@ end
 
 ---Execute all commands in the list.
 function M.execute_cmds()
+  local count = #cmds
   for _, cmd in ipairs(cmds) do
     cmd()
   end

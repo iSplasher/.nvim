@@ -215,7 +215,7 @@ M.saved_maps_d = {}
 
 
 
-local _deferred_wk_args = {}
+M._deferred_wk_args = {}
 
 --
 --
@@ -272,32 +272,47 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
 
     if k_opts.noremap == nil and k_opts.remap == nil then
       -- check if already mapped
-      local err = false
-      -- for each mode
       local map_exists = M.keymap_exists(_mode, key)
       if map_exists ~= false then
-        if not err then
-          err = true
-          M.print_error({ keys = key, mode = _mode, command = command, desc = desc })
-          -- Get the map
-          -- {'lnum': 0, 'script': 0, 'mode': 'i', 'silent': 0, 'callback': function('<lambda>1'), 'noremap': 1, 'lhs': '<CR>', 'lhsr', 'nowait': 0, 'expr': 0, 'sid': -8, 'buffer': 0}
-          local e_map = map_exists
-          local e_map_lhs = e_map.lhs or ""
-          local e_map_rhs = e_map.rhs or e_map.callback or e_map.expr or ""
-          if type(e_map_rhs) == "function" then
-            e_map_rhs = "<function>"
-          end
-          local e_map_desc = e_map.desc or ""
-          local e_map_mode = e_map.mode or ""
-          if type(e_map_mode) == "table" then
-            e_map_mode = table.concat(e_map_mode, ", ")
-          end
+        M.print_error({ keys = key, mode = _mode, command = command, desc = desc })
 
-          error("\nWARNING: Keymap '" .. key .. "' (" .. desc .. ")" ..
-            " already exists in '" .. M.table_to_string(_mode) ..
-            "' mode. (use { [no]remap = true } or to disable this warning)" ..
-            "\n  Existing map: " .. e_map_lhs .. " -> " .. e_map_rhs .. " (" .. e_map_mode .. ") " .. e_map_desc)
+        -- Format existing mapping info
+        local e_map_lhs = map_exists.lhs or key
+        local e_map_rhs = map_exists.rhs or map_exists.callback or ""
+        if type(e_map_rhs) == "function" then
+          e_map_rhs = "<function>"
+        elseif map_exists.callback then
+          e_map_rhs = "<callback>"
         end
+        local e_map_desc = map_exists.desc or ""
+        local e_map_mode = map_exists.mode or ""
+
+        -- Get source location if available
+        local source_info = ""
+        if map_exists.sid and map_exists.sid > 0 then
+          local script_info = vim.fn.getscriptinfo({ sid = map_exists.sid })
+          if script_info and #script_info > 0 and script_info[1].name then
+            source_info = " [" .. script_info[1].name .. "]"
+          end
+        end
+
+        -- Get current location where new keymap is being defined
+        local current_info = debug.getinfo(2, "Sl")
+        local current_location = ""
+        if current_info and current_info.source and current_info.currentline then
+          local file = current_info.source:match("^@(.+)") or current_info.source
+          current_location = string.format("\n  Attempting to define at: %s:%d", file, current_info.currentline)
+        end
+        -- Create readable mode list
+        local mode_str = type(_mode) == "table" and table.concat(_mode, ",") or tostring(_mode)
+
+        error(string.format(
+          "\nWARNING: Keymap '%s' (%s) already exists in '%s' mode.\n" ..
+          "  Existing: %s -> %s (%s) %s%s\n" ..
+          "  Use { remap = true } to override or { noremap = true } to skip",
+          key, desc or "no desc", mode_str,
+          e_map_lhs, e_map_rhs, e_map_mode, e_map_desc, current_location
+        ))
       else
         k_opts.remap = true
       end
@@ -314,43 +329,46 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
     end
 
     -- set the keymap
-    vim.keymap.set(_mode, key, command, { desc = desc, table.unpack(k_opts) })
+    local opts_args = { desc = desc, table.unpack(k_opts) }
+    vim.keymap.set(_mode, key, command, opts_args)
 
-    -- add to which-key
-    --  defer the call BufReadPost because whick-key might not be loaded yet, we defer the call
-    table.insert(_deferred_wk_args, {
-      key,
-      mode = _mode,
-      desc = desc,
-      buffer = k_opts.buffer,
-      icon = k_opts.icon,
-      group = k_opts.group,
-    })
+    if k_opts.icon or k_opts.group then
+      -- add to which-key
+      local wk_arg = {
+        key,
+        command,
+        mode = _mode,
+        icon = k_opts.icon,
+        group = k_opts.group,
+        table.unpack(opts_args),
+      }
+      local ok, wk = pcall(require, "which-key")
+      if ok and wk then
+        wk.add({ wk_arg })
+      else
+        --  defer the call because which-key might not be loaded yet, we defer the call
+        table.insert(M._deferred_wk_args, wk_arg)
+      end
+    end
     -- add to saved_maps
     local map = {
       mode = _mode,
       keys = key,
       map = command,
-      desc = desc,
       icon = k_opts.icon,
       group = k_opts.group,
+      table.unpack(opts_args),
     }
     table.insert(M.saved_maps, map)
     M.saved_maps_d[key] = map
-    
-    
+
 
   end
 end
 
 vim.api.nvim_create_autocmd("BufReadPost", {
   callback = function()
-    local ok, wk = pcall(require, "which-key")
-    if ok and wk and vim.tbl_count(_deferred_wk_args) > 0 then
-      wk.add(_deferred_wk_args)
-    else
-      M.warn("kmap -- which-key not loaded, cannot add icon to keymaps")
-    end
+   
   end,
 })
 ---Get a dictionary of all saved keymaps.
@@ -376,7 +394,7 @@ end
 ---Check if a keymap exists.
 ---@param mode string | string[] @The mode to check the keymap for.
 ---@param keys string @The keys to check the keymap for.
----@return false|gamma.utility.saved_kmap @Whether or not the keymap exists. If it does, return the keymap.
+---@return false|table @Whether or not the keymap exists. If it does, return the keymap info.
 function M.keymap_exists(mode, keys)
   if #M.saved_maps == 0 then
     M.get_saved_maps()
@@ -392,11 +410,12 @@ function M.keymap_exists(mode, keys)
   end
 
   for _, m in ipairs(_mode) do
-    local r = vim.fn.mapcheck(keys, m) ~= ""
-    if r ~= "" then
-      local m = M.saved_maps_d[keys]
-      if m ~= nil then
-        return m
+    -- Fast check first with mapcheck
+    if vim.fn.mapcheck(keys, m) ~= "" then
+      -- Only call maparg if mapping exists
+      local map_info = vim.fn.maparg(keys, m, false, true)
+      if map_info and next(map_info) then
+        return map_info
       end
     end
   end
@@ -767,6 +786,34 @@ function M.get_termcodes(keys, opts)
   end
 
   return vim.api.nvim_replace_termcodes(keys, true, true, opts.special ~= false)
+end
+
+---@class gamma.utility.notify_opts
+---@field title? string The title of the notification
+---@field timeout? number The timeout in milliseconds before the notification disappears
+---@field icon? string The icon to display with the notification
+---@field defer? number Delay in milliseconds before showing the notification
+
+---Notify with optional deferred execution
+---@param message string The notification message
+---@param level? number The log level (default: vim.log.levels.INFO)
+---@param opts? gamma.utility.notify_opts Notification options (can include defer field for delayed execution)
+function M.notify(message, level, opts)
+  level = level or vim.log.levels.INFO
+  opts = opts or {}
+  
+  -- Extract defer option and remove it from opts before passing to vim.notify
+  local defer_ms = opts.defer or 0
+  local notify_opts = vim.tbl_deep_extend("force", {}, opts)
+  notify_opts.defer = nil
+  
+  if defer_ms > 0 then
+    vim.defer_fn(function()
+      vim.notify(message, level, notify_opts)
+    end, defer_ms)
+  else
+    vim.notify(message, level, notify_opts)
+  end
 end
 
 M.transkey = M.get_termcodes         -- Alias for get_termcodes

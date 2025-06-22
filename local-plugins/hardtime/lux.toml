@@ -1,0 +1,19 @@
+package = "hardtime"
+version = "0.1.0"
+lua = ">=5.1"
+
+[description]
+summary = "Break bad habits, master Vim motions (based on m4xshen/hardtime.nvim)"
+maintainer = "iSplasher"
+labels = [""]
+
+
+[dependencies]
+# Add your dependencies here
+# `busted = ">=2.0"`
+
+[run]
+args = ["lua/main.lua"]
+
+[build]
+type = "builtin"

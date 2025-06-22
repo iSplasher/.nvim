@@ -1,7 +1,7 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
 
-local disabled_filetypes = {
+local disabled_ui_filetypes = {
     "startify",
     "dashboard",
     "neo-tree",
@@ -17,6 +17,10 @@ local disabled_filetypes = {
     "TelescopeResults",
 }
 
+local disabled_hard_time_filetypes = {
+    "log",
+    table.unpack(disabled_ui_filetypes),
+}
 local equivalence_classes = {
     ' \t\r\n',
     '([{<',
@@ -86,13 +90,14 @@ return {
     },
 
     {
-        "m4xshen/hardtime.nvim",
-        event = "VeryLazy",
-        dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+        "hardtime",
+        dev = true,
+        event = "VimEnter",
+        dependencies = { "MunifTanjim/nui.nvim" },
         opts = {
             max_count = 5,
             disable_mouse = false,
-            disabled_filetypes = { table.unpack(disabled_filetypes) },
+            disabled_filetypes = { table.unpack(disabled_hard_time_filetypes) },
             -- Remove <Up> keys and append <Space> to the disabled_keys
             disabled_keys = {
                 ["<Up>"] = { "n", "v" },
@@ -100,6 +105,40 @@ return {
                 ["<Left>"] = { "n", "v" },
                 ["<Right>"] = { "n", "v" },
             },
+            message = function(key, key_count)
+                local base_message = "⚡ Hardtime: " .. key .. " pressed too frequently!"
+
+                -- Customized messages for different keys
+                if key == "k" then
+                    return base_message .. " Try " .. key_count .. "k or Ctrl-U to scroll up efficiently."
+                elseif key == "j" then
+                    return base_message .. " Try " .. key_count .. "j or Ctrl-D to scroll down efficiently."
+                elseif key == "h" then
+                    return base_message .. " Consider: b/B/ge/gE/F/T/0/^ for leftward movement."
+                elseif key == "l" then
+                    return base_message .. " Consider: w/W/e/E/f/t/$/A for rightward movement."
+                elseif key == "x" then
+                    return base_message .. " Consider: dw/de/db for more efficient deletion."
+                elseif key == "X" then
+                    return base_message .. " Consider: d0/d^ for deleting to line start."
+                elseif key == "y" then
+                    return base_message .. " Consider: yw/ye/yb or visual selection for copying."
+                elseif key == "Y" then
+                    return base_message .. " Y copies the whole line - use it wisely!"
+                elseif key == "J" then
+                    return base_message .. " J joins lines - consider if multiple joins are needed."
+                elseif key == "d" then
+                    return base_message .. " Consider: dw/de/dd/d$/d0 for targeted deletion."
+                elseif key == "c" then
+                    return base_message .. " Consider: cw/ce/cc/c$/c0 for efficient editing."
+                elseif key == "p" then
+                    return base_message .. " Multiple pastes? Consider visual mode or counts."
+                elseif key == "P" then
+                    return base_message .. " Pasting before cursor - use thoughtfully."
+                else
+                    return base_message .. " Consider more efficient alternatives."
+                end
+            end,
         }
     },
 
@@ -129,7 +168,7 @@ return {
             --     PrevParagraph = { text = "{", prio = 8 },
             --     NextParagraph = { text = "}", prio = 8 },
             -- },
-            disabled_fts = { table.unpack(disabled_filetypes) },
+            disabled_fts = { table.unpack(disabled_ui_filetypes) },
         },
     },
 

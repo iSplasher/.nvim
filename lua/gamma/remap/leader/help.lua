@@ -4,7 +4,16 @@ local popup = require('gamma.popup')
 local kmap = utility.kmap
 
 if not vim.g.vscode and not vim.g.ide then
-    kmap('n', '<leader>?l', [[:new | put =execute('messages')<CR>]], "Show log messages", { silent = true })
+    kmap('n', '<leader>?l', function()
+        local messages = vim.split(vim.fn.execute('messages'), '\n')
+        popup.floating_content({
+            title = "Log Messages",
+            content = messages,
+        }, { 
+            filetype = "log",
+            modifiable = false,
+        })
+    end, "Show log messages", { silent = true })
 
     -- Show guide
     local guide_path = utility.config_path() .. "/help.txt"

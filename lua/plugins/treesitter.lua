@@ -19,8 +19,7 @@ return {
     -- Highlight, edit, and navigate code
     {
         'nvim-treesitter/nvim-treesitter',
-        branch = 'master',
-        lazy = false, -- says it doesn't support lazy loading
+        event = { 'BufReadPost', 'BufNewFile' },
         build = ':TSUpdate',
         dependencies = {
             'nvim-treesitter/nvim-treesitter-textobjects',

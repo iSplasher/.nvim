@@ -57,7 +57,7 @@ local M = {
             { "<auto>", mode = "nxso" },
             { "*",        mode = "nv" },
             { "<C>",      mode = "vnxsot" },
-            { "a",        mode = "nv" },
+            { "r",        mode = "nv" },
             { "<leader>", mode = "nv" },
         },
         keys = {
@@ -68,7 +68,7 @@ local M = {
             local mode = ctx.mode
             local operator = ctx.operator
             -- If the mode is this we defer which-key to second key press
-            if vim.list_contains({ "d", "c" }, operator) then
+            if vim.list_contains({ "d", "c", "y" }, operator) then
                 return true
             end
 
@@ -143,7 +143,7 @@ local M = {
             { "<leader>m", group = "[M]ark" },
             { "<leader>q", group = "[Q]uit/Close actions", icon = { name = 'quit', icon = '󰈆', color = 'red' } },
             -- { "<leader>a", group = "[A]ctions" },
-            -- { "<leader>i", group = "[I]nteractive" },
+            { "<leader>bh", group = "[H]arpoon" },
             { "<leader>g", group = "[G]it | [G]lobal", icon = { name = 'git', icon = '', color = 'red' } },
             { "<leader>d", group = "[D]ebug" },
             { "<leader>l", group = "[L]SP" },
@@ -160,6 +160,9 @@ local M = {
             { "<leader>#", group = "[#]" },
             { "<leader>+", group = "[+]" },
         })
+        if vim.tbl_count(utility._deferred_wk_args) > 0 then
+            wk.add(utility._deferred_wk_args)
+        end
     end
 }
 

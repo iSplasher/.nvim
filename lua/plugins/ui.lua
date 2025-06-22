@@ -14,13 +14,15 @@ return {
     },
     config = function(_, opts)
       require('size-matters').setup(opts)
-      kmap('n', '<C-ScrollWheelUp>', function()
-        require('size-matters').update_font "grow"
-      end, "Increase font size", { silent = true })
+      if not vim.g.neovide then
+        kmap('n', '<C-ScrollWheelUp>', function()
+          require('size-matters').update_font "grow"
+        end, "Increase font size", { silent = true })
 
-      kmap('n', '<C-ScrollWheelDown>', function()
-        require('size-matters').update_font "shrink"
-      end, "Decrease font size", { silent = true })
+        kmap('n', '<C-ScrollWheelDown>', function()
+          require('size-matters').update_font "shrink"
+        end, "Decrease font size", { silent = true })
+      end
 
       kmap('n', '<C-0>', function()
         require('size-matters').reset_font()

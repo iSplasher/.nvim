@@ -4,6 +4,7 @@
 
 local M = {}
 local vimrc_config = require('config.context.vimrc')
+local utility = require('gamma.utility')
 
 -- Get vim options and globals based on exports list
 local function get_vim_options_and_globals()
@@ -723,7 +724,11 @@ local function analyze_placeholder_mappings(content)
 end
 -- Export function
 function M.export_vimrc(filename)
-    filename = filename or '.vimrc'
+    -- Default to config root if no filename provided
+    if not filename then
+        local config_root = utility.config_path()
+        filename = config_root .. '/.vimrc'
+    end
 
     local content = M.generate_vimrc_content()
 

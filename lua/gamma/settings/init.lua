@@ -10,10 +10,17 @@ if not _cmd_ok then
   end
 end
 
-vim.g.backupdir = vim.fn.stdpath('data') .. '/backup'
+local swapdir = vim.fn.stdpath('data') .. '/swap'
+local backupdir = vim.fn.stdpath('data') .. '/backup'
 -- create the directories if they don't exist
-vim.fn.system('mkdir -p "' .. vim.g.backupdir .. '"')
-vim.g.backupdir = vim.g.backupdir .. '//,.' -- fallback
+vim.fn.system('mkdir -p "' .. backupdir .. '"')
+vim.fn.system('mkdir -p "' .. swapdir .. '"')
+
+-- Swap file configuration to prevent multiple instance conflicts
+vim.opt.swapfile = true               -- Keep swap files for recovery
+vim.opt.directory = swapdir           -- Centralized swap directory
+vim.opt.shortmess:append("A")         -- Don't give the "ATTENTION" message when existing swap file is found
+vim.g.backupdir = backupdir .. '//,.' -- Centralized backup directory
 
 -- Set leader key to space
 vim.g.mapleader = " "
