@@ -375,7 +375,9 @@ local function setup(user_config)
             if found then
                local keys = string.sub(last_keys, found, #last_keys)
                local text = hint.message(keys)
-               util.notify(text)
+               if text ~= nil and text ~= "" then
+                  util.notify(text)
+               end
             end
          end
       end

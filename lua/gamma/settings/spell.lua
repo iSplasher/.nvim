@@ -1,13 +1,17 @@
+local cfg = require("config")
 local M = {}
 
 M.group = vim.api.nvim_create_augroup("Spell Settings", { clear = true })
 
+-- Buffer types where spell checking should be enabled
+local spell_enabled_buftypes = {
+    "NeogitCommitMessage",
+}
 -- Filetypes where spell checking should be enabled
 local spell_enabled_filetypes = {
     "markdown",
     "text",
     "gitcommit",
-    "NeogitCommitMessage",
     "tex",
     "plaintex",
     "rst",
@@ -15,40 +19,20 @@ local spell_enabled_filetypes = {
     "org",
 }
 
+-- Buffer types  where spell checking should be explicitly disabled
+local spell_disabled_buftypes = cfg.auxiliary_buftypes
 -- Filetypes where spell checking should be explicitly disabled
-local spell_disabled_filetypes = {
-    "help",
-    "WhichKey",
-    "TelescopePrompt",
-    "TelescopeResults",
-    "mason",
-    "lazy",
-    "lspinfo",
-    "toggleterm",
-    "startuptime",
-    "checkhealth",
-    "man",
-    "notify",
-    "nofile",
-    "quickfix",
-    "prompt",
-    "popup",
-    "NvimTree",
-    "neo-tree",
-    "Trouble",
-    "alpha",
-    "dashboard",
-    "oil",
-    "fugitive",
-    "git",
-    "diff",
-}
+local spell_disabled_filetypes = {}
 
 -- Enable spell checking for specific filetypes
 vim.api.nvim_create_autocmd("FileType", {
     group = M.group,
     pattern = spell_enabled_filetypes,
     callback = function()
+        if vim.tbl_contains(spell_disabled_buftypes, vim.bo.buftype) then
+            -- If the buffer type is in the disabled list, skip enabling spell
+            return
+        end
         vim.opt_local.spell = true
         vim.opt_local.spelllang = "en_us"
     end,
@@ -60,11 +44,31 @@ vim.api.nvim_create_autocmd("FileType", {
     group = M.group,
     pattern = spell_disabled_filetypes,
     callback = function()
+        if vim.tbl_contains(spell_enabled_buftypes, vim.bo.buftype) then
+            -- If the buffer type is in the enabled list, skip disabling spell
+            return
+        end
         vim.opt_local.spell = false
     end,
     desc = "Disable spell checking for UI and code filetypes",
 })
 
+-- Disable spell checking for certain buffer types
+vim.api.nvim_create_autocmd("BufEnter", {
+    group = M.group,
+    callback = function()
+        local buf = vim.api.nvim_get_current_buf()
+        local buftype = vim.bo[buf].buftype
+        if vim.tbl_contains(spell_disabled_buftypes, buftype) then
+            vim.opt_local.spell = false
+        elseif vim.tbl_contains(spell_enabled_buftypes, buftype) then
+            vim.opt_local.spell = true
+            vim.opt_local.spelllang = "en_us"
+        end
+        -- Default behavior for other buffer types
+    end,
+    desc = "Disable spell checking in certin buffer types",
+})
 -- Disable spell checking for floating windows (additional safety net)
 vim.api.nvim_create_autocmd("WinEnter", {
     group = M.group,

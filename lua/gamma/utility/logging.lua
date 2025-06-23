@@ -52,6 +52,7 @@ end
 ---@field timeout? number The timeout in milliseconds before the notification disappears
 ---@field icon? string The icon to display with the notification
 ---@field defer? number Delay in milliseconds before showing the notification
+---@field on_open? fun(win: number)
 
 ---Notify with optional deferred execution
 ---@param message string The notification message

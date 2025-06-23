@@ -1,15 +1,9 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
+local cfg = require('config')
 
 local M = {
-    disabled = {
-        'TelescopePrompt',
-        'spectre_panel',
-        'dashboard',
-        "wk", "WhichKey", "TelescopePrompt",
-        "TelescopeResults", "mason", "lazy",
-        "alpha", "dashboard"
-    },
+    disabled = cfg.lsp_disabled_buftypes,
     -- https://github.com/williamboman/mason-lspconfig.nvim?tab=readme-ov-file#available-lsp-servers
     ensure_installed = {
         'diagnosticls',

@@ -1,4 +1,4 @@
-local ui_filetypes = {
+local ui_buftypes = {
     "startify",
     "dashboard",
     "neo-tree",
@@ -18,15 +18,43 @@ local ui_filetypes = {
     "trouble",
     "undotree",
     "TelescopeResults",
+    "WhichKey",
+    "TelescopePrompt",
+    "TelescopeResults",
+    "mason",
+    "lazy",
+    "lspinfo",
+    "toggleterm",
+    "startuptime",
+    "checkhealth",
+    "man",
+    "notify",
+    "nofile",
+    "quickfix",
+    "prompt",
+    "popup",
+    "NvimTree",
+    "neo-tree",
+    "Trouble",
+    "alpha",
+    "dashboard",
+    "oil",
+    "fugitive",
+    "git",
+    "diff",
 }
 
-local auxiliary_filetypes = {
+local auxiliary_buftypes = {
     "lspinfo",
     "log",
     "Diffview.*",
-    table.unpack(ui_filetypes),
+    table.unpack(ui_buftypes),
 }
 
+local lsp_disabled_buftypes = {
+    table.unpack(ui_buftypes),
+    table.unpack(auxiliary_buftypes),
+}
 
 local equivalence_classes = {
     ' \t\r\n',
@@ -34,9 +62,11 @@ local equivalence_classes = {
     ')]}>',
     '\'"`',
 }
+
 local M = {
-    ui_filetypes = ui_filetypes,
-    auxiliary_filetypes = auxiliary_filetypes,
+    ui_buftypes = ui_buftypes,
+    auxiliary_buftypes = auxiliary_buftypes,
+    lsp_disabled_buftypes = lsp_disabled_buftypes,
     equivalence_classes = equivalence_classes,
 }
 

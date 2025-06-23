@@ -99,7 +99,7 @@ return {
             --     PrevParagraph = { text = "{", prio = 8 },
             --     NextParagraph = { text = "}", prio = 8 },
             -- },
-            disabled_fts = { table.unpack(cfg.ui_filetypes) },
+            disabled_fts = { table.unpack(cfg.ui_buftypes) },
         },
     },
 

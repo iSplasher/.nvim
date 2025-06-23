@@ -32,6 +32,7 @@ local M = {
         "notify",
         "nofile",
         "quickfix",
+        "notify",
         "prompt",
         "popup",
         "NvimTree",

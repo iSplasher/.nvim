@@ -19,11 +19,12 @@ return {
     -- Highlight, edit, and navigate code
     {
         'nvim-treesitter/nvim-treesitter',
-        event = { 'BufReadPost', 'BufNewFile' },
+        event = { "BufReadPost", "BufNewFile" },
         build = ':TSUpdate',
         dependencies = {
             'nvim-treesitter/nvim-treesitter-textobjects',
             'nvim-treesitter/nvim-treesitter-context',
+            'neovim/nvim-lspconfig',
             'andymass/vim-matchup',
             'windwp/nvim-ts-autotag',
         },

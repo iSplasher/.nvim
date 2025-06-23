@@ -5,14 +5,19 @@ local kmap = utility.kmap
 
 if not vim.g.vscode and not vim.g.ide then
     kmap('n', '<leader>?l', function()
-        local messages = vim.split(vim.fn.execute('messages'), '\n')
-        popup.floating_content({
-            title = "Log Messages",
-            content = messages,
-        }, { 
-            filetype = "log",
-            modifiable = false,
-        })
+        -- if Noice cmd is available, use it
+        if vim.fn.exists(':Noice') > 0 then
+            vim.cmd('Noice log')
+        else
+            local messages = vim.fn.execute('messages', 'silent')
+            popup.floating_content({
+                title = "Log Messages",
+                content = messages,
+            }, {
+                filetype = "log",
+                modifiable = false,
+            })
+        end
     end, "Show log messages", { silent = true })
 
     -- Show guide
