@@ -1,10 +1,9 @@
 local M = {}
 
----@class gamma.utility.saved_kmap
+---@class gamma.utility.saved_kmap : vim.keymap.set.Opts
 ---@field mode string | string[] The mode the keymap is set for.
 ---@field keys string The keys the keymap is set for.
 ---@field map string | function The command the keymap is set for.
----@field desc string The description of the keymap.
 ---@field icon? gamma.utility.kmap_icon_opts The icon options for the keymap.
 
 ---Custom keymaps set throughout will be inserted here.
@@ -21,7 +20,7 @@ M.saved_maps_d = {}
 ---@field cat? string The category of the icon, can be file|filetype|extension.
 ---@field name? string The name of the icon in the specified category.
 
----@class gamma.utility.kmap_opts
+---@class gamma.utility.kmap_opts : vim.keymap.set.Opts
 ---@field noremap? boolean Only remap the keymap if it does not already exist.
 ---@field remap? boolean Remap if the keymap already exists. (default: true if noremap is not set)
 ---@field silent? boolean Do not echo the command to the command-line.
@@ -29,7 +28,6 @@ M.saved_maps_d = {}
 ---@field nowait? boolean Do not wait for other keymaps after this one.
 ---@field cmd? boolean Execute the given command directly when invoked.
 ---@field script? boolean Only remap characters that were defined local to a script.
----@field unique? boolean Do not override a keymap if it already exists.
 ---@field buffer? boolean | number Set the keymap for a given buffer only.
 ---@field local? boolean Set the keymap for the current buffer only.
 ---@field desc? string The description of the keymap.
@@ -150,20 +148,25 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       error("kmap -- icon must be a string or table")
     end
 
-    -- set the keymap
-    local opts_args = { desc = desc, table.unpack(k_opts) }
+    -- set the keymap (filter out custom fields that vim.keymap.set doesn't accept)
+    local vim_opts = {}
+    for k, v in pairs(k_opts) do
+        if k ~= 'icon' and k ~= 'group' then
+            vim_opts[k] = v
+        end
+    end
+    local opts_args = vim.tbl_extend('keep', { desc = desc }, vim_opts)
     vim.keymap.set(_mode, key, command, opts_args)
 
     if k_opts.icon or k_opts.group then
       -- add to which-key
-      local wk_arg = {
+      local wk_arg = vim.tbl_extend('keep', {
         key,
         command,
         mode = _mode,
         icon = k_opts.icon,
         group = k_opts.group,
-        table.unpack(opts_args),
-      }
+      }, opts_args)
       local ok, wk = pcall(require, "which-key")
       if ok and wk then
         wk.add({ wk_arg })
@@ -173,14 +176,14 @@ function M.kmap(mode, keys, command, desc_or_opts, opts)
       end
     end
     -- add to saved_maps
-    local map = {
+    local map = vim.tbl_extend('keep', {
       mode = _mode,
       keys = key,
       map = command,
       icon = k_opts.icon,
       group = k_opts.group,
       table.unpack(opts_args),
-    }
+    }, opts_args)
     table.insert(M.saved_maps, map)
     M.saved_maps_d[key] = map
   end

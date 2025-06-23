@@ -94,7 +94,10 @@ local M = {
     },
     plugs = {},
     -- Keys to exclude from vimrc export (format: "mode:keys")
-    exclude_mappings = {},
+    exclude_mappings = {
+        -- Note: These are checked against the RHS content, not just the key
+        ['hlslens'] = true,  -- Exclude any mapping whose RHS contains 'hlslens'
+    },
 
     -- Function to vimscript substitutions for common function-based keymaps
     substitutions = {
@@ -127,6 +130,11 @@ local M = {
         ['write.*quit'] = ':wq<CR>',
         ['wrap'] = ':set wrap!<CR>',
         ['relativenumber'] = ':set relativenumber!<CR>',
+        
+        -- hlslens plugin substitutions (remove lua calls for pure vim)
+        -- Match the exact strings from the RHS
+        ["<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>"] = 'nzzzv',
+        ["<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>"] = 'Nzzzv',
     },
 }
 

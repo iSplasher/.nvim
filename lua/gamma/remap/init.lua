@@ -17,4 +17,4 @@ end, "[R]eload current buffer")
 -- kmap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { remap = true, expr = true, silent = true })
 
 -- U to redo
-kmap('n', 'U', '<C-r>', "Redo", { noremap = true })
+kmap('n', 'U', '<C-r>', "Redo", { remap = true })

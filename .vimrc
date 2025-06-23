@@ -1,5 +1,5 @@
 " .vimrc - Auto-generated from current Neovim configuration
-" Generated on: 2025-06-22 21:56:10
+" Generated on: 2025-06-23 16:00:08
 " Exported from Neovim session using gamma.vimrc configuration
 
 " ============================================================================
@@ -24,43 +24,43 @@ endif
 " GLOBAL VARIABLES
 " ============================================================================
 
-let g:mapleader = " "
 let g:maplocalleader = ","
+let g:mapleader = " "
 
 " ============================================================================
 " VIM OPTIONS (from current session)
 " ============================================================================
 
+set list
+set smarttab
+set number
 set breakindent
-set softtabstop=4
+set ignorecase
 set smartindent
 set incsearch
-set updatetime=50
-set showbreak=↪ 
-set nowrap
-set autoindent
-set smarttab
-set listchars=extends:⟩,nbsp:␣,eol:↲,trail:·,tab:» ,precedes:⟨
-set smartcase
-set timeoutlen=300
-set encoding=utf-8
-set hlsearch
-set clipboard=unnamedplus
-set expandtab
-set shiftwidth=4
 set completeopt=menuone,noselect
-set tabstop=4
-set list
+set listchars=extends:⟩,eol:↲,precedes:⟨,trail:·,nbsp:␣,tab:» 
+set nowrap
+set encoding=utf-8
+set smartcase
 set relativenumber
-set signcolumn=yes
+set softtabstop=4
+set timeoutlen=300
+set expandtab
+set wrapmargin=2
+set showbreak=↪ 
+set tabstop=4
 set autoread
 set timeout
-set undofile
-set number
 set scrolloff=8
-set wrapmargin=2
-set ignorecase
+set signcolumn=yes
+set undofile
+set updatetime=50
+set clipboard=unnamedplus
+set hlsearch
+set shiftwidth=4
 set termguicolors
+set autoindent
 
 " ============================================================================
 " MIDDLE CONFIGURATION
@@ -72,47 +72,23 @@ set ffs=unix,dos,mac
 " KEYMAPS (from remap files)
 " ============================================================================
 
-" Lua\gamma\remap\init (lua\gamma\remap\init.lua)
+" Init (lua/gamma/remap/init.lua)
 " Disable quit via Q
-nnoremap Q <nop>
+nmap Q <nop>
 " Redo
-nnoremap U <C-R>
-" [R]eload current buffer
-nnoremap <F5> <nop>
+nmap U <C-r>
 
-" Lua\gamma\remap\leader\file (lua\gamma\remap\leader\file.lua)
-nnoremap <leader>qw :w<CR>
-
-" Lua\gamma\remap\leader\help (lua\gamma\remap\leader\help.lua)
-nnoremap <leader>?h :set relativenumber!<CR>
-
-" Lua\gamma\remap\leader\init (lua\gamma\remap\leader\init.lua)
-nnoremap <leader>tr :set relativenumber!<CR>
-
-" Lua\gamma\remap\leader\toggle (lua\gamma\remap\leader\toggle.lua)
-nnoremap <leader>tw :set wrap!<CR>
-
-" Lua\gamma\remap\movement (lua\gamma\remap\movement.lua)
-" Move to beginning of line
-nnoremap H ^
-" Move to end of line
-nnoremap L $
-" Previous search result
-nnoremap N Nzzzv
-" Previous quickfix item
-nnoremap [q :cprev<CR>
-" Next quickfix item
-nnoremap ]q :cnext<CR>
+" Movement (lua/gamma/remap/movement.lua)
+nmap [q <nop>
+nmap ]q <nop>
 " Next search result
-nnoremap n nzzzv
-" Move to beginning of line
-vnoremap H ^
-" Move to end of line
-vnoremap L $
+nmap n nzzzv
+" Previous search result
+nmap N Nzzzv
 " Half page down
-nnoremap <C-d> <C-d>zz
+nmap <C-d> <C-d>zz
 " Half page up
-nnoremap <C-u> <C-u>zz
+nmap <C-u> <C-u>zz
 " Move cursor left
 inoremap <A-h> <Left>
 " Move cursor down
@@ -122,23 +98,36 @@ inoremap <A-k> <Up>
 " Move cursor right
 inoremap <A-l> <Right>
 " Move to beginning of word
-inoremap <A-b> <C-o>b
+imap <silent> <A-b> <C-o>b
 " Move to next word
-inoremap <A-w> <C-o>w
+imap <silent> <A-w> <C-o>w
 " Move to end of word
-inoremap <A-e> <C-o>e
+imap <silent> <A-e> <C-o>e
+" Move to beginning of line
+nmap <silent> H ^
+" Move to beginning of line
+vmap <silent> H ^
+" Move to end of line
+nmap <silent> L $
+" Move to end of line
+vmap <silent> L $
+" Next quickfix item
+nmap <silent> ]q :cnext<CR>
+" Previous quickfix item
+nmap <silent> [q :cprev<CR>
 
-" Lua\gamma\remap\text (lua\gamma\remap\text.lua)
+" Text (lua/gamma/remap/text.lua)
+nmap Y y$
 " Join lines (keep cursor position)
-nnoremap J mzJ`z
-" Cut current line
-nnoremap X dd
-" Yank line to system clipboard
-nnoremap Y mc"+Y`c
+nmap J mzJ`z
 " Paste without overwriting register
-xnoremap p "_dP
+xmap p "_dP
+" Yank line to system clipboard
+nmap Y mc"+Y`c
+" Cut current line
+nmap X dd
 " Paste from system clipboard in command mode
-cnoremap <C-v> <C-r>+
+cmap <C-v> <C-r>+
 
 " ============================================================================
 " PLUGIN MANAGEMENT (vim-plug)

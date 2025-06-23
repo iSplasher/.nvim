@@ -128,34 +128,11 @@ local function get_matching_keymaps()
         }
     end
 
-    -- First pass: try to match with live session keymaps (nvim_get_keymap)
-    local matched_keys = {}
-    local found_count = 0
-    for _, mode in ipairs(modes) do
-        local mode_maps = vim.api.nvim_get_keymap(mode)
-        for _, map in ipairs(mode_maps) do
-            -- Check if this keymap matches one from our custom files
-            local lookup_key = mode .. ':' .. (map.lhs or '')
-            if custom_lookup[lookup_key] then
-                found_count = found_count + 1
-                matched_keys[lookup_key] = true
-                local custom_info = custom_lookup[lookup_key]
-                table.insert(keymaps, {
-                    mode = mode,
-                    lhs = map.lhs,
-                    rhs = map.rhs or '',
-                    desc = map.desc or custom_info.desc or '',
-                    noremap = map.noremap == 1,
-                    silent = map.silent == 1,
-                    file = custom_info.file
-                })
-            end
-        end
-    end
-
-    -- Second pass: try to match with saved_maps from utility
+    -- First pass: try to match with saved_maps from utility
     local utility = require('gamma.utility')
     local saved_maps = utility.get_saved_maps()
+    local matched_keys = {}
+    local found_count = 0
 
     for _, saved_map in ipairs(saved_maps) do
         -- Handle mode being a table or string
@@ -168,51 +145,24 @@ local function get_matching_keymaps()
 
         for _, mode in ipairs(modes_to_check) do
             local lookup_key = mode .. ':' .. saved_map.keys
-            if custom_lookup[lookup_key] and not matched_keys[lookup_key] then
+            if custom_lookup[lookup_key] then
                 found_count = found_count + 1
                 matched_keys[lookup_key] = true
                 local custom_info = custom_lookup[lookup_key]
 
                 -- Convert saved_map.map to string if it's a function
                 local rhs = saved_map.map
+                
                 if type(rhs) == 'function' then
-                    -- Try to find a substitution for this function
-                    local function_info = debug.getinfo(rhs, 'S')
-                    local function_str = tostring(rhs)
-                    local substitution = nil
+                    rhs = tostring(rhs) -- Convert to string for later processing
+                end
 
-                    -- Get the function source if available
-                    local source_lines = {}
-                    if function_info and function_info.source and function_info.source:match("^@") then
-                        local file_path = function_info.source:sub(2)
-                        if vim.fn.filereadable(file_path) == 1 then
-                            local lines = vim.fn.readfile(file_path)
-                            if function_info.linedefined and function_info.lastlinedefined then
-                                for i = function_info.linedefined, function_info.lastlinedefined do
-                                    if lines[i] then
-                                        table.insert(source_lines, lines[i])
-                                    end
-                                end
-                            end
-                        end
-                    end
-
-                    local combined_text = function_str .. " " .. table.concat(source_lines, " ")
-
-                    -- Check substitutions against function content
-                    for pattern, replacement in pairs(vimrc_config.substitutions) do
-                        if combined_text:find(pattern, 1, true) or combined_text:match(pattern) then
-                            substitution = replacement
-                            break
-                        end
-                    end
-
-                    if substitution then
-                        rhs = substitution
-                    else
-                        -- Skip function mappings that can't be substituted
-                        goto continue
-                    end
+                -- Determine noremap setting: prioritize explicit noremap, then invert remap, default to false (allow remap)
+                local noremap_setting = false
+                if saved_map.noremap ~= nil then
+                    noremap_setting = saved_map.noremap
+                elseif saved_map.remap ~= nil then
+                    noremap_setting = not saved_map.remap
                 end
 
                 table.insert(keymaps, {
@@ -220,12 +170,40 @@ local function get_matching_keymaps()
                     lhs = saved_map.keys,
                     rhs = rhs,
                     desc = saved_map.desc or custom_info.desc or '',
-                    noremap = true, -- Most custom maps are noremap
-                    silent = false,
+                    noremap = noremap_setting,
+                    silent = saved_map.silent or false,
+                    nowait = saved_map.nowait or false,
                     file = custom_info.file
                 })
 
                 ::continue::
+            end
+        end
+    end
+
+    -- Second pass: try to match with live session keymaps (nvim_get_keymap)
+    for _, mode in ipairs(modes) do
+        local mode_maps = vim.api.nvim_get_keymap(mode)
+        for _, map in ipairs(mode_maps) do
+            -- Check if this keymap matches one from our custom files
+            local lookup_key = mode .. ':' .. (map.lhs or '')
+            if custom_lookup[lookup_key] and not matched_keys[lookup_key] then
+                found_count = found_count + 1
+                matched_keys[lookup_key] = true
+                local custom_info = custom_lookup[lookup_key]
+                
+                local rhs = map.rhs or ''
+                
+                table.insert(keymaps, {
+                    mode = mode,
+                    lhs = map.lhs,
+                    rhs = rhs,
+                    desc = map.desc or custom_info.desc or '',
+                    noremap = map.noremap == 1,
+                    silent = map.silent == 1,
+                    nowait = map.nowait == 1,
+                    file = custom_info.file
+                })
             end
         end
     end
@@ -245,6 +223,7 @@ local function get_matching_keymaps()
                         desc = custom_info.desc or '',
                         noremap = true,
                         silent = false,
+                        nowait = false,
                         file = custom_info.file,
                         line = custom_info.line
                     })
@@ -252,6 +231,59 @@ local function get_matching_keymaps()
             end
         end
     end
+
+    -- Post-process keymaps: apply substitutions and exclusions
+    local processed_keymaps = {}
+    for _, keymap in ipairs(keymaps) do
+        local rhs = keymap.rhs or ''
+        
+        -- Check exclusions first
+        local should_exclude = false
+        for exclude_pattern, _ in pairs(vimrc_config.exclude_mappings) do
+            if rhs:find(exclude_pattern, 1, true) then
+                should_exclude = true
+                break
+            end
+        end
+        
+        if not should_exclude then
+            -- Apply substitutions
+            local original_rhs = rhs
+            
+            -- For function mappings, try to find substitutions
+            if rhs:match("^function:") then
+                -- Try to find a substitution for this function
+                for pattern, replacement in pairs(vimrc_config.substitutions) do
+                    if rhs:find(pattern, 1, true) or rhs:match(pattern) then
+                        rhs = replacement
+                        break
+                    end
+                end
+                
+                -- If no substitution found, skip this mapping
+                if rhs == original_rhs then
+                    goto continue_processing
+                end
+            else
+                -- For string mappings, apply substitutions
+                for pattern, replacement in pairs(vimrc_config.substitutions) do
+                    if rhs:find(pattern, 1, true) or rhs:match(pattern) then
+                        rhs = replacement
+                        break
+                    end
+                end
+            end
+            
+            -- Add processed keymap
+            local processed_keymap = vim.tbl_deep_extend('force', keymap, { rhs = rhs })
+            table.insert(processed_keymaps, processed_keymap)
+        end
+        
+        ::continue_processing::
+    end
+    
+    -- Replace original keymaps with processed ones
+    keymaps = processed_keymaps
 
     -- Debug output
     local total_custom = 0
@@ -354,6 +386,9 @@ local function keymap_to_vimscript(map)
     local flags = ''
     if map.silent then
         flags = flags .. ' <silent>'
+    end
+    if map.nowait then
+        flags = flags .. ' <nowait>'
     end
 
     local lines = {}
