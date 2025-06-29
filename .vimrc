@@ -1,5 +1,5 @@
 " .vimrc - Auto-generated from current Neovim configuration
-" Generated on: 2025-06-29 01:59:50
+" Generated on: 2025-06-29 02:57:28
 " Exported from Neovim session using gamma.vimrc configuration
 
 " ============================================================================
@@ -24,13 +24,16 @@ endif
 " GLOBAL VARIABLES
 " ============================================================================
 
-let g:maplocalleader = ","
 let g:mapleader = " "
+let g:maplocalleader = ","
 
 " ============================================================================
 " VIM OPTIONS (from current session)
 " ============================================================================
 
+set timeoutlen=500
+set encoding=utf-8
+set softtabstop=4
 set smartindent
 set incsearch
 set updatetime=50
@@ -38,29 +41,26 @@ set showbreak=↪
 set wrapmargin=2
 set autoindent
 set smarttab
+set listchars=eol:↲,extends:⟩,precedes:⟨,nbsp:␣,trail:·,tab:» 
+set termguicolors
 set undofile
 set number
-set termguicolors
+set hlsearch
+set shiftwidth=4
 set timeout
-set timeoutlen=500
+set tabstop=4
 set list
+set completeopt=menuone,noselect
+set breakindent
+set clipboard=unnamedplus
 set relativenumber
 set signcolumn=yes
-set completeopt=menuone,noselect
-set clipboard=unnamedplus
-set listchars=trail:·,tab:» ,extends:⟩,nbsp:␣,eol:↲,precedes:⟨
-set tabstop=4
 set expandtab
-set nowrap
-set shiftwidth=4
+set scrolloff=8
 set smartcase
 set ignorecase
 set autoread
-set encoding=utf-8
-set scrolloff=8
-set hlsearch
-set breakindent
-set softtabstop=4
+set nowrap
 
 " ============================================================================
 " MIDDLE CONFIGURATION
@@ -191,7 +191,7 @@ vnoremap K :m '<-2<CR>gv=gv
 " PLUGIN MANAGEMENT (vim-plug)
 " ============================================================================
 
-if empty(glob('~/.vim/autoload/plug.vim'))
+if (!has('ide')) && empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
@@ -367,3 +367,4 @@ nnoremap <leader><tab> :NERDTreeToggle<CR>
 " ============================================================================
 
 " Add your custom vim configurations below this line
+

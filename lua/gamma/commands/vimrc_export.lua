@@ -586,7 +586,7 @@ function M.generate_vimrc_content()
         add('" PLUGIN MANAGEMENT (vim-plug)')
         add('" ============================================================================')
         add('')
-        add('if empty(glob(\'~/.vim/autoload/plug.vim\'))')
+        add('if (!has(\'ide\')) && empty(glob(\'~/.vim/autoload/plug.vim\'))')
         add('  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs')
         add('    \\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
         add('  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC')
@@ -651,7 +651,7 @@ function M.generate_vimrc_content()
         add('')
 
         -- Add plugin-specific mappings and configs from configuration
-        for _, plugin in ipairs(vimrc_config.plugs) do
+        for _, plugin in pairs(vimrc_config.plugs) do
             if plugin.enabled ~= false then
                 local plugin_name = plugin[1] or plugin.name
                 local has_config = false
@@ -716,7 +716,7 @@ function M.generate_vimrc_content()
     add('" Add your custom vim configurations below this line')
     add('')
 
-    return table.concat(lines, '\n')
+    return lines
 end
 
 -- Analyze placeholder mappings and suggest improvements
@@ -727,7 +727,7 @@ local function analyze_placeholder_mappings(content)
     }
 
     -- Find all placeholder mappings with file:line info
-    for line in content:gmatch('[^\n]+') do
+    for _, line in ipairs(content) do
         local mapping = line:match('<cmd>echo "Custom keymap from ([^"]+)"<CR>')
         if mapping then
             local file_path, line_num = mapping:match('([^:]+):?(%d*)')
@@ -806,24 +806,14 @@ function M.export_vimrc(filename)
         filename = config_root .. '/.vimrc'
     end
 
-    local content = M.generate_vimrc_content()
+    local lines = M.generate_vimrc_content()
 
-    local file = io.open(filename, 'w')
-    if not file then
-        vim.notify('Error: Could not write to ' .. filename, vim.log.levels.ERROR)
-        return false
-    end
+    vim.fn.writefile(lines, vim.fn.expand(filename))
 
-    file:write(content)
-    file:close()
-
-    local line_count = 0
-    for _ in content:gmatch('\n') do
-        line_count = line_count + 1
-    end
+    local line_count = #lines
 
     -- Analyze placeholder mappings and suggest improvements
-    local improvements = analyze_placeholder_mappings(content)
+    local improvements = analyze_placeholder_mappings(lines)
 
     if next(improvements.substitutions) or next(improvements.exclusions) then
         vim.notify('Found placeholder mappings that could be improved:', vim.log.levels.INFO)
