@@ -71,6 +71,8 @@ return {
   },
   {
     "giuxtaposition/blink-cmp-copilot",
+    lazy = true,
+    event = 'InsertEnter',
     dependencies = { 'saghen/blink.cmp', "zbirenbaum/copilot.lua" },
   }
 }

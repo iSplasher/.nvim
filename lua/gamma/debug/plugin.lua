@@ -198,7 +198,7 @@ function M.show_plugin_manager(filter_mode)
 
 
     -- Set up keymaps
-    local opts = { silent = true, remap = true }
+    local opts = { silent = true, force = true }
 
     popup.floating_content({
             title = string.format('Plugin Manager - %s', filter_text),

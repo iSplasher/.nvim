@@ -5,6 +5,8 @@
 local enabled = {
   "kevinhwang91/nvim-hlslens",
   "tpope/vim-sleuth",
+  'tpope/vim-sandwich',
+  'tpope/vim-surround',
   'tpope/vim-commentary',
   'unblevable/quick-scope',
   'ggandor/leap.nvim',
@@ -15,6 +17,8 @@ local enabled = {
   'numToStr/Comment.nvim',
   'Rentib/cliff.nvim',
   'echasnovski/mini.move',
+  'echasnovski/mini.surround',
+  'echasnovski/mini.ai',
 }
 
 return {

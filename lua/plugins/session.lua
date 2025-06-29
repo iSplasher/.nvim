@@ -1,5 +1,6 @@
 local utility = require('gamma.utility')
 local kmap = utility.kmap
+local global_cfg = require('config')
 
 return {
   -- Session
@@ -25,6 +26,7 @@ return {
       local function session_filename_to_dir(filename)
         -- Get session filename.
         local dir = filename:sub(#tostring(cfg.sessions_dir) + 2)
+        dir = utility.normalize_path_sep(dir)
 
         dir = dir:gsub(colon_replacer, ':')
         dir = dir:gsub(path_replacer, '/')
@@ -35,7 +37,7 @@ return {
       --- Replaces separators and colons into special symbols to transform session directory into a filename.
       local function dir_to_session_filename(dir)
         local filename = dir:gsub(':', colon_replacer)
-        filename = filename:gsub(Path.path.sep, path_replacer)
+        filename = filename:gsub('/', path_replacer)
         return Path:new(cfg.sessions_dir):joinpath(filename)
       end
 
@@ -58,6 +60,8 @@ return {
           'C:\\Program Files',
           vim.fn.stdpath('data'),
           vim.fn.stdpath('cache'),
+          '/tmp',
+          '~'
         },
         autosave_ignore_filetypes = {
           'git',
@@ -65,7 +69,7 @@ return {
           'help',
           'gitrebase'
         },
-        autosave_ignore_buftypes = {},
+        autosave_ignore_buftypes = global_cfg.auxiliary_buftypes,
         autosave_only_in_session = false,
       }
 

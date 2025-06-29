@@ -27,10 +27,20 @@ end
 local last_notification_text
 local last_notification_time = M.get_time()
 
-function M.notify(text)
+function M.notify(text, log_level)
    if text ~= last_notification_text then
-      logger.info(text)
-      config.config.callback(text)
+      log_level = log_level or vim.log.levels.INFO
+
+      -- Use appropriate logger method based on level
+      if log_level == vim.log.levels.ERROR then
+         logger.error(text)
+      elseif log_level == vim.log.levels.WARN then
+         logger.warn(text)
+      else
+         logger.info(text)
+      end
+
+      config.config.callback(text, log_level)
    end
    last_notification_text = text
    last_notification_time = M.get_time()

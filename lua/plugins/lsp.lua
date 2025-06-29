@@ -166,7 +166,6 @@ table.insert(M, {
         end,
         config = cfg.lspconfig_config, -- The majority of the configuration is in the config.lsp module
         dependencies = {
-            'saghen/blink.cmp',
             'williamboman/mason-lspconfig.nvim',
             "folke/lazydev.nvim",
             -- Schema

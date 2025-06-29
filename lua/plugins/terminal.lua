@@ -36,7 +36,7 @@ return {
       end
       -- Terminal keybindings
       function _G.set_terminal_keymaps()
-        local opts = { buffer = 0, noremap = true }
+        local opts = { buffer = 0, force = false }
         kmap('n', '<esc>', prev_window, "Focus previous window", opts)
         kmap('n', '<tab>', prev_window, "Focus previous window", opts)
         kmap({ 'n', 'v' }, 'q', close_terminal, "Close terminal", opts)
@@ -104,9 +104,9 @@ return {
         end
       end
 
-      kmap('c', "!", switch_to_terminal_on_shebang, "Run shell command", { remap = true })
+      kmap('c', "!", switch_to_terminal_on_shebang, "Run shell command", { force = true })
 
-      kmap('n', "<leader>//", switch_to_terminal, "Open terminal", { remap = true })
+      kmap('n', "<leader>//", switch_to_terminal, "Open terminal", { force = true })
       kmap('n', "<leader>/f", "<cmd>ToggleTerm direction=float<CR>", "Toggle terminal (floating)")
       kmap('n', "<leader>/h", new_terminal_h, "Create terminal (horizontal)")
 

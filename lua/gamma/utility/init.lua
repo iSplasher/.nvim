@@ -7,6 +7,7 @@ local system_utils = require('gamma.utility.system')
 local shell_utils = require('gamma.utility.shell')
 local logging_utils = require('gamma.utility.logging')
 local input_utils = require('gamma.utility.input')
+local plugin_utils = require('gamma.utility.plugin')
 local M = {}
 
 -- Export all functions from table utilities
@@ -57,4 +58,7 @@ M.transkey = input_utils.transkey
 M.get_key = input_utils.get_key
 M.canonicalize_key = input_utils.canonicalize_key
 
+-- Export all functions from plugin utilities
+M.is_plugin_loaded = plugin_utils.is_plugin_loaded
+M.is_which_key_enabled = plugin_utils.is_which_key_enabled
 return M

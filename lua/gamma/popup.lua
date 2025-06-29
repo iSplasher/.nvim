@@ -141,8 +141,8 @@ function M.floating_content(opts, buffer_opts, win_opts)
 
     -- Add keymaps for closing the window and navigation
     local keymaps = {
-        { 'n', 'q',     close_window, "Close window", { nowait = true, noremap = true } },
-        { 'n', '<Esc>', close_window, "Close window", { nowait = true, noremap = true } },
+        { 'n', 'q',     close_window, "Close window", { nowait = true, force = false } },
+        { 'n', '<Esc>', close_window, "Close window", { nowait = true, force = false } },
     }
 
     local keymaps_arg = function()
@@ -244,8 +244,8 @@ function M.floating_content(opts, buffer_opts, win_opts)
             kopts.buffer = buf
         end
 
-        if kopts.remap == nil and kopts.noremap == nil then
-            kopts.remap = true
+        if kopts.force == nil then
+            kopts.force = true
         end
 
         kmap(map[1], map[2], map[3], map[4], kopts)

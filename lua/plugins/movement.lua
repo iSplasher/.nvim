@@ -21,9 +21,12 @@ return {
         event = "BufReadPost",
         dependencies = { "tpope/vim-repeat" },
         config = function()
-            kmap({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', "Leap forward", {})
-            kmap({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)', "Leap backward", {})
-            kmap({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-from-window)', "Leap from window", {})
+            kmap({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-forward)', "Leap forward", {})
+            kmap({ 'n', 'x', 'o' }, 'gS', '<Plug>(leap-backward)', "Leap backward", {})
+
+            -- Aliases for leap motions
+            kmap({ 'n', 'x', 'o' }, 'sg', 'gs', "Leap forward", {})
+            kmap({ 'n', 'x', 'o' }, 'Sg', 'gS', "Leap backward", {})
 
             -- Define equivalence classes for brackets and quotes, in addition to
             -- the default whitespace group.
@@ -112,14 +115,18 @@ return {
             local set = kmap
 
             -- Operator
-            set({ "n", "x" }, "gm", mc.operator, "Add cursors to operator motion", { noremap = true })
+            set({ "n", "x" }, "<localleader>m", mc.operator, "Add cursors to operator motion", {})
 
             -- Add or skip cursor above/below the main cursor.
-            set({ "n", "x", "v" }, "<C-up>", function() mc.lineAddCursor(-1) end, "MultiCursor: Add cursor above", {})
-            set({ "n", "x", "v" }, "<C-down>", function() mc.lineAddCursor(1) end, "MultiCursor: Add cursor below", {})
-            set({ "n", "x", "v" }, "<leader><up>", function() mc.lineSkipCursor(-1) end, "MultiCursor: Skip cursor above",
+            set({ "n", "x", "v" }, { "<C-M-Up>", "<localleader><Up>" }, function() mc.lineAddCursor(-1) end,
+                "MultiCursor: Add cursor above",
                 {})
-            set({ "n", "x", "v" }, "<leader><down>", function() mc.lineSkipCursor(1) end,
+            set({ "n", "x", "v" }, { "<C-M-Down>", "<localleader><Down>" }, function() mc.lineAddCursor(1) end,
+                "MultiCursor: Add cursor below", {})
+            set({ "n", "x", "v" }, { "<localleader><S-Up>" }, function() mc.lineSkipCursor(-1) end,
+                "MultiCursor: Skip cursor above",
+                {})
+            set({ "n", "x", "v" }, { "<localleader><S-Defineown>" }, function() mc.lineSkipCursor(1) end,
                 "MultiCursor: Skip cursor below", {})
 
             -- Add or skip adding a new cursor by matching word/selection
@@ -136,18 +143,18 @@ return {
                 { silent = true })
 
             -- Disable and enable cursors.
-            set({ "n", "x", "v" }, "<C-Q>", mc.toggleCursor, "Toggle multi-cursors", {})
+            set({ "n", "x", "v" }, "<leader>tm", mc.toggleCursor, "Toggle multi-cursors", {})
 
 
             -- Search word under cursor, or take selection and add cursors to all occurrences.
-            set({ "n", "x", "v" }, "<C-L>", function()
+            set({ "n", "x", "v" }, { "<C-L>", "g*m" }, function()
                 -- if vim.fn.visualmode() == "v" then
                 --     mc.addCursorsToSelection()
                 -- else
                 --     mc.addCursorsToWord()
                 -- end
                 mc.matchAllAddCursors()
-            end, "Add cursor to all occurrences of word/selection under cursor", { remap = true })
+            end, "Add cursor to all occurrences of word/selection under cursor")
 
 
             -- Mappings defined in a keymap layer only apply when there are

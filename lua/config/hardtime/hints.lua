@@ -366,8 +366,8 @@ M.hints = {
     ["[hjkl][hjkl][hjkl][hjkl]"] = {
         message = function(keys)
             local direction = keys:sub(1, 1)
-            local suggestion = (direction == "h" or direction == "k") and "S (leap backward)" or
-                "s (leap forward)"
+            local suggestion = (direction == "h" or direction == "k") and "gS (leap backward)" or
+                "gs (leap forward)"
             return base_message .. "For long movements, use " .. suggestion .. " instead of " .. keys
         end,
         length = 4,
@@ -551,6 +551,54 @@ M.hints = {
                 "Good! :%s is efficient. Also try <leader>sr (ssr.nvim) for structural search & replace"
         end,
         length = 4,
+    },
+
+    -- Promote surround operations over manual editing
+    ["I['\"(`{]"] = {
+        message = function(keys)
+            local char = keys:sub(2, 2)
+            return base_message .. "Use sa/ys (surround add) instead of manually adding " .. char .. " characters"
+        end,
+        length = 2,
+    },
+    ["A['\"`)}]"] = {
+        message = function(keys)
+            local char = keys:sub(2, 2)
+            return base_message .. "Use sa/ys (surround add) instead of manually adding " .. char .. " characters"
+        end,
+        length = 2,
+    },
+    ["f['\"`({]i.+A['\"`)}]"] = {
+        message = function()
+            return base_message .. "Use sr/cs (change surround) instead of manually changing surrounding characters"
+        end,
+        length = 6,
+    },
+    ["F['\"`({]x.*A['\"`)}]"] = {
+        message = function()
+            return base_message .. "Use sd/ds (delete surround) then sa/ys (add surround) or sr/cs (change surround)"
+        end,
+        length = 6,
+    },
+
+    -- Promote leap over repetitive movement
+    ["[fFtT].+[hjkl]+"] = {
+        message = function()
+            return base_message .. "For complex navigation, try gs/gS (leap) to jump directly to target locations"
+        end,
+        length = 4,
+    },
+    ["[0%^%$][hjkl]+"] = {
+        message = function()
+            return base_message .. "Use gs/gS (leap) to jump to specific characters instead of multiple movements"
+        end,
+        length = 3,
+    },
+    ["/.*<CR>[nN][nN][nN]"] = {
+        message = function()
+            return base_message .. "Use gs/gS (leap) to jump directly to visible text instead of search + multiple n/N"
+        end,
+        length = 6,
     },
 }
 

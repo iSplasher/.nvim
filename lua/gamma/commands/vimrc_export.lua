@@ -48,7 +48,8 @@ def extract_kmap_keys(file_path):
             content = f.read()
 
         # Pattern to extract mode, keys, description, and position
-        pattern = r'kmap\s*\(\s*["\']([^"\']+)["\']\s*,\s*["\']([^"\']+)["\']\s*,\s*[^,]+\s*(?:,\s*["\']([^"\']*)["\'])?'
+        # Supports both string and string[] for both mode and keys
+        pattern = r'kmap\s*\(\s*(?:["\']([^"\']+)["\']|\{([^}]+)\})\s*,\s*(?:["\']([^"\']+)["\']|\{([^}]+)\})\s*,\s*[^,]+\s*(?:,\s*["\']([^"\']*)["\'])?'
 
         # Find matches with line numbers
         lines = content.split('\n')
@@ -60,16 +61,39 @@ def extract_kmap_keys(file_path):
 
             matches = re.findall(pattern, line)
             for match in matches:
-                mode, keys, desc = match
+                mode_str, mode_arr, keys_str, keys_arr, desc = match
+                
+                # Handle mode (string or array)
+                if mode_str:
+                    modes = [mode_str]
+                elif mode_arr:
+                    # Parse array: {"n", "v"} -> ["n", "v"]
+                    modes = [m.strip(' "\'') for m in mode_arr.split(',')]
+                else:
+                    continue
+                
+                # Handle keys (string or array)
+                if keys_str:
+                    keys_list = [keys_str]
+                elif keys_arr:
+                    # Parse array: {"x", "y"} -> ["x", "y"]
+                    keys_list = [k.strip(' "\'') for k in keys_arr.split(',')]
+                else:
+                    continue
+                
                 # Get relative path from config root
                 rel_path = os.path.relpath(file_path, config_path)
-                keymap_keys.append({
-                    'mode': mode,
-                    'keys': keys,
-                    'desc': desc or '',
-                    'file': rel_path,
-                    'line': line_num
-                })
+                
+                # Create entries for each mode/key combination
+                for mode in modes:
+                    for keys in keys_list:
+                        keymap_keys.append({
+                            'mode': mode,
+                            'keys': keys,
+                            'desc': desc or '',
+                            'file': rel_path,
+                            'line': line_num
+                        })
 
     except Exception as e:
         print(f"Error parsing {file_path}: {e}")
@@ -120,7 +144,7 @@ local function get_matching_keymaps()
     -- Create lookup table for custom keys
     local custom_lookup = {}
     for _, custom in ipairs(custom_keys) do
-        local key = custom.mode .. ':' .. custom.keys
+        local key = custom.mode .. ':' .. utility.canonicalize_key(custom.keys)
         custom_lookup[key] = {
             file = custom.file,
             desc = custom.desc or '',
@@ -144,25 +168,23 @@ local function get_matching_keymaps()
         end
 
         for _, mode in ipairs(modes_to_check) do
-            local lookup_key = mode .. ':' .. saved_map.keys
+            local lookup_key = mode .. ':' .. utility.canonicalize_key(saved_map.keys)
             if custom_lookup[lookup_key] then
                 found_count = found_count + 1
                 matched_keys[lookup_key] = true
                 local custom_info = custom_lookup[lookup_key]
 
-                -- Convert saved_map.map to string if it's a function
-                local rhs = saved_map.map
+                -- Convert saved_map.command to string if it's a function
+                local rhs = saved_map.command
                 
                 if type(rhs) == 'function' then
                     rhs = tostring(rhs) -- Convert to string for later processing
                 end
 
-                -- Determine noremap setting: prioritize explicit noremap, then invert remap, default to false (allow remap)
-                local noremap_setting = false
+                -- Determine noremap setting: prioritize explicit noremap, then invert remap, default to true
+                local noremap_setting = true
                 if saved_map.noremap ~= nil then
                     noremap_setting = saved_map.noremap
-                elseif saved_map.remap ~= nil then
-                    noremap_setting = not saved_map.remap
                 end
 
                 table.insert(keymaps, {
@@ -186,7 +208,7 @@ local function get_matching_keymaps()
         local mode_maps = vim.api.nvim_get_keymap(mode)
         for _, map in ipairs(mode_maps) do
             -- Check if this keymap matches one from our custom files
-            local lookup_key = mode .. ':' .. (map.lhs or '')
+            local lookup_key = mode .. ':' .. utility.canonicalize_key((map.lhs or ''))
             if custom_lookup[lookup_key] and not matched_keys[lookup_key] then
                 found_count = found_count + 1
                 matched_keys[lookup_key] = true
@@ -539,6 +561,25 @@ function M.generate_vimrc_content()
         end
     end
 
+    if vimrc_config.mappings and #vimrc_config.mappings > 0 then
+        add('" ============================================================================')
+        add('" KEYMAPS (from vimrc config)')
+        add('" ============================================================================')
+        add('')
+
+        -- Add keymaps from vimrc_config.mappings
+        for _, map in ipairs(vimrc_config.mappings) do
+            local line = map[1]
+            local desc = map[2]
+            if desc then
+                add(string.format('" %s', desc))
+            end
+            if line then
+                add(line)
+            end
+        end
+        add('')
+    end
     -- Plugin management section
     if vimrc_config.plugs and #vimrc_config.plugs > 0 then
         add('" ============================================================================')

@@ -55,11 +55,17 @@ local M = {
             bt = disabled_buftypes,  -- disable for these buftypes
         },
         triggers = {
-            { "<auto>", mode = "nxso" },
-            { "*",        mode = "nv" },
+            { "<auto>",   mode = "nvxso" },
+            { "*",        mode = "nvxso" },
             { "<C>",      mode = "vnxsot" },
-            { "r",        mode = "nv" },
-            { "<leader>", mode = "nv" },
+            { "r",        mode = "nvxso" },
+            { "<leader>", mode = "nvxso" },
+            { "s",        mode = "nvxso" },
+            { "S",        mode = "nvxso" },
+            { "f",        mode = "nvxso" },
+            { "F",        mode = "nvxso" },
+            { "t",        mode = "nvxso" },
+            { "T",        mode = "nvxso" },
         },
         keys = {
             scroll_down = "<Down>",     -- Use down arrow to scroll down
@@ -78,8 +84,7 @@ local M = {
         end,
         filter   = function(mapping)
             -- exclude mappings without a description
-            -- return mapping.desc and mapping.desc ~= ""
-            return true
+            return mapping.desc and mapping.desc ~= ""
         end,
         show     = function(filter, node, current_node)
             -- if buffer is local, don't show leader key mappings

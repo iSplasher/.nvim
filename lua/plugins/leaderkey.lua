@@ -28,15 +28,7 @@ return {
         event = 'VeryLazy',
         priorty = 200,
         opts = wkcfg.opts,
-        config = wkcfg.config,
-        init = function()
-            -- This option and 'timeoutlen' determine the behavior when part of a
-            -- mapped key sequence has been received. For example, if <c-f> is
-            -- pressed and 'timeout' is set, Nvim will wait 'timeoutlen' milliseconds
-            -- for any key that can follow <c-f> in a mapping.
-            vim.opt.timeout = true
-            vim.opt.timeoutlen = 300
-        end
+        config = wkcfg.config
     },
 
 }

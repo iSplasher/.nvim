@@ -11,6 +11,10 @@ local hardtime_group = vim.api.nvim_create_augroup("HardtimeGroup", {})
 
 -- Track buffer-specific keymaps that we've set
 local buffer_keymaps = {} -- { [bufnr] = { { mode, key }, ... } }
+-- Track temporarily blocked keys
+local blocked_keys = {}          -- { [key] = { modes = {...}, timer = timer_obj, original_maps = {...} } }
+-- Track notification debouncing to prevent spam
+local notification_debounce = {} -- { [key] = last_notification_time }
 
 local config = require("hardtime.config")
 
@@ -21,6 +25,140 @@ end
 
 local function restore_mouse()
    vim.o.mouse = old_mouse_state
+end
+
+-- Handle notifications with debouncing to prevent spam
+local function handle_debounced_notification(key, message_type)
+   if not config.config.notification then
+      return
+   end
+   
+   local current_time = util.get_time()
+   local debounce_key = key .. "_" .. message_type -- Separate debounce per message type
+   local last_notification = notification_debounce[debounce_key] or 0
+   local debounce_period = config.config.timeout or 1000 -- Use config timeout or 1 second
+   
+   -- Only notify if enough time has passed since last notification for this key+type
+   if current_time - last_notification < debounce_period then
+      return
+   end
+   
+   notification_debounce[debounce_key] = current_time
+   
+   vim.schedule(function()
+      local message, log_level
+      if message_type == "blocked" then
+         message = "Key " .. key .. " is temporarily blocked!"
+         if config.config.message then
+            message = config.config.message(key, key_count)
+         end
+         log_level = vim.log.levels.ERROR
+      elseif message_type == "restricted" then
+         message = "You pressed the " .. key .. " key too soon!"
+         if config.config.message then
+            message = config.config.message(key, key_count)
+         end
+         log_level = vim.log.levels.WARN
+      elseif message_type == "disabled" then
+         message = "The " .. key .. " key is disabled!"
+         if config.config.disabled_message then
+            message = config.config.disabled_message(key)
+         end
+         log_level = vim.log.levels.ERROR
+      end
+      
+      if message then
+         util.notify(message, log_level)
+      end
+   end)
+end
+
+
+-- Remove temporary block on a key and restore original mapping
+local function unblock_key(key)
+   if not blocked_keys[key] then
+      return
+   end
+
+   -- Stop timer
+   if blocked_keys[key].timer then
+      blocked_keys[key].timer:stop()
+   end
+
+   -- Remove blocking keymaps and restore originals
+   for _, mode in ipairs(blocked_keys[key].modes) do
+      pcall(vim.keymap.del, mode, key)
+
+      -- Restore original mapping if it existed
+      local original = blocked_keys[key].original_maps[mode]
+      if original then
+         if original.callback then
+            pcall(vim.keymap.set, mode, key, original.callback, {
+               buffer = original.buffer == 1 and 0 or nil,
+               noremap = original.noremap == 1,
+               silent = original.silent == 1,
+               expr = original.expr == 1,
+               desc = original.desc,
+            })
+         elseif original.rhs then
+            pcall(vim.keymap.set, mode, key, original.rhs, {
+               buffer = original.buffer == 1 and 0 or nil,
+               noremap = original.noremap == 1,
+               silent = original.silent == 1,
+               expr = original.expr == 1,
+               desc = original.desc,
+            })
+         end
+      end
+   end
+
+   blocked_keys[key] = nil
+   -- Clear all debounce entries for this key (all message types)
+   for debounce_key, _ in pairs(notification_debounce) do
+      if debounce_key:match("^" .. key:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1") .. "_") then
+         notification_debounce[debounce_key] = nil
+      end
+   end
+end
+
+-- Temporarily block a key by setting a keymap
+local function block_key(key, modes)
+   local block_data = blocked_keys[key]
+
+   if block_data then
+      -- Already blocked, just reset the timer
+      if block_data.timer then
+         block_data.timer:stop()
+      end
+   else
+      -- Save original mappings before overriding
+      block_data = { modes = {}, timer = nil, original_maps = {} }
+      blocked_keys[key] = block_data
+
+      for _, mode in ipairs(modes) do
+         -- Save the original mapping
+         local original_map = vim.fn.maparg(key, mode, false, true)
+         if original_map and next(original_map) then
+            block_data.original_maps[mode] = original_map
+         end
+
+         -- Set blocking keymap that notifies and returns <Ignore> when triggered
+         vim.keymap.set(mode, key, function()
+            handle_debounced_notification(key, "blocked")
+            return "<Ignore>"
+         end, {
+            noremap = true,
+            expr = true,
+            desc = "hardtime: " .. key .. " temporary block",
+         })
+         table.insert(block_data.modes, mode)
+      end
+   end
+
+   -- Set timer to unblock the key after restriction period
+   block_data.timer = vim.defer_fn(function()
+      unblock_key(key)
+   end, config.config.max_time or 1000)
 end
 
 local function get_return_key(key)
@@ -62,6 +200,12 @@ local function should_disable_hardtime()
 end
 
 local function handler(key)
+   -- Early exit: if key is already dynamically blocked, just return blocked result
+   if blocked_keys[key] then
+      return config.config.restriction_mode == "hint" and get_return_key(key) or ""
+   end
+
+   -- Early exit: plugin disabled for this context
    if should_disable_hardtime() then
       return get_return_key(key)
    end
@@ -73,38 +217,30 @@ local function handler(key)
       util.reset_notification()
    end
 
-   -- key disabled
+   -- Early exit: key is permanently disabled
    if config.config.disabled_keys[key] then
-      if config.config.notification and should_reset_notification then
-         vim.schedule(function()
-            local message = "The " .. key .. " key is disabled!"
-            if config.config.disabled_message then
-               message = config.config.disabled_message(key)
-            end
-            util.notify(message)
-         end)
+      if should_reset_notification then
+         handle_debounced_notification(key, "disabled")
       end
       return ""
    end
 
-   -- reset
+   -- Reset counter for resetting keys
    if config.config.resetting_keys[key] then
       key_count = 0
    end
 
+   -- Early exit: key is not restricted
    if config.config.restricted_keys[key] == nil then
       return get_return_key(key)
    end
 
-   -- restrict
+   -- Check if restriction should apply
    local should_reset_key_count = curr_time - last_time > config.config.max_time
-   local is_different_key = config.config.allow_different_key
-       and key ~= last_key
-   if
-       key_count < config.config.max_count
-       or should_reset_key_count
-       or is_different_key
-   then
+   local is_different_key = config.config.allow_different_key and key ~= last_key
+
+   if key_count < config.config.max_count or should_reset_key_count or is_different_key then
+      -- Key is allowed
       if should_reset_key_count or is_different_key then
          key_count = 1
          util.reset_notification()
@@ -112,22 +248,22 @@ local function handler(key)
          key_count = key_count + 1
       end
 
-      last_time = util.get_time()
+      last_time = curr_time
       return get_return_key(key)
    end
 
-   if config.config.notification then
-      vim.schedule(function()
-         local message = "You pressed the " .. key .. " key too soon!"
-         if config.config.message then
-            message = config.config.message(key, key_count)
-         end
-         util.notify(message)
-      end)
-   end
+   -- Key should be restricted - notify and potentially block
+   handle_debounced_notification(key, "restricted")
 
    if config.config.restriction_mode == "hint" then
       return get_return_key(key)
+   end
+   -- Block mode: trigger dynamic blocking for future keypresses
+   local modes_to_block = config.config.restricted_keys[key]
+   if modes_to_block then
+      vim.schedule(function()
+         block_key(key, type(modes_to_block) == "table" and modes_to_block or { modes_to_block })
+      end)
    end
    return ""
 end
@@ -147,10 +283,10 @@ end
 local M = {}
 M.is_plugin_enabled = false
 
--- Set up keymaps for a specific buffer
+-- Set up keymaps for a specific buffer - hybrid approach
 local function setup_buffer_keymaps(bufnr)
    if buffer_keymaps[bufnr] then
-      return -- Already set up for this buffer
+      return
    end
 
    buffer_keymaps[bufnr] = {}
@@ -159,27 +295,21 @@ local function setup_buffer_keymaps(bufnr)
       return
    end
 
-   local keys_groups = {
-      config.config.resetting_keys,
-      config.config.restricted_keys,
-      config.config.disabled_keys,
-   }
+   -- Only set permanent keymaps for disabled_keys (these should always be blocked)
+   -- restricted_keys will use dynamic blocking
+   for key, mode in pairs(config.config.disabled_keys) do
+      if mode then
+         local success, _ = pcall(vim.keymap.set, mode, key, function()
+            return handler(key)
+         end, {
+            buffer = bufnr,
+            noremap = true,
+            expr = true,
+            desc = "hardtime: " .. key .. " disabled",
+         })
 
-   for _, keys in ipairs(keys_groups) do
-      for key, mode in pairs(keys) do
-         if mode then
-            local success, _ = pcall(vim.keymap.set, mode, key, function()
-               return handler(key)
-            end, {
-               buffer = bufnr,
-               noremap = true,
-               expr = true,
-               desc = "hardtime: " .. key .. " restriction", -- Custom description instead of which_key_ignore
-            })
-
-            if success then
-               table.insert(buffer_keymaps[bufnr], { mode, key })
-            end
+         if success then
+            table.insert(buffer_keymaps[bufnr], { mode, key })
          end
       end
    end
@@ -191,6 +321,7 @@ local function cleanup_buffer_keymaps(bufnr)
       return
    end
 
+   -- Clean up permanent disabled key mappings
    for _, keymap_info in ipairs(buffer_keymaps[bufnr]) do
       local mode, key = keymap_info[1], keymap_info[2]
       pcall(vim.keymap.del, mode, key, { buffer = bufnr })
@@ -304,8 +435,15 @@ function M.disable()
       cleanup_buffer_keymaps(bufnr)
    end
 
-   -- Clear the tracking table
+   -- Clean up any dynamically blocked keys
+   for key, _ in pairs(blocked_keys) do
+      unblock_key(key)
+   end
+
+   -- Clear the tracking tables
    buffer_keymaps = {}
+   blocked_keys = {}
+   notification_debounce = {}
 end
 
 function M.toggle()
@@ -327,32 +465,31 @@ local function setup(user_config)
 
    local max_keys_size = util.get_max_keys_size()
 
+   -- Cache commonly used values
+   local hint_enabled = config.config.hint
+   local hints_table = config.config.hints
    vim.on_key(function(_, k)
+      -- Early exits for performance
+      if k == "" then return end
       local mode = vim.fn.mode()
-      if k == "" or mode == "c" or mode == "R" then
-         return
-      end
+      if mode == "c" or mode == "R" then return end
 
       if mode == "i" then
          reset_timer()
          return
       end
 
-      -- ignore key if it is triggering which-key.nvim
+      -- Skip mouse moves immediately
+      if k == vim.keycode("<MouseMove>") then return end
+
+      -- Check which-key state (only if available)
       local has_wk, wk = pcall(require, "which-key.state")
-      if has_wk and wk.state ~= nil then
-         return
-      end
+      if has_wk and wk.state ~= nil then return end
 
-      local key = vim.fn.keytrans(k)
-      if key == "<MouseMove>" then
-         return
-      end
+      -- Process key
+      local key = k == "<" and "<" or vim.fn.keytrans(k)
 
-      if k == "<" then
-         key = "<"
-      end
-
+      -- Update tracking variables
       last_keys = last_keys .. key
       last_key = key
 
@@ -360,15 +497,13 @@ local function setup(user_config)
          last_keys = last_keys:sub(-max_keys_size)
       end
 
-      if
-          not config.config.hint
-          or not M.is_plugin_enabled
-          or should_disable_hardtime()
-      then
+      -- Early exit if hints disabled or plugin disabled
+      if not hint_enabled or not M.is_plugin_enabled or should_disable_hardtime() then
          return
       end
 
-      for pattern, hint in pairs(config.config.hints) do
+      -- Process hints efficiently
+      for pattern, hint in pairs(hints_table) do
          if hint then
             local len = hint.length or #pattern
             local found = string.find(last_keys, pattern, -len)
@@ -376,7 +511,8 @@ local function setup(user_config)
                local keys = string.sub(last_keys, found, #last_keys)
                local text = hint.message(keys)
                if text ~= nil and text ~= "" then
-                  util.notify(text)
+                  util.notify(text, vim.log.levels.INFO)
+                  break -- Only show first matching hint
                end
             end
          end

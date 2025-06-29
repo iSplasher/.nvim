@@ -6,14 +6,39 @@ return {
     {
         "gbprod/yanky.nvim",
         opts = {
-            ring = { storage = "sqlite" },
+            ring = {
+                history_length = 100,
+                storage = "sqlite",
+                storage_path = vim.fn.stdpath("data") .. "/databases/yanky.db", -- Only for sqlite storage
+                sync_with_numbered_registers = true,
+                cancel_event = "update",
+                ignore_registers = { "_" },
+                update_register_on_cycle = false,
+                permanent_wrapper = nil,
+            },
             picker = {
                 select = {
                     action = nil, -- nil to use default put action
                 },
                 telescope = {
-                    mappings = nil, -- nil to use default mappings
+                    use_default_mappings = true, -- if default mappings should be used
+                    mappings = nil,              -- nil to use default mappings or no mappings (see `use_default_mappings`)
                 },
+            },
+            system_clipboard = {
+                sync_with_ring = true,
+                clipboard_register = nil,
+            },
+            highlight = {
+                on_put = true,
+                on_yank = true,
+                timer = 500,
+            },
+            preserve_cursor_position = {
+                enabled = true,
+            },
+            textobj = {
+                enabled = false,
             },
         },
         cmd = {
@@ -36,8 +61,8 @@ return {
                 { "P",     "<Plug>(YankyPutBefore)",                 mode = { "n", "x" },                                desc = "Put yanked text before cursor" },
                 { "gp",    "<Plug>(YankyGPutAfter)",                 mode = { "n", "x" },                                desc = "Put yanked text after selection" },
                 { "gP",    "<Plug>(YankyGPutBefore)",                mode = { "n", "x" },                                desc = "Put yanked text before selection" },
-                { "<c-p>", "<Plug>(YankyPreviousEntry)",             desc = "Select previous entry through yank history" },
-                { "<c-n>", "<Plug>(YankyNextEntry)",                 desc = "Select next entry through yank history" },
+                -- { "<c-p>", "<Plug>(YankyPreviousEntry)",             desc = "Select previous entry through yank history" },
+                -- { "<c-n>", "<Plug>(YankyNextEntry)",                 desc = "Select next entry through yank history" },
                 { "]p",    "<Plug>(YankyPutIndentAfterLinewise)",    desc = "Put indented after cursor (linewise)" },
                 { "[p",    "<Plug>(YankyPutIndentBeforeLinewise)",   desc = "Put indented before cursor (linewise)" },
                 { "]P",    "<Plug>(YankyPutIndentAfterLinewise)",    desc = "Put indented after cursor (linewise)" },
@@ -173,7 +198,7 @@ return {
     {
         'echasnovski/mini.move',
         version = '*',
-        event = 'BufEnter',
+        event = 'BufReadPost',
         config = function()
             require('mini.move').setup(
                 {
@@ -204,13 +229,13 @@ return {
             kmap('x', { '<C-S-j>', '<C-S-down' }, "<Cmd>lua MiniMove.move_selection('down')<CR>", 'Move selection down')
 
             kmap('n', { '<C-S-h>', '<C-S-left' }, "<Cmd>lua MiniMove.move_line('left')<CR>", 'Move line left',
-                { noremap = true })
+                { force = false })
             kmap('n', { '<C-S-l>', '<C-S-right' }, "<Cmd>lua MiniMove.move_line('right')<CR>", 'Move line right',
-                { noremap = true })
+                { force = false })
             kmap('n', { '<C-S-k>', '<C-S-up' }, "<Cmd>lua MiniMove.move_line('up')<CR>", 'Move line up',
-                { noremap = true })
+                { force = false })
             kmap('n', { '<C-S-j>', '<C-S-down' }, "<Cmd>lua MiniMove.move_line('down')<CR>", 'Move line down',
-                { noremap = true })
+                { force = false })
         end
     },
 
@@ -218,7 +243,7 @@ return {
     {
         'echasnovski/mini.ai',
         version = '*',
-        event = 'LSPAttach',
+        event = 'BufReadPost',
         opts = {
             custom_textobjects = {
                 -- Whole buffer
@@ -230,5 +255,118 @@ return {
                 end,
             }
         }
-    }
+    },
+
+    -- Surround text objects
+    {
+        'echasnovski/mini.surround',
+        version = '*',
+        event = 'BufReadPost',
+        opts = {
+            -- Add custom surroundings to be used on top of builtin ones. For more
+            -- information with examples, see `:h MiniSurround.config`.
+            custom_surroundings = nil,
+
+            -- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
+            highlight_duration = 500,
+
+            -- Module mappings. Use `''` (empty string) to disable one.
+            mappings = {
+                add = "sa",          -- Add surrounding in Normal and Visual modes
+                delete = "sd",       -- Delete surrounding
+                find = "sf",         -- Find surrounding (to the right)
+                find_left = "Sf",    -- Find surrounding (to the left)
+                highlight = "sv",    -- Highlight surrounding
+                replace = "sr",      -- Replace surrounding
+                update_n_lines = '', -- Update `n_lines`
+
+                suffix_last = ',',   -- Suffix to search with "prev" method
+                suffix_next = ';',   -- Suffix to search with "next" method
+            },
+
+            -- Number of lines within which surrounding is searched
+            n_lines = 20,
+
+            -- Whether to respect selection type:
+            -- - Place surroundings on separate lines in linewise mode.
+            -- - Place surroundings on each line in blockwise mode.
+            respect_selection_type = false,
+
+            -- How to search for surrounding (first inside current line, then inside
+            -- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
+            -- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more details,
+            -- see `:h MiniSurround.config`.
+            search_method = 'cover',
+
+            -- Whether to disable showing non-error feedback
+            -- This also affects (purely informational) helper messages shown after
+            -- idle time if user input is required.
+            silent = false,
+        },
+        config = function(_, opts)
+            require('mini.surround').setup(opts)
+
+            -- Backwards
+            kmap({ 'n' }, "Sa", [[:lua MiniSurround.add()<CR>]], "Add surrounding (backwards)", {})
+            kmap({ 'v' }, "Sa", [[:lua MiniSurround.add('visual')<CR>]], "Add surrounding (backwards)", {})
+            kmap({ 'n', 'v' }, "Sr", [[:lua MiniSurround.replace()<CR>]], "Replace surrounding (backwards)",
+                {})
+            kmap({ 'n', 'v' }, "Sd", [[:lua MiniSurround.delete()<CR>]], "Delete surrounding (backwards)",
+                {})
+            kmap({ 'n', 'v' }, "Sv", [[:lua MiniSurround.highlight()<CR>]], "Highlight surrounding (backwards)",
+                {})
+
+            -- Disable default 's/S' behavior and map to surround operations
+            kmap({ 'n' }, "s", "<nop>", "Surround operations", {})
+            kmap({ 'n' }, "S", "<nop>", "Surround operations", {})
+
+            -- Operator pending mapping for 's' after operators
+            -- TODO: fix this
+            -- kmap({ 'o' }, "s", function()
+            --     -- Check if we're in operator pending mode and map to appropriate surround operation
+            --     local mode = vim.api.nvim_get_mode()
+            --     if mode.mode == 'no' then
+            --         local operator = vim.v.operator
+
+
+            --         local surround_cmd = nil
+            --         local keys = ""
+            --         if operator == 'y' then
+            --             local m = vim.v.insertmode == 'v' and "visual" or "normal"
+            --             surround_cmd = [[:lua MiniSurround.add(']] .. m .. [[')<CR>]]
+            --             keys = "sa"
+            --         elseif operator == 'd' then
+            --             surround_cmd = [[:lua MiniSurround.delete()<CR>]]
+            --             keys = "sd"
+            --         elseif operator == 'c' then
+            --             surround_cmd = [[:lua MiniSurround.replace()<CR>]]
+            --             keys = "sc"
+            --         elseif operator == 'r' then
+            --             surround_cmd = [[:lua MiniSurround.replace()<CR>]]
+            --             keys = "sr"
+            --         end
+
+            --         if utility.is_which_key_enabled() then
+            --             local wk = require("which-key")
+            --             -- show which-key menu for surround operations
+            --             wk.show({ keys = keys, mode = vim.v.insertmode == 'v' and "v" or "n", expand = true })
+            --         end
+
+            --         if surround_cmd then
+            --             return surround_cmd
+            --         end
+            --     end
+            --     return "<nop>"
+            -- end, "Surround operations in operator mode", {})
+
+            -- Aliases
+            kmap({ 'v' }, "s", "sv", "Select surrounding", {})
+            kmap({ 'n', 'v', 'o' }, "ds", "sd", "Delete surrounding", {})
+            kmap({ 'n', 'v', 'o' }, "cs", "sr", "Replace surrounding", {})
+
+            -- Yank
+            -- TODO: implement this
+            -- kmap({ 'n', 'v', 'o' }, "ys", "", "Yank surrounding", {})
+        end,
+    },
 }

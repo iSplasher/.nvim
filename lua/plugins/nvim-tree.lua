@@ -56,14 +56,14 @@ return {
             local function on_attach(bufnr)
                 local api = require('nvim-tree.api')
 
-                local function opts(desc, noremap)
-                    if noremap == nil then
-                        noremap = true
+                local function opts(desc, force)
+                    if force == nil then
+                        force = true
                     end
                     return {
                         desc = 'nvim-tree: ' .. desc,
                         buffer = bufnr,
-                        noremap = noremap,
+                        force = force,
                         silent = true,
                         nowait = true
                     }

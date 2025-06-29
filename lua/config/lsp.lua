@@ -313,7 +313,7 @@ M.lspconfig_config = function(_, opts)
 
             
             local nmap = function(keys, func, desc)
-                utility.kmap('n', keys, func, { buffer = opts.buffer, remap = false, desc = desc })
+                utility.kmap('n', keys, func, { buffer = opts.buffer, force = false, desc = desc })
             end
 
             nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -354,7 +354,10 @@ M.lspconfig_config = function(_, opts)
 
                 local cfg = opts.servers[server_name] or {}
 
-                cfg.capabilities = require('blink.cmp').get_lsp_capabilities(cfg.capabilities)
+                local success, capabilities = pcall(require, 'blink.cmp').get_lsp_capabilities(cfg.capabilities)
+                if success then
+                    cfg.capabilities = capabilities
+                end
                 require('lspconfig')[server_name].setup(cfg)
             end,
         }

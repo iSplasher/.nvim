@@ -1,5 +1,5 @@
 " .vimrc - Auto-generated from current Neovim configuration
-" Generated on: 2025-06-23 16:00:08
+" Generated on: 2025-06-29 01:59:50
 " Exported from Neovim session using gamma.vimrc configuration
 
 " ============================================================================
@@ -31,36 +31,36 @@ let g:mapleader = " "
 " VIM OPTIONS (from current session)
 " ============================================================================
 
-set list
-set smarttab
-set number
-set breakindent
-set ignorecase
 set smartindent
 set incsearch
-set completeopt=menuone,noselect
-set listchars=extends:⟩,eol:↲,precedes:⟨,trail:·,nbsp:␣,tab:» 
-set nowrap
-set encoding=utf-8
-set smartcase
-set relativenumber
-set softtabstop=4
-set timeoutlen=300
-set expandtab
-set wrapmargin=2
-set showbreak=↪ 
-set tabstop=4
-set autoread
-set timeout
-set scrolloff=8
-set signcolumn=yes
-set undofile
 set updatetime=50
-set clipboard=unnamedplus
-set hlsearch
-set shiftwidth=4
-set termguicolors
+set showbreak=↪ 
+set wrapmargin=2
 set autoindent
+set smarttab
+set undofile
+set number
+set termguicolors
+set timeout
+set timeoutlen=500
+set list
+set relativenumber
+set signcolumn=yes
+set completeopt=menuone,noselect
+set clipboard=unnamedplus
+set listchars=trail:·,tab:» ,extends:⟩,nbsp:␣,eol:↲,precedes:⟨
+set tabstop=4
+set expandtab
+set nowrap
+set shiftwidth=4
+set smartcase
+set ignorecase
+set autoread
+set encoding=utf-8
+set scrolloff=8
+set hlsearch
+set breakindent
+set softtabstop=4
 
 " ============================================================================
 " MIDDLE CONFIGURATION
@@ -72,62 +72,120 @@ set ffs=unix,dos,mac
 " KEYMAPS (from remap files)
 " ============================================================================
 
-" Init (lua/gamma/remap/init.lua)
+" Lua\gamma\remap\init (lua\gamma\remap\init.lua)
 " Disable quit via Q
-nmap Q <nop>
+nnoremap Q <nop>
 " Redo
-nmap U <C-r>
+nnoremap U <C-r>
 
-" Movement (lua/gamma/remap/movement.lua)
-nmap [q <nop>
-nmap ]q <nop>
+" Lua\gamma\remap\leader\file (lua\gamma\remap\leader\file.lua)
+nnoremap  !q <cmd>echo "Custom keymap from lua\gamma\remap\leader\file.lua:12"<CR>
+nnoremap  q! <cmd>echo "Custom keymap from lua\gamma\remap\leader\file.lua:12"<CR>
+
+" Lua\gamma\remap\movement (lua\gamma\remap\movement.lua)
 " Next search result
-nmap n nzzzv
+nnoremap n nzzzv
 " Previous search result
-nmap N Nzzzv
+nnoremap N Nzzzv
 " Half page down
-nmap <C-d> <C-d>zz
+nnoremap <silent> <nowait> <C-d> <C-d>zz
 " Half page up
-nmap <C-u> <C-u>zz
+nnoremap <silent> <nowait> <C-u> <C-u>zz
 " Move cursor left
-inoremap <A-h> <Left>
+inoremap <silent> <A-h> <Left>
 " Move cursor down
-inoremap <A-j> <Down>
+inoremap <silent> <A-j> <Down>
 " Move cursor up
-inoremap <A-k> <Up>
+inoremap <silent> <A-k> <Up>
 " Move cursor right
-inoremap <A-l> <Right>
+inoremap <silent> <A-l> <Right>
 " Move to beginning of word
-imap <silent> <A-b> <C-o>b
+inoremap <silent> <A-b> <C-o>b
 " Move to next word
-imap <silent> <A-w> <C-o>w
+inoremap <silent> <A-w> <C-o>w
 " Move to end of word
-imap <silent> <A-e> <C-o>e
+inoremap <silent> <A-e> <C-o>e
 " Move to beginning of line
-nmap <silent> H ^
+nnoremap <silent> H ^
 " Move to beginning of line
-vmap <silent> H ^
+vnoremap <silent> H ^
 " Move to end of line
-nmap <silent> L $
+nnoremap <silent> L $
 " Move to end of line
-vmap <silent> L $
+vnoremap <silent> L $
 " Next quickfix item
-nmap <silent> ]q :cnext<CR>
+nnoremap <silent> ]q :cnext<CR>
 " Previous quickfix item
-nmap <silent> [q :cprev<CR>
+nnoremap <silent> [q :cprev<CR>
 
-" Text (lua/gamma/remap/text.lua)
-nmap Y y$
+" Lua\gamma\remap\text (lua\gamma\remap\text.lua)
 " Join lines (keep cursor position)
-nmap J mzJ`z
+nnoremap J mzJ`z
 " Paste without overwriting register
-xmap p "_dP
+xnoremap p "_dP
 " Yank line to system clipboard
-nmap Y mc"+Y`c
-" Cut current line
-nmap X dd
+nnoremap <silent> Y mc"+Y`c
+" Delete to void register
+nnoremap d "_d
+" Delete to void register
+vnoremap d "_d
+" Yank character to numbered register then delete
+nnoremap x yl"_dl
+" Yank line to numbered register then delete
+nnoremap X yy"_dd
+" Copy to system clipboard
+nnoremap <silent> <C-c> "+y
+" Copy to system clipboard
+vnoremap <silent> <C-c> "+y
 " Paste from system clipboard in command mode
-cmap <C-v> <C-r>+
+cnoremap <silent> <C-v> <C-r>+
+
+" ============================================================================
+" KEYMAPS (from vimrc config)
+" ============================================================================
+
+" Close current window/buffer
+nnoremap <C-q> :close<CR>
+" Close current window/buffer
+inoremap <C-q> :close<CR>
+" Close current window/buffer
+vnoremap <C-q> :close<CR>
+" List buffers
+nnoremap <leader>bb :buffers<CR>
+" Delete buffer
+nnoremap <leader>bd :bdelete<CR>
+" Next buffer
+nnoremap <leader>bn :bnext<CR>
+" Previous buffer
+nnoremap <leader>bp :bprevious<CR>
+" Wipeout buffer
+nnoremap <leader>b! :bwipeout<CR>
+" Search buffer lines
+nnoremap <leader>b/ :BLines<CR>
+" Toggle relative numbers
+nnoremap <leader>tr :set relativenumber!<CR>
+" Toggle spell check
+nnoremap <leader>ts :set spell!<CR>
+" Toggle line wrap
+nnoremap <leader>tw :set wrap!<CR>
+" Quick write
+nnoremap <leader>qw :w<CR>
+" Quick quit
+nnoremap <leader>qq :q<CR>
+" Quit all
+nnoremap <leader>qa :qa<CR>
+" Scroll down and center
+nnoremap <C-d> <C-d>zz
+" Scroll up and center
+nnoremap <C-u> <C-u>zz
+" Next search result centered
+nnoremap n nzzzv
+" Previous search result centered
+nnoremap N Nzzzv
+" Move selection down
+vnoremap J :m '>+1<CR>gv=gv
+" Move selection up
+vnoremap K :m '<-2<CR>gv=gv
 
 " ============================================================================
 " PLUGIN MANAGEMENT (vim-plug)
@@ -145,7 +203,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-surround'
+Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-sleuth'
 Plug 'justinmk/vim-sneak'
 Plug 'unblevable/quick-scope'
@@ -184,16 +242,39 @@ nmap gc <Plug>Commentary
 xmap gc <Plug>Commentary
 nmap gcu <Plug>Commentary<Plug>Commentary
 
+" machakann/vim-sandwich configuration
+" Add aliases to match mini.surround config
+" Standard aliases
+nmap ds <Plug>(sandwich-delete)
+nmap cs <Plug>(sandwich-replace)
+nmap ys <Plug>(sandwich-add)
+xmap ys <Plug>(sandwich-add)
+" Backwards aliases (using , suffix for previous)
+nmap Sa <Plug>(sandwich-add),
+nmap Sr <Plug>(sandwich-replace),
+nmap Sd <Plug>(sandwich-delete),
+nmap Sf <Plug>(sandwich-query-n),
+xmap Sa <Plug>(sandwich-add),
+xmap Sr <Plug>(sandwich-replace),
+xmap Sd <Plug>(sandwich-delete),
+
 " justinmk/vim-sneak configuration
-" Match leap.nvim functionality
+" Match leap.nvim functionality (updated to gs/gS)
 let g:sneak#label = 1
 let g:sneak#use_ic_scs = 1
-map s <Plug>Sneak_s
-map S <Plug>Sneak_S
-xmap s <Plug>Sneak_s
-xmap S <Plug>Sneak_S
-omap s <Plug>Sneak_s
-omap S <Plug>Sneak_S
+map gs <Plug>Sneak_s
+map gS <Plug>Sneak_S
+xmap gs <Plug>Sneak_s
+xmap gS <Plug>Sneak_S
+omap gs <Plug>Sneak_s
+omap gS <Plug>Sneak_S
+" Aliases for leap motions
+map sg <Plug>Sneak_s
+map Sg <Plug>Sneak_S
+xmap sg <Plug>Sneak_s
+xmap Sg <Plug>Sneak_S
+omap sg <Plug>Sneak_s
+omap Sg <Plug>Sneak_S
 
 " unblevable/quick-scope configuration
 " Quick-scope configuration
@@ -224,27 +305,27 @@ let g:targets_aiAI = 1
 " These mappings add directional variants similar to mini.ai
 
 " Around/Inside Next - use targets.vim's forward seeking
-omap an a)
-omap aN a}
-omap a<lt>n a>
-omap a"n a"
-omap a'n a'
-xmap an a)
-xmap aN a}
-xmap a<lt>n a>
-xmap a"n a"
-xmap a'n a'
+onoremap an a)
+onoremap aN a}
+onoremap a<lt>n a>
+onoremap a"n a"
+onoremap a'n a'
+xnoremap an a)
+xnoremap aN a}
+xnoremap a<lt>n a>
+xnoremap a"n a"
+xnoremap a'n a'
 
-omap In i)
-omap IN i}
-omap i<lt>n i>
-omap i"n i"
-omap i'n i'
-xmap In i)
-xmap IN i}
-xmap i<lt>n i>
-xmap i"n i"
-xmap i'n i'
+onoremap In i)
+onoremap IN i}
+onoremap i<lt>n i>
+onoremap i"n i"
+onoremap i'n i'
+xnoremap In i)
+xnoremap IN i}
+xnoremap i<lt>n i>
+xnoremap i"n i"
+xnoremap i'n i'
 
 " Goto text object edges (simplified approach)
 nnoremap g[ [{

@@ -61,7 +61,7 @@ vim.opt.completeopt = 'menuone,noselect'
 vim.opt.wrap = false
 vim.opt.wrapmargin = 2
 
--- sync with system clipboard
+-- Don't sync with system clipboard by default
 vim.opt.clipboard = "unnamedplus"
 
 -- search & highlighting
@@ -107,3 +107,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
+
+-- This option and 'timeoutlen' determine how long Nvim waits for a mapped sequence to complete.
+vim.opt.timeout = true
+vim.opt.timeoutlen = 500 -- 500ms

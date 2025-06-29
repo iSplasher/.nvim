@@ -47,7 +47,7 @@ return {
         nearest_only = true, -- show nearest matches only
       }
 
-      local kopts = { remap = true, silent = true }
+      local kopts = { force = true, silent = true }
 
       kmap('n', 'n',
         [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],

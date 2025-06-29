@@ -22,7 +22,7 @@ require('compat')
 ---@field plugs gamma.context.PluginOpts[] List of plugins to be included in the vimrc.
 ---@field exports string[] List of options to export.
 ---                        Will look for these options in the gamma.set module, otherwise in the current Neovim session.
----@field mappings gamma.context.KeymapOpts[] Keymap patterns to add to the vimrc file.
+---@field mappings gamma.context.KeymapOpts[] General keymap patterns to add to the vimrc file.
 ---@field substitutions table<string, string> Function to vimscript substitutions for function-based keymaps.
 ---@field exclude_mappings table<string, true> Keys to exclude from vimrc export (format: "mode:keys")
 ---@type gamma.context.Vimrc
@@ -64,6 +64,10 @@ local M = {
     },
 
     mappings = {
+        -- Remap substitutions
+        { 'nnoremap <C-q> :close<CR>',                    'Close current window/buffer' },
+        { 'inoremap <C-q> :close<CR>',                    'Close current window/buffer' },
+        { 'vnoremap <C-q> :close<CR>',                    'Close current window/buffer' },
         -- Buffer operations
         { 'nnoremap <leader>bb :buffers<CR>', 'List buffers' },
         { 'nnoremap <leader>bd :bdelete<CR>', 'Delete buffer' },
@@ -190,20 +194,46 @@ plugins {
             }
         end
     },
-    'tpope/vim-surround',
+    { 'machakann/vim-sandwich',
+        config = function()
+            return {
+                '" Add aliases to match mini.surround config',
+                '" Standard aliases',
+                'nmap ds <Plug>(sandwich-delete)',
+                'nmap cs <Plug>(sandwich-replace)',
+                'nmap ys <Plug>(sandwich-add)',
+                'xmap ys <Plug>(sandwich-add)',
+                '" Backwards aliases (using , suffix for previous)',
+                'nmap Sa <Plug>(sandwich-add),',
+                'nmap Sr <Plug>(sandwich-replace),',
+                'nmap Sd <Plug>(sandwich-delete),',
+                'nmap Sf <Plug>(sandwich-query-n),',
+                'xmap Sa <Plug>(sandwich-add),',
+                'xmap Sr <Plug>(sandwich-replace),',
+                'xmap Sd <Plug>(sandwich-delete),'
+            }
+        end
+    },
     'tpope/vim-sleuth',
     { 'justinmk/vim-sneak',
         config = function()
             return {
-                '" Match leap.nvim functionality',
+                '" Match leap.nvim functionality (updated to gs/gS)',
                 'let g:sneak#label = 1',
                 'let g:sneak#use_ic_scs = 1',
-                'map s <Plug>Sneak_s',
-                'map S <Plug>Sneak_S',
-                'xmap s <Plug>Sneak_s',
-                'xmap S <Plug>Sneak_S',
-                'omap s <Plug>Sneak_s',
-                'omap S <Plug>Sneak_S'
+                'map gs <Plug>Sneak_s',
+                'map gS <Plug>Sneak_S',
+                'xmap gs <Plug>Sneak_s',
+                'xmap gS <Plug>Sneak_S',
+                'omap gs <Plug>Sneak_s',
+                'omap gS <Plug>Sneak_S',
+                '" Aliases for leap motions',
+                'map sg <Plug>Sneak_s',
+                'map Sg <Plug>Sneak_S',
+                'xmap sg <Plug>Sneak_s',
+                'xmap Sg <Plug>Sneak_S',
+                'omap sg <Plug>Sneak_s',
+                'omap Sg <Plug>Sneak_S'
             }
         end
     },
@@ -242,27 +272,27 @@ plugins {
                 '" These mappings add directional variants similar to mini.ai',
                 '',
                 '" Around/Inside Next - use targets.vim\'s forward seeking',
-                'omap an a)',
-                'omap aN a}',
-                'omap a<lt>n a>',
-                'omap a"n a"',
-                'omap a\'n a\'',
-                'xmap an a)',
-                'xmap aN a}',
-                'xmap a<lt>n a>',
-                'xmap a"n a"',
-                'xmap a\'n a\'',
+                'onoremap an a)',
+                'onoremap aN a}',
+                'onoremap a<lt>n a>',
+                'onoremap a"n a"',
+                'onoremap a\'n a\'',
+                'xnoremap an a)',
+                'xnoremap aN a}',
+                'xnoremap a<lt>n a>',
+                'xnoremap a"n a"',
+                'xnoremap a\'n a\'',
                 '',
-                'omap In i)',
-                'omap IN i}',
-                'omap i<lt>n i>',
-                'omap i"n i"',
-                'omap i\'n i\'',
-                'xmap In i)',
-                'xmap IN i}',
-                'xmap i<lt>n i>',
-                'xmap i"n i"',
-                'xmap i\'n i\'',
+                'onoremap In i)',
+                'onoremap IN i}',
+                'onoremap i<lt>n i>',
+                'onoremap i"n i"',
+                'onoremap i\'n i\'',
+                'xnoremap In i)',
+                'xnoremap IN i}',
+                'xnoremap i<lt>n i>',
+                'xnoremap i"n i"',
+                'xnoremap i\'n i\'',
                 '',
                 '" Goto text object edges (simplified approach)',
                 'nnoremap g[ [{',

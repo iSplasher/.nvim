@@ -29,9 +29,9 @@ return {
 
       -- Quick navigation between marked buffers
       kmap({ "n", 'v', 'i', 'x', }, "<C-S-P>", function() harpoon:list():prev() end, "Previous Harpoon mark",
-        { remap = true })
+        { force = true })
       kmap({ "n", 'v', 'i', 'x', }, "<C-S-N>", function() harpoon:list():next() end, "Next Harpoon mark",
-        { remap = true })
+        { force = true })
 
       -- Basic telescope configuration
       local conf = require("telescope.config").values
